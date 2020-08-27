@@ -1,9 +1,13 @@
 import torch
 from torch.autograd import Function
 from torch.nn.modules.utils import _pair
-
 from _ext import deform_conv
 
+# from ctypes import cdll
+# so_file = '/root/TDAN-VSR-CVPR-2020/_ext/deform_conv/_deform_conv.so'
+# print('before calling cdll')
+# deform_conv = cdll.LoadLibrary(so_file)
+# print('so file was called')
 
 def conv_offset2d(input,
                   offset,

@@ -42,6 +42,7 @@ def rgb2ycbcrT(rgb):
 
 
 def chop_forward(x, model, scale, shave=10, min_size=8000, n_GPUs=1):
+    print('call chop_forward')
     n_GPUs = min(n_GPUs, 4)
     b, num, c, h, w = x.size()
     h_half, w_half = h // 2, w // 2
@@ -180,23 +181,27 @@ class Solver(object):
         self.fine_tune = kwargs.pop('fine_tune', False)
         self.verbose = kwargs.pop('verbose', False)
         self.print_every = kwargs.pop('print_every', 10)
-
         self._reset()
 
     def _reset(self):
         """ Initialize some book-keeping variable, dont call it manually"""
         self.use_gpu = torch.cuda.is_available()
-        if self.use_gpu:
+        
+        if self.use_gpu:            
             self.model = self.model.cuda()
+        
         self.hist_train_psnr = []
         self.hist_val_psnr = []
         self.hist_loss = []
 
     def _epoch_step(self, dataset, epoch):
         """ Perform 1 training 'epoch' on the 'dataset'"""
+        
+        print('call _epoch_step in solver')
         dataloader = DataLoader(dataset, batch_size=self.batch_size,
-                                shuffle=True, num_workers=64)
-
+                                shuffle=True, num_workers=0)
+        
+        # num_batchs = 1
         num_batchs = len(dataset) // self.batch_size
 
         # observe the training progress
@@ -204,35 +209,50 @@ class Solver(object):
             bar = progressbar.ProgressBar(max_value=num_batchs)
 
         running_loss = 0
+        
+
         for i, sample in enumerate(dataloader):
+            print('start enumerate(dataloader)')
+        
             input_batch, label_batch = sample['lr'], sample['hr']
+            
             # Wrap with torch Variable
             input_batch, label_batch = self._wrap_variable(input_batch,
                                                            label_batch,
                                                            self.use_gpu)
+
             # zero the grad
             self.optimizer.zero_grad()
 
             # Forward
-
             if self.model_name in ['TDAN']:
+                print('start model TDAN')
+                print('the input_batch type is : ', type(input_batch))
                 output_batch, lrs = self.model(input_batch)
+                print('forward - 1')
                 num = input_batch.size(1)
+                print('forward - 2')
                 center = num // 2
+                print('forward - 3')
                 x = input_batch[:, center, :, :, :].unsqueeze(1).repeat(1, num, 1, 1, 1)
+                print('forward - 4')
                 loss = self.loss_fn(output_batch, label_batch) + 0.25 * self.loss_fn(lrs, x)
+                print('forward - 5')
             else:
                 output_batch = self.model(input_batch)
                 loss = self.loss_fn(output_batch, label_batch)
 
+            print('finished forward')
             running_loss += loss.data[0]
 
             # Backward + update
+            print('start backward')
             loss.backward()
             #nn.utils.clip_grad_norm(self.model.parameters(), 0.4)
             self.optimizer.step()
 
             if self.verbose:
+                print('in the bar update')
                 bar.update(i, force=True)
 
         average_loss = running_loss / num_batchs
@@ -271,7 +291,7 @@ class Solver(object):
         if 'is_test' is True, psnr and output of each image is also
         return for statistics and generate output image at test phase
         """
-
+        print('call _check_PSNR')
         # process one image per iter for test phase
         if is_test:
             batch_size = 1
@@ -279,7 +299,7 @@ class Solver(object):
             batch_size = 1  # self.batch_size
 
         dataloader = DataLoader(dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=1)
+                                shuffle=False, num_workers=0)
 
         avr_psnr = 0
         avr_ssim = 0
@@ -365,6 +385,7 @@ class Solver(object):
         The best model is save under checkpoint which is used
         for test phase or finetuning
         """
+        print('solver train start')
 
         # check fine_tuning option
         model_path = os.path.join(self.check_point, 'model.pt')
@@ -387,7 +408,7 @@ class Solver(object):
             self.model.load_state_dict(model_dict)
             '''
             self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
-
+        
         # capture best model
         best_val_psnr = -1
         best_psnr = -1
@@ -455,7 +476,7 @@ class Solver(object):
             batch_size = 1  # self.batch_size
 
         dataloader = DataLoader(dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=1)
+                                shuffle=False, num_workers=0)
 
         # book keeping variables for test phase
         psnrs = []  # psnr for each image

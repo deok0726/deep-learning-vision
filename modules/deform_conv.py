@@ -2,12 +2,12 @@ import math
 
 import torch
 import torch.nn as nn
-from torch.nn.modules.module import Module
+# from torch.nn.modules.module import Module
 from torch.nn.modules.utils import _pair
 from functions import conv_offset2d
 
 
-class ConvOffset2d(Module):
+class ConvOffset2d(nn.Module):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -29,7 +29,7 @@ class ConvOffset2d(Module):
             torch.Tensor(out_channels, in_channels, *self.kernel_size))
 
         self.reset_parameters()
-
+        
     def reset_parameters(self):
         n = self.in_channels
         for k in self.kernel_size:

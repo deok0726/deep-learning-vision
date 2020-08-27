@@ -21,21 +21,42 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 class VSR_Dataset(object):
     def __init__(self, dir, trans = None):
+        
+        self.lis = sorted(glob.glob(dir + '/*'))
+        # self.lis = sorted(os.listdir(dir))
+        
+        # for dir_fol in vid_dir:
+        #     self.dir_HR.append(os.path.join(dir_fol, "truth"))
+        #     self.dir_LR.append(os.path.join(dir_fol, "blur4"))
 
-        self.dir_HR = os.path.join(dir, "HR")
-        self.dir_LR = os.path.join(dir, "LR_bicubic")
-        self.lis = sorted(os.listdir(self.dir_HR))
+        # for dir_idx in dir:
+        #     self.dir_HR.append(os.path.join(dir_idx, "truth"))
+        #     self.dir_LR.append(os.path.join(dir_idx, "blur4"))
+
+        # for x in range(len(self.dir_HR)):
+        #     self.lis.append(sorted(os.listdir(self.dir_HR[x])))
+
+        # 원본 코드
+        # self.dir_HR = os.path.join(dir, "truth")
+        # self.dir_LR = os.path.join(dir, "blur4")
+        # self.lis = sorted(os.listdir(self.dir_HR))
+        
 
         self.transform = trans
 
     def __len__(self):
         return len(self.lis)
-
+    
     def __getitem__(self, idx):
-        HR = os.path.join(self.dir_HR, self.lis[idx])
-        LR = os.path.join(self.dir_LR, self.lis[idx])
-        scale = 4
+        print('SR_datasets __getitem__ is called')
+
+        HR = os.path.join(self.lis[idx], "truth")
+        LR = os.path.join(self.lis[idx], "blur4")
+        scale = 4        
         ims = sorted(os.listdir(HR))
+        print('the directory of HR is : ', HR)
+        print('length of image is : ', len(ims))
+
         # get frame size
         image = io.imread(os.path.join(HR, ims[0]))
         row, col, ch = image.shape
@@ -54,7 +75,37 @@ class VSR_Dataset(object):
 
         if self.transform:
             sample = self.transform(sample)
-        return sample
+        
+        print('SR_datasets __getitem__ is finished')
+
+        return sample    
+
+    # def __getitem__(self, idx):
+    #     HR = os.path.join(self.dir_HR, self.lis[idx])
+    #     LR = os.path.join(self.dir_LR, self.lis[idx])
+    #     scale = 4
+    #     # ims = sorted(os.listdir(HR))
+    #     ims = sorted(os.listdir(self.dir_HR))
+        
+    #     # get frame size
+    #     image = io.imread(os.path.join(self.dir_HR, ims[0]))
+    #     row, col, ch = image.shape
+    #     frames_lr = np.zeros((5, int(row / scale), int(col / scale), ch))
+    #     if len(ims) > 5:
+    #         center = random.randint(2, len(ims)-3)
+    #     else:
+    #         center = len(ims) // 2
+    #     frames_hr = io.imread(os.path.join(HR, ims[center]))
+
+    #     for j in range(center - 2, center + 3):  # only use 5 frames
+    #         i = j - center + 2
+    #         frames_lr[i, :, :, :] = io.imread(os.path.join(LR, ims[j]))
+
+    #     sample = {'lr': frames_lr, 'hr': frames_hr, 'im_name': ims[center]}
+
+    #     if self.transform:
+    #         sample = self.transform(sample)
+    #     return sample
 
 class DataAug(object):
     def __call__(self, sample):

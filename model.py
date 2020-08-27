@@ -147,35 +147,37 @@ class TDAN_F(nn.Module):
 
 class TDAN_VSR(nn.Module):
     def __init__(self):
+        # print('TDAN_VSR __init__ start')
         super(TDAN_VSR, self).__init__()
         self.name = 'TDAN'
         self.conv_first = nn.Conv2d(3, 64, 3, padding=1, bias=True)
-
         self.residual_layer = self.make_layer(Res_Block, 5)
         self.relu = nn.ReLU(inplace=True)
         # deformable
         self.cr = nn.Conv2d(128, 64, 3, padding=1, bias=True)
         self.off2d_1 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
-        self.dconv_1 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
+        self.deconv_1 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d_2 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
         self.deconv_2 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d_3 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
         self.deconv_3 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
-        self.dconv = ConvOffset2d(64, 64, (3, 3), padding=(1, 1), num_deformable_groups=8)
+        self.deconv = ConvOffset2d(64, 64, (3, 3), padding=(1, 1), num_deformable_groups=8)
         self.recon_lr = nn.Conv2d(64, 3, 3, padding=1, bias=True)
 
         fea_ex = [nn.Conv2d(5 * 3, 64, 3, padding= 1, bias=True),
                        nn.ReLU()]
 
         self.fea_ex = nn.Sequential(*fea_ex)
-        self.recon_layer = self.make_layer(Res_Block, 10)
+
+        # self.recon_layer = self.make_layer(Res_Block, 10)
+        self.recon_layer = self.make_layer(Res_Block, 1)
+        
         upscaling = [
             Upsampler(default_conv, 4, 64, act=False),
             nn.Conv2d(64, 3, 3, padding=1, bias=False)]
 
         self.up = nn.Sequential(*upscaling)
-
         # xavier initialization
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -183,12 +185,14 @@ class TDAN_VSR(nn.Module):
                 m.weight.data.normal_(0, math.sqrt(2. / n))
 
     def align(self, x, x_center):
+        print('call model align')
         y = []
         batch_size, num, ch, w, h = x.size()
         center = num // 2
         ref = x[:, center, :, :, :].clone()
         for i in range(num):
             if i == center:
+                print('hererererer')
                 y.append(x_center.unsqueeze(1))
                 continue
             supp = x[:, i, :, :, :]
@@ -196,16 +200,19 @@ class TDAN_VSR(nn.Module):
             fea = self.cr(fea)
             # feature trans
             offset1 = self.off2d_1(fea)
-            fea = (self.dconv_1(fea, offset1))
+            print('before deconv_1')
+            fea = (self.deconv_1(fea, offset1))
+            print('after deconv_1')
             offset2 = self.off2d_2(fea)
             fea = (self.deconv_2(fea, offset2))
             offset3 = self.off2d_3(fea)
             fea = (self.deconv_3(supp, offset3))
             offset4 = self.off2d(fea)
-            aligned_fea = (self.dconv(fea, offset4))
+            aligned_fea = (self.deconv(fea, offset4))
             im = self.recon_lr(aligned_fea).unsqueeze(1)
             y.append(im)
         y = torch.cat(y, dim=1)
+        print('finish model align')
         return y
 
     def make_layer(self, block, num_of_layer):
@@ -214,19 +221,24 @@ class TDAN_VSR(nn.Module):
             layers.append(block())
         return nn.Sequential(*layers)
 
+   
     def forward(self, x):
-
-        batch_size, num, ch, w, h = x.size()  # 5 video frames
+        print('call model forward')
+        batch_size, num, ch, w, h = x.size()  # 5 video frames, x is input_batch
         # center frame interpolation
         center = num // 2
         # extract features
         y = x.view(-1, ch, w, h)
+        print('model forward - 1')
         # y = y.unsqueeze(1)
-        out = self.relu(self.conv_first(y))
+        out = self.relu(self.conv_first(y)) # This is where the out of memory occurs
+        print('model forward - 2')
         x_center = x[:, center, :, :, :]
+        print('model forward - 3')
         out = self.residual_layer(out)
+        print('model forward - 4')
         out = out.view(batch_size, num, -1, w, h)
-
+        print('start align function in forward')
         # align supporting frames
         lrs = self.align(out, x_center) # motion alignments
         y = lrs.view(batch_size, -1, w, h)
@@ -235,6 +247,7 @@ class TDAN_VSR(nn.Module):
 
         out = self.recon_layer(fea)
         out = self.up(out)
+        print('finish model forward')
         return out, lrs
 
 # vsr network
@@ -265,13 +278,13 @@ class align_net_w_feat(nn.Module):
         # deformable
         self.cr = nn.Conv2d(128, 64, 3, padding=1, bias=True)
         self.off2d_1 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
-        self.dconv_1 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
+        self.deconv_1 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d_2 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
         self.deconv_2 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d_3 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
         self.deconv_3 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
-        self.dconv = ConvOffset2d(64, 64, (3, 3), padding=(1, 1), num_deformable_groups=8)
+        self.deconv = ConvOffset2d(64, 64, (3, 3), padding=(1, 1), num_deformable_groups=8)
         self.recon_lr = nn.Conv2d(64, 3, 3, padding=1, bias=True)
 
         # xavier initialization
@@ -303,13 +316,13 @@ class align_net_w_feat(nn.Module):
 
             # feature trans
             offset1 = self.off2d_1(fea)
-            fea = self.dconv_1(fea, offset1)
+            fea = self.deconv_1(fea, offset1)
             offset2 = self.off2d_2(fea)
             fea = self.deconv_2(fea, offset2)
             offset3 = self.off2d_3(fea)
             fea = self.deconv_3(supp, offset3)
             offset4 = self.off2d(fea)
-            aligned_fea = self.dconv(fea, offset4)
+            aligned_fea = self.deconv(fea, offset4)
             im = self.recon_lr(aligned_fea).unsqueeze(1)
             y.append(im)
             feats.append(fea.unsqueeze(1))
@@ -347,13 +360,13 @@ class align_net(nn.Module):
         # deformable
         self.cr = nn.Conv2d(128, 64, 3, padding=1, bias=True)
         self.off2d_1 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
-        self.dconv_1 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
+        self.deconv_1 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d_2 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
         self.deconv_2 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d_3 = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
         self.deconv_3 = ConvOffset2d(64, 64, 3, padding=1, num_deformable_groups=8)
         self.off2d = nn.Conv2d(64, 18 * 8, 3, padding=1, bias=True)
-        self.dconv = ConvOffset2d(64, 64, (3, 3), padding=(1, 1), num_deformable_groups=8)
+        self.deconv = ConvOffset2d(64, 64, (3, 3), padding=(1, 1), num_deformable_groups=8)
         self.recon_lr = nn.Conv2d(64, 3, 3, padding=1, bias=True)
 
         # xavier initialization
@@ -383,13 +396,13 @@ class align_net(nn.Module):
 
             # feature trans
             offset1 = self.off2d_1(fea)
-            fea = self.dconv_1(fea, offset1)
+            fea = self.deconv_1(fea, offset1)
             offset2 = self.off2d_2(fea)
             fea = self.deconv_2(fea, offset2)
             offset3 = self.off2d_3(fea)
             fea = self.deconv_3(supp, offset3)
             offset4 = self.off2d(fea)
-            aligned_fea = self.dconv(fea, offset4)
+            aligned_fea = self.deconv(fea, offset4)
             im = self.recon_lr(aligned_fea).unsqueeze(1)
             y.append(im)
         y = torch.cat(y, dim=1)

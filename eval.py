@@ -70,11 +70,11 @@ parser.add_argument('-m', '--model', metavar='M', type=str, default='TDAN',
                     help='network architecture.')
 parser.add_argument('-s', '--scale', metavar='S', type=int, default=4, 
                     help='interpolation scale. Default 4')
-parser.add_argument('-t', '--test-set', metavar='NAME', type=str, default='/home/cxu-serve/u1/ytian21/project/video_retoration/TDAN-VSR/data/Vid4',
+parser.add_argument('-t', '--test-set', metavar='NAME', type=str, default='/hd/youtube_dl_face/cropped_videos_frames/youtube_face_test/',
                     help='dataset for testing.')
 parser.add_argument('-mp', '--model-path', metavar='MP', type=str, default='model',
                     help='model path.')
-parser.add_argument('-sp', '--save-path', metavar='SP', type=str, default='res',
+parser.add_argument('-sp', '--save-path', metavar='SP', type=str, default='/hd/saved_models/tdan',
                     help='saving directory path.')
 args = parser.parse_args()
 
@@ -95,7 +95,7 @@ for i in range(len(lis)):
     print(lis[i])
     LR = os.path.join(dir_LR, lis[i], 'LR_bicubic')
     ims = sorted(os.listdir(LR))
-    num = len(ims)
+    # num = len(ims)
     # number of the seq
     num = len(ims)
     image = io.imread(os.path.join(LR, ims[0]))
