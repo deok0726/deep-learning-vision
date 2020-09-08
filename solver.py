@@ -42,7 +42,6 @@ def rgb2ycbcrT(rgb):
 
 
 def chop_forward(x, model, scale, shave=10, min_size=8000, n_GPUs=1):
-    print('call chop_forward')
     n_GPUs = min(n_GPUs, 4)
     b, num, c, h, w = x.size()
     h_half, w_half = h // 2, w // 2
@@ -196,70 +195,61 @@ class Solver(object):
 
     def _epoch_step(self, dataset, epoch):
         """ Perform 1 training 'epoch' on the 'dataset'"""
-        
-        print('call _epoch_step in solver')
         dataloader = DataLoader(dataset, batch_size=self.batch_size,
-                                shuffle=True, num_workers=0)
+                                shuffle=True, num_workers=2)
         
-        # num_batchs = 1
-        num_batchs = len(dataset) // self.batch_size
-
+        num_batchs = len(dataset)*320 // self.batch_size # len(dataset) is num of folders
+        
         # observe the training progress
         if self.verbose:
             bar = progressbar.ProgressBar(max_value=num_batchs)
 
         running_loss = 0
-        
+        progress = 0
 
         for i, sample in enumerate(dataloader):
-            print('start enumerate(dataloader)')
-        
-            input_batch, label_batch = sample['lr'], sample['hr']
+            for j in range(len(sample)):
+
+                input_batch, label_batch = sample[j]['lr'], sample[j]['hr']
+                
+                # Wrap with torch Variable
+                input_batch, label_batch = self._wrap_variable(input_batch,
+                                                            label_batch,
+                                                            self.use_gpu)
+
+                # zero the grad
+                self.optimizer.zero_grad()
+
+                # Forward
+                if self.model_name in ['TDAN']:
+                    # print('the input_batch type is : ', type(input_batch))
+                    output_batch, lrs = self.model(input_batch)
+                    num = input_batch.size(1)
+                    center = num // 2
+                    x = input_batch[:, center, :, :, :].unsqueeze(1).repeat(1, num, 1, 1, 1)
+                    loss = self.loss_fn(output_batch, label_batch) + 0.25 * self.loss_fn(lrs, x)
+                else:
+                    output_batch = self.model(input_batch)
+                    loss = self.loss_fn(output_batch, label_batch)
+
+                running_loss += loss.data[0]
+
+                # Backward + update
+                loss.backward()
+                #nn.utils.clip_grad_norm(self.model.parameters(), 0.4)
+                self.optimizer.step()
             
-            # Wrap with torch Variable
-            input_batch, label_batch = self._wrap_variable(input_batch,
-                                                           label_batch,
-                                                           self.use_gpu)
-
-            # zero the grad
-            self.optimizer.zero_grad()
-
-            # Forward
-            if self.model_name in ['TDAN']:
-                print('start model TDAN')
-                print('the input_batch type is : ', type(input_batch))
-                output_batch, lrs = self.model(input_batch)
-                print('forward - 1')
-                num = input_batch.size(1)
-                print('forward - 2')
-                center = num // 2
-                print('forward - 3')
-                x = input_batch[:, center, :, :, :].unsqueeze(1).repeat(1, num, 1, 1, 1)
-                print('forward - 4')
-                loss = self.loss_fn(output_batch, label_batch) + 0.25 * self.loss_fn(lrs, x)
-                print('forward - 5')
-            else:
-                output_batch = self.model(input_batch)
-                loss = self.loss_fn(output_batch, label_batch)
-
-            print('finished forward')
-            running_loss += loss.data[0]
-
-            # Backward + update
-            print('start backward')
-            loss.backward()
-            #nn.utils.clip_grad_norm(self.model.parameters(), 0.4)
-            self.optimizer.step()
-
-            if self.verbose:
-                print('in the bar update')
-                bar.update(i, force=True)
+                if self.verbose:
+                    progress += 1
+                    bar.update(progress, force=True)
 
         average_loss = running_loss / num_batchs
         self.hist_loss.append(average_loss)
+        
         if self.verbose:
             print('Epoch  %5d, loss %.5f' \
-                  % (epoch, average_loss))
+                % (epoch+1, average_loss))
+    
 
     def _wrap_variable(self, input_batch, label_batch, use_gpu):
         if use_gpu:
@@ -282,7 +272,7 @@ class Solver(object):
         mse = diff.pow(2).mean()
         psnr = -10 * np.log10(mse)
         return psnr
-
+    
     def _check_PSNR(self, dataset, is_test=False):
         """
         Get the output of model with the input being 'dataset' then
@@ -291,18 +281,24 @@ class Solver(object):
         if 'is_test' is True, psnr and output of each image is also
         return for statistics and generate output image at test phase
         """
-        print('call _check_PSNR')
         # process one image per iter for test phase
         if is_test:
             batch_size = 1
         else:
             batch_size = 1  # self.batch_size
 
+        num_batchs = len(dataset)*320 // batch_size # len(dataset) is num of folders
+        
+        # observe the training progress
+        if self.verbose:
+            bar = progressbar.ProgressBar(max_value=num_batchs)
+
         dataloader = DataLoader(dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=0)
+                                shuffle=False, num_workers=2)
 
         avr_psnr = 0
         avr_ssim = 0
+        progress = 0
 
         # book keeping variables for test phase
         psnrs = []  # psnr for each image
@@ -312,53 +308,59 @@ class Solver(object):
         names = []
 
         for batch, sample in enumerate(dataloader):
-            input_batch, label_batch, name = sample['lr'], sample['hr'], sample['im_name']
+            for j in range(len(sample)):
 
-            # Wrap with torch Variable
-            input_batch, label_batch = self._wrap_variable(input_batch,
-                                                           label_batch,
-                                                           self.use_gpu)
+                input_batch, label_batch, name = sample[j]['lr'], sample[j]['hr'], sample[j]['im_name']
 
-            if is_test:
-                start = time.time()
-                if self.model_name in ['TDAN']:
-                    output_batch = chop_forward(input_batch, self.model, 4)
-                    #output_batch = chop_forward(input_batch, self.model, 4)
-                    #output_batch = forward_x8(input_batch, self.model).unsqueeze(0)
-                    #print(output_batch.size())
-                    # _, lrs = self.model(input_batch)
-                    # output_batch = lrs[:, -1, :, :, :]
+                # Wrap with torch Variable
+                input_batch, label_batch = self._wrap_variable(input_batch,
+                                                            label_batch,
+                                                            self.use_gpu)
+
+                if is_test:
+                    start = time.time()
+                    if self.model_name in ['TDAN']:
+                        output_batch = chop_forward(input_batch, self.model, 4)
+                        #output_batch = chop_forward(input_batch, self.model, 4)
+                        #output_batch = forward_x8(input_batch, self.model).unsqueeze(0)
+                        #print(output_batch.size())
+                        # _, lrs = self.model(input_batch)
+                        # output_batch = lrs[:, -1, :, :, :]
+                    else:
+                        output_batch = self.model(input_batch)
+                    elapsed_time = time.time() - start
                 else:
-                    output_batch = self.model(input_batch)
-                elapsed_time = time.time() - start
-            else:
-                if self.model_name in ['TDAN']:
-                    #output_batch, _ = self.model(input_batch)
-                    output_batch = chop_forward(input_batch, self.model, 4)
-                else:
-                    output_batch = self.model(input_batch)
-            # ssim is calculated with the normalize (range [0, 1]) image
-            ssim = pytorch_ssim.ssim(output_batch + 0.5, label_batch + 0.5, size_average=False)
-            ssim = torch.sum(ssim.data)
-            avr_ssim += ssim
+                    if self.model_name in ['TDAN']:
+                        #output_batch, _ = self.model(input_batch)
+                        output_batch = chop_forward(input_batch, self.model, 4)
+                    else:
+                        output_batch = self.model(input_batch)
+                # ssim is calculated with the normalize (range [0, 1]) image
+                ssim = pytorch_ssim.ssim(output_batch + 0.5, label_batch + 0.5, size_average=False)
+                ssim = torch.sum(ssim.data)
+                avr_ssim += ssim
 
-            # calculate PSRN
-            output = output_batch.data
-            label = label_batch.data
+                # calculate PSRN
+                output = output_batch.data
+                label = label_batch.data
 
-            output = (output + 0.5) * 255
-            label = (label + 0.5) * 255
+                output = (output + 0.5) * 255
+                label = (label + 0.5) * 255
 
-            output = quantize(output, 255)
-            label = quantize(label, 255)
-            # diff = input - target
+                output = quantize(output, 255)
+                label = quantize(label, 255)
+                # diff = input - target
 
-            output = output.squeeze(dim=0)
-            label = label.squeeze(dim=0)
+                output = output.squeeze(dim=0)
+                label = label.squeeze(dim=0)
 
-            psnr = self._comput_PSNR(output / 255.0, label / 255.0)
-            # print(psnr)
-            avr_psnr += psnr
+                psnr = self._comput_PSNR(output / 255.0, label / 255.0)
+                # print(psnr)
+                avr_psnr += psnr
+
+                if self.verbose:
+                    progress += 1
+                    bar.update(progress, force=True)
 
             # save psnrs and outputs for statistics and generate image at test time
             if is_test:
@@ -369,7 +371,7 @@ class Solver(object):
                 outputs.append(np_output)
                 names.append(name)
 
-        epoch_size = len(dataset)
+        epoch_size = len(dataset)*320
         avr_psnr /= epoch_size
         avr_ssim /= epoch_size
         stats = (psnrs, ssims, proc_time)
@@ -385,7 +387,6 @@ class Solver(object):
         The best model is save under checkpoint which is used
         for test phase or finetuning
         """
-        print('solver train start')
 
         # check fine_tuning option
         model_path = os.path.join(self.check_point, 'model.pt')
@@ -419,7 +420,7 @@ class Solver(object):
             for epoch in range(self.num_epochs):
                 self._epoch_step(train_dataset, epoch)
                 self.scheduler.step()
-
+                
                 if epoch % 10 == 0:
                     if self.verbose:
                         print('Computing PSNR...')
@@ -433,15 +434,26 @@ class Solver(object):
                     if self.verbose:
                         print('Average train PSNR:%.3fdB average ssim: %.3f' % (train_psnr, train_ssim))
                         print('')
-                    if best_psnr < train_psnr:
-                        best_psnr = train_psnr
-                        # write the model to hard-disk for testing
-                        if not os.path.exists(self.check_point):
-                            os.makedirs(self.check_point)
-                        model_path = os.path.join(self.check_point, 'model.pt')
-                        torch.save(self.model, model_path)
-                        print(' Best average psnr: %.3f' % (best_psnr))
-                        print('')
+                    
+                    # update model regardless of psnr
+                    best_psnr = train_psnr
+                    # write the model to hard-disk for testing
+                    if not os.path.exists(self.check_point):
+                        os.makedirs(self.check_point)
+                    model_path = os.path.join(self.check_point, 'model.pt')
+                    torch.save(self.model, model_path)
+                    print(' Best average psnr: %.3f' % (best_psnr))
+                    print('')
+                    
+                    # if best_psnr < train_psnr:
+                    #     best_psnr = train_psnr
+                    #     # write the model to hard-disk for testing
+                    #     if not os.path.exists(self.check_point):
+                    #         os.makedirs(self.check_point)
+                    #     model_path = os.path.join(self.check_point, 'model.pt')
+                    #     torch.save(self.model, model_path)
+                    #     print(' Best average psnr: %.3f' % (best_psnr))
+                    #     print('')
 
     def test(self, dataset):
         """
@@ -476,7 +488,7 @@ class Solver(object):
             batch_size = 1  # self.batch_size
 
         dataloader = DataLoader(dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=0)
+                                shuffle=False, num_workers=2)
 
         # book keeping variables for test phase
         psnrs = []  # psnr for each image
