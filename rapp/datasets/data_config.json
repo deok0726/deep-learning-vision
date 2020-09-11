@@ -110,5 +110,12 @@
         "processed":true,
         "file_name":"train.csv",
         "test_file":"test.csv"
+    },
+
+    "mvtec": {
+        "from":"custom",
+        "input_size":[3, 50, 50],
+        "labels":[0,1],
+        "folder_name":"metal_nut/"
     }
 }
