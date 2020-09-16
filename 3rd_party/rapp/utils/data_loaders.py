@@ -23,6 +23,11 @@ from collections.abc import Iterable
 from torch.utils.data.sampler import SubsetRandomSampler, Sampler
 from torch.utils.data import DataLoader, Dataset
 from torchvision.datasets import MNIST, FashionMNIST
+import cv2
+# import PIL
+# from PIL import Image
+import itertools
+
 
 def get_input_size(config):
     import json
@@ -66,6 +71,19 @@ def get_balance(seen_index_list, unseen_index_list, novelty_ratio=.5):
         return seen_index_list, unseen_index_list
 
 def get_loaders(config, use_full_class=False):
+    def random_crop(image, crop_height, crop_width):
+        max_x = image.shape[1] - crop_width
+        max_y = image.shape[0] - crop_height
+        x = np.random.randint(0, max_x)
+        y = np.random.randint(0, max_y)
+        crop = image[y: y + crop_height, x: x + crop_width]
+        return crop
+    def random_rotation(image):
+        rows, cols = image.shape[:2]
+        M = cv2.getRotationMatrix2D((cols/2, rows/2),np.random.randint(0, 360), np.random.rand())
+        dst = cv2.warpAffine(image, M,(cols, rows))
+        return dst
+
     # get data config for Tabular dataset
     import json
     with open('datasets/data_config.json', 'r') as f:
@@ -100,8 +118,14 @@ def get_loaders(config, use_full_class=False):
         dset_manager = ImageDatasetManager(
             dataset_name=config.data,
             transform=transforms.Compose([
+                # transforms.Lambda(lambda x: random_crop(x, data_config['input_size'][1], data_config['input_size'][2])),
+                # transforms.RandomCrop((data_config['input_size'][1], data_config['input_size'][2])),
                 transforms.ToTensor(),
-                transforms.Lambda(lambda x: x.flatten())
+                transforms.ToPILImage(),
+                transforms.Grayscale(num_output_channels=1),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,), (0.5,))
+                # transforms.Lambda(lambda x: x.flatten())
             ]),
         )
     elif data_config['from'] in ['kaggle', 'download']:
@@ -111,10 +135,32 @@ def get_loaders(config, use_full_class=False):
             data_config=data_config,
             transform=StandardScaler(),
         )
+    elif data_config['from'] == 'custom':
+        print(data_config['input_size'][1:])
+        print(tuple(data_config['input_size'][1:]))
+        # def random_crop(image, crop_height, crop_width):
+        #     max_x = image.shape[1] - crop_width
+        #     max_y = image.shape[0] - crop_height
+        #     x = np.random.randint(0, max_x)
+        #     y = np.random.randint(0, max_y)
+        #     crop = image[y: y + crop_height, x: x + crop_width]
+        #     return crop
+
+        dset_manager = ImageDatasetManager(
+            dataset_name=config.data,
+            transform=transforms.Compose([
+                # transforms.Resize(data_config['input_size'][1:]),
+                # transforms.Lambda(lambda x: cv2.resize(x, dsize=tuple(data_config['input_size'][1:]), interpolation=cv2.INTER_CUBIC)),
+                transforms.Lambda(lambda x: random_crop(x, data_config['input_size'][1], data_config['input_size'][2])),
+                transforms.Lambda(lambda x: random_rotation(x)),
+                transforms.ToTensor(),
+                # transforms.Lambda(lambda x: x.flatten())
+            ]), data_config=data_config
+        )
 
     # balance ratio of loaders
     if use_full_class:
-        seen_index_list = dset_manager.get_indexes(labels=seen_labels, ratios=[0.6, 0.2, 0.2])
+        seen_index_list = dset_manager.get_indexes(labels=seen_labels, ratios=[0.66, 0.16, 0.17])
         indexes_list = [
             seen_index_list[0],
             seen_index_list[1],
@@ -382,6 +428,85 @@ class TabularDatasetManager:
                 )
             ]
 
+# class ImageDataset_old(Dataset):
+#     def __init__(self, root, train=True, transform=None, target_transform=None):
+#         # data = np.genfromtxt(file_dir, skip_header=skip_header, delimiter=delimiter)
+#         self.image_paths = []
+#         self.labels = []
+#         if(train):
+#             root_dir = os.path.join(root, 'train')
+#         else:
+#             root_dir = os.path.join(root, 'test')
+#         for folder in os.listdir(root_dir):
+#             folder_path = os.path.join(root_dir, folder)
+#             images_in_folder = sorted(os.listdir(folder_path))
+#             self.image_paths.extend([os.path.join(folder_path, image) for image in images_in_folder])
+#             if folder == 'good':
+#                 self.labels.extend([0]*len(images_in_folder))
+#             else:
+#                 self.labels.extend([1]*len(images_in_folder))
+#         assert len(self.image_paths) == len(self.labels), 'images and label number mismatch'
+#         self.transform = transform
+#         self.target_transform = target_transform
+
+#     def __len__(self):
+#         return len(self.image_paths)
+        
+#     def __getitem__(self, idx):
+#         x = self.image_paths[idx]
+#         y = self.labels[idx]
+#         img = cv2.imread(x)
+#         if self.transform is not None:
+#             x = self.transform.transform(x)
+#         if self.target_transform is not None:
+#             y = self.target_transform.transform(y)
+        
+#         return torch.Tensor(x), torch.Tensor(y)
+
+class ImageDataset(Dataset):
+    def __init__(self, root, train=True, transform=None, target_transform=None):
+        self.data = []
+        self.targets = []
+        transToTensor = transforms.ToTensor()
+        if(train):
+            root_dir = os.path.join(root, 'train')
+        else:
+            root_dir = os.path.join(root, 'test')
+        for folder in os.listdir(root_dir):
+            folder_path = os.path.join(root_dir, folder)
+            images_in_folder = sorted(os.listdir(folder_path))
+            self.data.extend([cv2.imread(os.path.join(folder_path, image)) for image in images_in_folder])
+            # self.data.extend([transToTensor(Image.open(os.path.join(folder_path, image))) for image in images_in_folder])
+            # self.data.extend([Image.open(os.path.join(folder_path, image)).convert("RGB") for image in images_in_folder])
+            if folder == 'good':
+                self.targets.extend([0]*len(images_in_folder))
+            else:
+                self.targets.extend([1]*len(images_in_folder))
+        assert len(self.data) == len(self.targets), 'images and label number mismatch'
+        # print(type(self.data[0]))
+        # print(type(self.data[0])==PIL.PngImagePlugin.PngImageFile)
+        self.data = np.array(self.data)
+        # self.data = torch.stack(self.data)
+        self.targets = np.array(self.targets)
+        # self.targets = torch.FloatTensor(self.targets)
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __len__(self):
+        return len(self.data)
+        
+    def __getitem__(self, idx):
+        x = self.data[idx]
+        y = self.targets[idx].reshape(1, -1)
+        # y = self.targets[idx]
+        # img = cv2.imread(x)
+        if self.transform is not None:
+            x = self.transform(x)
+        if self.target_transform is not None:
+            y = self.target_transform(y)
+        
+        return torch.Tensor(x.squeeze()), torch.Tensor(y)
+        # return torch.Tensor(x), torch.Tensor(y)
 
 class ImageDatasetManager:
 
@@ -389,13 +514,13 @@ class ImageDatasetManager:
         self, dataset_name,
         transform=transforms.ToTensor(), target_transform=None,
         test_transform=None, test_target_transform=None,
-        shuffle=True, data_size=0, download=True
+        shuffle=True, data_size=0, download=True, data_config=None
     ):
         data_list = []
         targets_list = []
 
         self.train_dataset = self._get_dataset(
-            dataset_name, is_train=True, download=download,
+            dataset_name, is_train=True, download=download, data_config=data_config
         )
         if self.train_dataset:
             data, targets = self.train_dataset.data, self.train_dataset.targets
@@ -403,7 +528,7 @@ class ImageDatasetManager:
             targets_list.append(targets)
 
         self.test_dataset = self._get_dataset(
-            dataset_name, is_train=False, download=download,
+            dataset_name, is_train=False, download=download, data_config=data_config
         )
         if self.test_dataset:
             data, targets = self.test_dataset.data, self.test_dataset.targets
@@ -416,6 +541,9 @@ class ImageDatasetManager:
         elif type(data[0]) == torch.Tensor:
             self.total_x = torch.cat(data_list)[-data_size:] if data_list else None
             self.total_y = torch.cat(targets_list)[-data_size:] if targets_list else None
+        # elif type(data[0]) == PIL.Image.Image:
+            # self.total_x = list(itertools.chain.from_iterable(data_list))[-data_size:] if data_list else None
+            # self.total_y = list(itertools.chain.from_iterable(targets_list))[-data_size:] if targets_list else None
         else:
             raise NotImplementedError
 
@@ -437,7 +565,7 @@ class ImageDatasetManager:
         self.test_dataset.transform = test_transform if test_transform else transform
         self.test_dataset.target_transform = test_target_transform if test_target_transform else target_transform
 
-    def _get_dataset(self, dataset_name, is_train, download, root=os.path.join(os.path.expanduser("~"), "data")):
+    def _get_dataset(self, dataset_name, is_train, download, data_config, root=os.path.join(os.path.expanduser("~"), "data")):
         dataset_name = dataset_name.lower()
         if dataset_name == "mnist":
             dataset = MNIST(
@@ -451,6 +579,10 @@ class ImageDatasetManager:
                 train=is_train,
                 download=download,
             )
+        elif dataset_name == "mvtec":
+            folder_name = data_config['folder_name'].replace('/', '')
+            load_dir = os.path.join(root, folder_name)
+            dataset = ImageDataset(load_dir, train=is_train)
         else:
             raise NotImplementedError("No data for {}".format(dataset_name))
         return dataset
@@ -530,17 +662,20 @@ class ImageDatasetManager:
                     sampler=SubsetRandomSampler(indexes_list[0]),
                     pin_memory=use_gpu,
                     num_workers=0,
+                    drop_last=True
                 ),
                 DataLoader(
                     self.test_dataset, batch_size,
                     sampler=SequentialIndicesSampler(indexes_list[1]),
                     pin_memory=use_gpu,
                     num_workers=0,
+                    drop_last=True
                 ),
                 DataLoader(
                     self.test_dataset, batch_size,
                     sampler=SequentialIndicesSampler(indexes_list[2]),
                     pin_memory=use_gpu,
                     num_workers=0,
+                    drop_last=True
                 )
             ]

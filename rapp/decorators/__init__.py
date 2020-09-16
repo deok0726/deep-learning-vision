@@ -1,1 +1,0 @@
-from .variational_info_bottleneck import variational_info_bottleneck

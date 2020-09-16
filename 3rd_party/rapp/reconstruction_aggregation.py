@@ -32,10 +32,10 @@ def get_diffs(x, model, batch_size=256):
         x_tilde = model(_x)
         diffs.append((x_tilde - _x).cpu())
 
-        for layer in model.encoder.layer_list:
-            _x = layer(_x)
-            x_tilde = layer(x_tilde)
-            diffs.append((x_tilde - _x).cpu())
+        # for layer in model.encoder.layer_list:
+        #     _x = layer(_x)
+        #     x_tilde = layer(x_tilde)
+        #     diffs.append((x_tilde - _x).cpu())
 
         stacked.append(diffs)
 
