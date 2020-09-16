@@ -105,10 +105,10 @@ if __name__ == '__main__':
             'sap_aupr': sap_aupr,
             'nap_auroc': nap_auroc,
             'nap_aupr': nap_aupr,
-            'train_history': ';'.join(['%.4e' % e for e in train_history]),
-            'valid_history': ';'.join(['%.4e' % e for e in valid_history]),
-            'auroc_history': ';'.join(['%.4f' % e[0] for e in test_history]),
-            'aupr_history': ';'.join(['%.4f' % e[1] for e in test_history]),
+            # 'train_history': ';'.join(['%.4e' % e for e in train_history]),
+            # 'valid_history': ';'.join(['%.4e' % e for e in valid_history]),
+            # 'auroc_history': ';'.join(['%.4f' % e[0] for e in test_history]),
+            # 'aupr_history': ';'.join(['%.4f' % e[1] for e in test_history]),
         })
 
     reporter.export(config.output_file)

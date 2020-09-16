@@ -55,6 +55,12 @@ def get_f1_score(valid_score, test_score, test_label, f1_quantiles=[.99]):
     return f1s
 
 def get_recon_loss(valid_diff, test_diff, test_label, f1_quantiles=[.99]):
+    # if CAE
+    valid_diff = valid_diff.reshape((valid_diff.shape[0], -1))
+    test_diff = test_diff.reshape((test_diff.shape[0], -1))
+    # test_diff = torch.flatten(test_diff, start_dim=1)
+    # test_diff = test_diff.flatten(start_dim=1)
+
     loss = (test_diff**2).mean(axis=1)
     loss_auc_roc = get_auc_roc(loss, test_label)
     loss_auc_prc = get_auc_prc(loss, test_label)

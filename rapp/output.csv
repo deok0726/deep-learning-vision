@@ -1,0 +1,6 @@
+gpu_id,n_epochs,batch_size,verbose,data,unimodal_normal,target_class,novelty_ratio,model,btl_size,n_layers,use_rapp,start_layer_index,end_layer_index,n_trials,output_file,progress,sleep,base_auroc,base_aupr,sap_auroc,sap_aupr,nap_auroc,nap_aupr
+1,100,16,0,mvtec,True,0,0.5,cae,500,10,False,1,-1,3,output.csv,1,0,0.42399000416493127,0.43465691858682187,0,0,0,0,4.6896e+05
+1,100,16,0,mvtec,True,0,0.5,cae,500,10,False,1,-1,1,output.csv,2,0,0.2948771345272803,0.42944888182777285,0,0,0,0,4.3693e+05
+1,100,16,0,mvtec,True,0,0.5,cae,500,10,False,1,-1,2,output.csv,3,0,0.23990004164931278,0.37989662202052327,0,0,0,0,5.1180e+05
+1,100,16,0,mvtec,True,0,0.5,cae,500,10,False,1,-1,4,output.csv,4,0,0.3802582257392753,0.4061916327207261,0,0,0,0,2.0686e+05
+1,100,16,0,mvtec,True,0,0.5,cae,500,10,False,1,-1,5,output.csv,5,0,0.31945022907122034,0.3854976262970521,0,0,0,0,3.3617e+05
