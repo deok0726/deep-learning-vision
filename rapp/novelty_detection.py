@@ -18,11 +18,16 @@ import torch
 import numpy as np
 
 from torch import optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from ignite.engine import Engine, Events
+from ignite.contrib.handlers.param_scheduler import LRScheduler
+
 
 from utils.metric import *
 from utils.data_loaders import get_loaders, get_input_size
-
+torch.manual_seed(0)
+torch.cuda.manual_seed_all(0)
+np.random.seed(0)
 
 class NoveltyDetecter():
 
@@ -99,7 +104,10 @@ class NoveltyDetecter():
         return (base_auroc, base_aupr), (0, 0), (0, 0)
 
     def train(self, model, dset_manager, train_loader, valid_loader, test_loader, test_every_epoch=False):
-        optimizer = optim.Adam(model.parameters(), lr=1e-3)
+        # optimizer = optim.Adam(model.parameters(), lr=2e-3)
+        optimizer = optim.Adam(model.parameters(), lr=2e-4)
+        # optimizer = optim.Adam(model.parameters(), lr=1e-4)
+        scheduler = ReduceLROnPlateau(optimizer, 'min')
 
         trainer = Engine(model.step)
         trainer.model, trainer.optimizer, trainer.config = model, optimizer, self.config
@@ -114,7 +122,7 @@ class NoveltyDetecter():
 
         def run_validation(engine, evaluator, valid_loader):
             evaluator.run(valid_loader, max_epochs=1)
-
+        
         trainer.add_event_handler(
             Events.EPOCH_COMPLETED, run_validation, evaluator, valid_loader
         )
@@ -132,7 +140,11 @@ class NoveltyDetecter():
                 engine.best_model = deepcopy(engine.model.state_dict())
 
             engine.valid_history += [loss]
-
+        @evaluator.on(Events.COMPLETED)
+        def reduct_step(engine):
+            # engine is evaluator
+            # engine.metrics is a dict with metrics, e.g. {"loss": val_loss_value, "acc": val_acc_value}
+            scheduler.step(engine.state.metrics['recon'])
         def run_test(
             engine,
             detector,
@@ -242,7 +254,7 @@ if __name__ == '__main__':
     config = get_config()
     
     (base_auroc, base_aupr), (sap_auroc, sap_aupr), (nap_auroc, nap_aupr), _, _, _ = main(config)
-    print('BASE AUROC: %.4f AUPR: %.4f' % (base_auroc, base_aupr))
+    print('TEST BASE AUROC: %.4f AUPR: %.4f' % (base_auroc, base_aupr))
     if config.use_rapp:
         print('RaPP SAP AUROC: %.4f AUPR: %.4f' % (sap_auroc, sap_aupr))
         print('RaPP NAP AUROC: %.4f AUPR: %.4f' % (nap_auroc, nap_aupr))

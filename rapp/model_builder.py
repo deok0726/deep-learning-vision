@@ -97,6 +97,32 @@ def get_model(config):
                     btl_size=config.btl_size,
                     n_layers=config.n_layers,
                 )
+    elif config.model == 'cae':
+        from models.convolution_auto_encoder import ConvolutionAutoEncoder as CAE
+        if type(config.input_size) != int:
+            input_size = 1
+            for i in config.input_size:
+                input_size *= i
+        else:
+            input_size = config.input_size
+        model = CAE(
+            input_channel=3,
+            btl_size=config.btl_size
+        )
+    elif config.model == 'cae_mini':
+        # from models.convolution_auto_encoder_mini import ConvolutionAutoEncoder as CAE
+        # from models.convolution_auto_encoder_mini_mine import ConvolutionAutoEncoder as CAE
+        from models.convolution_auto_encoder_mem import ConvolutionAutoEncoder as CAE
+        if type(config.input_size) != int:
+            input_size = 1
+            for i in config.input_size:
+                input_size *= i
+        else:
+            input_size = config.input_size
+        model = CAE(
+            input_channel=3,
+            btl_size=config.btl_size,
+        )
     else:
         raise NotImplementedError
 

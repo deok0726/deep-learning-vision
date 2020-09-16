@@ -71,6 +71,19 @@ def get_balance(seen_index_list, unseen_index_list, novelty_ratio=.5):
         return seen_index_list, unseen_index_list
 
 def get_loaders(config, use_full_class=False):
+    def random_crop(image, crop_height, crop_width):
+        max_x = image.shape[1] - crop_width
+        max_y = image.shape[0] - crop_height
+        x = np.random.randint(0, max_x)
+        y = np.random.randint(0, max_y)
+        crop = image[y: y + crop_height, x: x + crop_width]
+        return crop
+    def random_rotation(image):
+        rows, cols = image.shape[:2]
+        M = cv2.getRotationMatrix2D((cols/2, rows/2),np.random.randint(0, 360), np.random.rand())
+        dst = cv2.warpAffine(image, M,(cols, rows))
+        return dst
+
     # get data config for Tabular dataset
     import json
     with open('datasets/data_config.json', 'r') as f:
@@ -105,8 +118,14 @@ def get_loaders(config, use_full_class=False):
         dset_manager = ImageDatasetManager(
             dataset_name=config.data,
             transform=transforms.Compose([
+                # transforms.Lambda(lambda x: random_crop(x, data_config['input_size'][1], data_config['input_size'][2])),
+                # transforms.RandomCrop((data_config['input_size'][1], data_config['input_size'][2])),
                 transforms.ToTensor(),
-                transforms.Lambda(lambda x: x.flatten())
+                transforms.ToPILImage(),
+                transforms.Grayscale(num_output_channels=1),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,), (0.5,))
+                # transforms.Lambda(lambda x: x.flatten())
             ]),
         )
     elif data_config['from'] in ['kaggle', 'download']:
@@ -119,19 +138,29 @@ def get_loaders(config, use_full_class=False):
     elif data_config['from'] == 'custom':
         print(data_config['input_size'][1:])
         print(tuple(data_config['input_size'][1:]))
+        # def random_crop(image, crop_height, crop_width):
+        #     max_x = image.shape[1] - crop_width
+        #     max_y = image.shape[0] - crop_height
+        #     x = np.random.randint(0, max_x)
+        #     y = np.random.randint(0, max_y)
+        #     crop = image[y: y + crop_height, x: x + crop_width]
+        #     return crop
+
         dset_manager = ImageDatasetManager(
             dataset_name=config.data,
             transform=transforms.Compose([
                 # transforms.Resize(data_config['input_size'][1:]),
-                transforms.Lambda(lambda x: cv2.resize(x, dsize=tuple(data_config['input_size'][1:]), interpolation=cv2.INTER_CUBIC)),
+                # transforms.Lambda(lambda x: cv2.resize(x, dsize=tuple(data_config['input_size'][1:]), interpolation=cv2.INTER_CUBIC)),
+                transforms.Lambda(lambda x: random_crop(x, data_config['input_size'][1], data_config['input_size'][2])),
+                transforms.Lambda(lambda x: random_rotation(x)),
                 transforms.ToTensor(),
-                transforms.Lambda(lambda x: x.flatten())
+                # transforms.Lambda(lambda x: x.flatten())
             ]), data_config=data_config
         )
 
     # balance ratio of loaders
     if use_full_class:
-        seen_index_list = dset_manager.get_indexes(labels=seen_labels, ratios=[0.6, 0.2, 0.2])
+        seen_index_list = dset_manager.get_indexes(labels=seen_labels, ratios=[0.66, 0.16, 0.17])
         indexes_list = [
             seen_index_list[0],
             seen_index_list[1],

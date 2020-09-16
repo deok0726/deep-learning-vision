@@ -114,8 +114,8 @@
 
     "mvtec": {
         "from":"custom",
-        "input_size":[3, 50, 50],
+        "input_size":[3, 256, 256],
         "labels":[0,1],
-        "folder_name":"metal_nut/"
+        "folder_name":"toothbrush/"
     }
 }
