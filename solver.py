@@ -196,7 +196,7 @@ class Solver(object):
     def _epoch_step(self, dataset, epoch):
         """ Perform 1 training 'epoch' on the 'dataset'"""
         dataloader = DataLoader(dataset, batch_size=self.batch_size,
-                                shuffle=True, num_workers=2)
+                                shuffle=True, num_workers=0)
         
         num_batchs = len(dataset)*320 // self.batch_size # len(dataset) is num of folders
         
@@ -294,7 +294,7 @@ class Solver(object):
             bar = progressbar.ProgressBar(max_value=num_batchs)
 
         dataloader = DataLoader(dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=2)
+                                shuffle=False, num_workers=0)
 
         avr_psnr = 0
         avr_ssim = 0
@@ -435,25 +435,25 @@ class Solver(object):
                         print('Average train PSNR:%.3fdB average ssim: %.3f' % (train_psnr, train_ssim))
                         print('')
                     
-                    # update model regardless of psnr
-                    best_psnr = train_psnr
-                    # write the model to hard-disk for testing
-                    if not os.path.exists(self.check_point):
-                        os.makedirs(self.check_point)
-                    model_path = os.path.join(self.check_point, 'model.pt')
-                    torch.save(self.model, model_path)
-                    print(' Best average psnr: %.3f' % (best_psnr))
-                    print('')
+                    # # update model regardless of psnr
+                    # best_psnr = train_psnr
+                    # # write the model to hard-disk for testing
+                    # if not os.path.exists(self.check_point):
+                    #     os.makedirs(self.check_point)
+                    # model_path = os.path.join(self.check_point, 'model.pt')
+                    # torch.save(self.model, model_path)
+                    # print(' Best average psnr: %.3f' % (best_psnr))
+                    # print('')
                     
-                    # if best_psnr < train_psnr:
-                    #     best_psnr = train_psnr
-                    #     # write the model to hard-disk for testing
-                    #     if not os.path.exists(self.check_point):
-                    #         os.makedirs(self.check_point)
-                    #     model_path = os.path.join(self.check_point, 'model.pt')
-                    #     torch.save(self.model, model_path)
-                    #     print(' Best average psnr: %.3f' % (best_psnr))
-                    #     print('')
+                    if best_psnr < train_psnr:
+                        best_psnr = train_psnr
+                        # write the model to hard-disk for testing
+                        if not os.path.exists(self.check_point):
+                            os.makedirs(self.check_point)
+                        model_path = os.path.join(self.check_point, 'model.pt')
+                        torch.save(self.model, model_path)
+                        print(' Best average psnr: %.3f' % (best_psnr))
+                        print('')
 
     def test(self, dataset):
         """
@@ -488,7 +488,7 @@ class Solver(object):
             batch_size = 1  # self.batch_size
 
         dataloader = DataLoader(dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=2)
+                                shuffle=False, num_workers=0)
 
         # book keeping variables for test phase
         psnrs = []  # psnr for each image

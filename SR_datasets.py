@@ -34,7 +34,7 @@ class VSR_Dataset(object):
         LR = os.path.join(self.lis[idx], "blur4")
         scale = 4
         ims = sorted(os.listdir(HR))
-
+        
         # get frame size
         image = io.imread(os.path.join(HR, ims[0]))
         row, col, ch = image.shape
@@ -48,18 +48,18 @@ class VSR_Dataset(object):
 
         while count < 320:
             frames_hr = io.imread(os.path.join(HR, ims[center[count]]))
-
+        
             for j in range(center[count] - 2, center[count] + 3):  # only use 5 frames
                 k = j - center[count] + 2
-                frames_lr[k, :, :, :] = io.imread(os.path.join(LR, ims[k]))
-
+                frames_lr[k, :, :, :] = io.imread(os.path.join(LR, ims[j]))
+                
             sample.append({'lr': frames_lr, 'hr': frames_hr, 'im_name': ims[center[count]]})
             
             if self.transform:
                 sample[count] = self.transform(sample[count])
             
             count += 1
-
+            
         return sample
 
 

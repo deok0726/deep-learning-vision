@@ -215,7 +215,6 @@ class TDAN_VSR(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-
         batch_size, num, ch, w, h = x.size()  # 5 video frames
         # center frame interpolation
         center = num // 2

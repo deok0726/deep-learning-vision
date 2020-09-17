@@ -68,7 +68,6 @@ def main():
     # train_dir = sorted(glob.glob(args.train_set + '/*'))
     # test_dir = sorted(glob.glob(args.test_set + '/*'))     
     train_dataset = VSR_Dataset(dir=args.train_set, trans=transforms.Compose([RandomCrop(48, args.scale), DataAug(), ToTensor()]))
-
     model_factory = ModelFactory()
     model = model_factory.create_model(args.model)
 
@@ -89,8 +88,7 @@ def main():
     
     start = time.time()
     solver.train(train_dataset, val_dataset)
-    end = time.time() - start
-    print('Training time is : ', end)
+    print('Training time is : ', time.time() - start)
 
 if __name__ == '__main__':
     main()
