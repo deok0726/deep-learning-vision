@@ -148,4 +148,9 @@ dmypy.json
 # license
 LICENSE
 
+# images
+*.png
+*.jpg
+*.jpeg
+
 # End of https://www.gitignore.io/api/linux,python

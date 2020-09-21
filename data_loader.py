@@ -1,7 +1,9 @@
-import torch
 from torchvision.datasets import MNIST, FashionMNIST
 from torchvision import transforms
+from PIL import Image
 import argument_parser as parser
+import torch
+import os
 import random
 import numpy as np
 
@@ -21,6 +23,18 @@ class DataLoader:
             train_dataset = MNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
             test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
+        elif args.dataset_name == 'FMNIST':
+            train_dataset = FashionMNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
+            test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
+            train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
+        elif args.dataset_name == 'MVTEC':
+            train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
+            test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
+            train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
+            valid_length = int(len(train_dataset) * (args.valid_ratio / (args.train_ratio + args.valid_ratio)))
+            train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
+        else:
+            raise Exception('Wrong dataset name')
         return train_dataset, valid_dataset, test_dataset
     
     def _preprocess_to_anomaly_detection_dataset(self, args, original_train_dataset, original_test_dataset):
@@ -78,17 +92,58 @@ class DataLoader:
     def _get_transform(self, args, is_target):
         transforms_list = []
         if not is_target:
+            if args.random_crop:
+                transforms_list.append(transforms.RandomCrop(args.crop_size))
             if args.grayscale:
                 transforms_list.append(transforms.Grayscale())
+                args.channel_num = 1
             transforms_list.append(transforms.ToTensor())
+            if args.normalize:
+                if args.channel_num == 3:
+                    transforms_list.append(transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,)))
+                elif args.channel_num == 1:
+                    transforms_list.append(transforms.Normalize((0.5,), (0.5,)))
         else:
             pass
         return transforms.Compose(transforms_list)
+
+class ImageDataset(torch.utils.data.Dataset):
+    def __init__(self, root, train=True, transform=None, target_transform=None):
+        self.image_paths = []
+        self.targets = []
+        if(train):
+            root_dir = os.path.join(root, 'train')
+        else:
+            root_dir = os.path.join(root, 'test')
+        for folder in os.listdir(root_dir):
+            folder_path = os.path.join(root_dir, folder)
+            images_in_folder = sorted(os.listdir(folder_path))
+            self.image_paths.extend([os.path.join(folder_path, image) for image in images_in_folder])
+            if folder == 'good':
+                self.targets.extend([0]*len(images_in_folder))
+            else:
+                self.targets.extend([1]*len(images_in_folder))
+        assert len(self.image_paths) == len(self.targets), 'images and label number mismatch'
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __len__(self):
+        return len(self.image_paths)
+        
+    def __getitem__(self, idx):
+        x = Image.open(self.image_paths[idx])
+        y = self.targets[idx]
+        if self.transform is not None:
+            x = self.transform(x)
+        if self.target_transform is not None:
+            y = self.target_transform(y)
+        return x, y
 
 
 if __name__ == "__main__":
     from torchvision.utils import save_image
     args = parser.get_args()
+
     # Reproducibility
     random_seed = args.random_seed
     torch.manual_seed(random_seed)
