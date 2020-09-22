@@ -5,8 +5,8 @@ parser = argparse.ArgumentParser(description='anomaly_detection')
 
 # main
 parser.add_argument('--backbone_name', type=str, default='AE', help="model name")
-parser.add_argument('--num_epoch', type=int, default='10', help="num_epoch")
-parser.add_argument('--batch_size', type=int, default='50', help="batch size")
+parser.add_argument('--num_epoch', type=int, default=10, help="num_epoch")
+parser.add_argument('--batch_size', type=int, default=50, help="batch size")
 parser.add_argument('--learning_rate', type=float, default='0.001', help="learning rate")
 
 # data loader
@@ -25,11 +25,9 @@ parser.add_argument('--train_ratio', type=float, default=2*9/10, help="training 
 parser.add_argument('--valid_ratio', type=float, default=2*1/10, help="validation dataset ratio")
 parser.add_argument('--test_ratio', type=float, default=1, help="test dataset ratio")
 parser.add_argument('--anomaly_ratio', type=float, default=0.1, help="anomaly data ratio")
-# train
-parser.add_argument('--batch_size', type=int, default=4, help="batch size")
 
 # save
-parser.add_argument('--save_dir', type=str, default='ckpt/', help="ckpt dir")
+parser.add_argument('--save_dir', type=str, default='/hd/checkpoints/pytorch/ckpts/', help="ckpt dir")
 
 def get_args():
     args = parser.parse_args()

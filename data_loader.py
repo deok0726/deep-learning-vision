@@ -48,41 +48,52 @@ class DataLoader:
         test_data, test_targets = original_test_dataset.data, original_test_dataset.targets
         data = torch.cat((train_data, test_data))
         targets = torch.cat((train_targets, test_targets))
-        # 2. Split training set, validation set, and test set according to the label
+        if isinstance(data, torch.ByteTensor):
+            data = data.float().div(255)
+        # 2. Split training data, validation data, and test data according to the label
         anomaly_mask = targets == args.anomaly_class
-        anomaly_index = torch.nonzero(anomaly_mask)
-        normal_index = torch.nonzero(~anomaly_mask)
+        anomaly_index = torch.nonzero(anomaly_mask, as_tuple=True)
+        normal_index = torch.nonzero(~anomaly_mask, as_tuple=True)
         anomaly_data = data[anomaly_index]
+        anomaly_data = anomaly_data.unsqueeze(1)
         anomaly_targets = targets[anomaly_index]
         normal_data = data[normal_index]
+        normal_data = normal_data.unsqueeze(1)
         normal_targets = targets[normal_index]
-        anomaly_dataset = torch.utils.data.TensorDataset(anomaly_data, anomaly_targets)
-        normal_dataset = torch.utils.data.TensorDataset(normal_data, normal_targets)
-        train_length = int(len(normal_dataset) * train_ratio)
-        valid_length = int(len(normal_dataset) * valid_ratio)
-        test_length = len(normal_dataset) - train_length - valid_length
-        train_dataset, valid_dataset, test_dataset = torch.utils.data.random_split(normal_dataset, [train_length, valid_length, test_length])
-        # 3. Adjusting the balance of the anomaly ratio of the test set of normal data and the data set of abnormal data set
-        current_ratio = len(anomaly_dataset) / (test_length + len(anomaly_dataset))
+        # shuffle
+        normal_shuffle_idx = torch.randperm(normal_data.shape[0])
+        anomaly_shuffle_idx = torch.randperm(anomaly_data.shape[0])
+        normal_data = normal_data[normal_shuffle_idx]
+        normal_targets = normal_targets[normal_shuffle_idx]
+        anomaly_data = anomaly_data[anomaly_shuffle_idx]
+        anomaly_targets = anomaly_targets[anomaly_shuffle_idx]
+        # split
+        train_length = int(len(normal_data) * train_ratio)
+        valid_length = int(len(normal_data) * valid_ratio)
+        test_length = len(normal_data) - train_length - valid_length
+        train_data, valid_data, test_data = torch.split(normal_data, [train_length, valid_length, test_length])
+        train_targets, valid_targets, test_targets = torch.split(normal_targets, [train_length, valid_length, test_length])
+        # 3. Adjusting the balance of the anomaly ratio of the test set of normal data and the data of abnormal data
+        current_ratio = anomaly_data.shape[0] / (test_length + anomaly_data.shape[0])
         if current_ratio < args.anomaly_ratio:
             normal_count = int(len(anomaly_dataset) / args.anomaly_ratio - len(anomaly_dataset))
-            test_dataset = torch.utils.data.Subset(test_dataset, torch.randperm(test_length)[:normal_count])
-            print(len(test_dataset))
+            normal_index = torch.randperm(test_length)[:normal_count]
+            test_data = test_data[normal_index]
+            test_targets = test_target[normal_index]
         elif current_ratio > args.anomaly_ratio:
             anomaly_count = int(test_length * args.anomaly_ratio / (1 - args.anomaly_ratio))
-            anomaly_dataset = torch.utils.data.Subset(anomaly_dataset, torch.randperm(len(anomaly_dataset))[:anomaly_count])
-            print(len(anomaly_dataset))
+            anomaly_index = torch.randperm(anomaly_data.shape[0])[:anomaly_count]
+            anomaly_data = anomaly_data[anomaly_index]
+            anomaly_targets = anomaly_targets[anomaly_index]
         else:
             pass
-        # 4. concatenate dataset
-        test_dataset = torch.utils.data.ConcatDataset((test_dataset, anomaly_dataset))
-        # 5. apply transforms
-        train_dataset.transform = original_train_dataset.transform
-        train_dataset.target_transform = original_train_dataset.target_transform
-        valid_dataset.transform = original_train_dataset.transform
-        valid_dataset.target_transform = original_train_dataset.target_transform
-        test_dataset.transform = original_test_dataset.transform
-        test_dataset.target_transform = original_test_dataset.target_transform
+        # 4. concatenate data
+        test_data = torch.cat((test_data, anomaly_data), 0)
+        test_targets = torch.cat((test_targets, anomaly_targets), 0)
+        # 5. make dataset
+        train_dataset = torch.utils.data.TensorDataset(train_data, train_targets)
+        valid_dataset = torch.utils.data.TensorDataset(valid_data, valid_targets)
+        test_dataset = torch.utils.data.TensorDataset(test_data, test_targets)
         return train_dataset, valid_dataset, test_dataset
 
     def _get_data_loader(self, args, dataset):
@@ -139,11 +150,31 @@ class ImageDataset(torch.utils.data.Dataset):
             y = self.target_transform(y)
         return x, y
 
+class customTensorDataset(torch.utils.data.Dataset):
+    def __init__(self, *tensors, transform=None, target_transform=None):
+        assert all(tensors[0].shape[0] == tensor.shape[0] for tensor in tensors), 'tensor dimension mismatch'
+        self.tensors = tensors
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __getitem__(self, index):
+        x = self.tensors[0]
+        y = self.tensors[1]
+        x = self.transform(x)
+        y = self.target_transform(y)
+        return tuple(x, y)
+
+    def __len__(self):
+        return self.tensors[0].size(0)
 
 if __name__ == "__main__":
     from torchvision.utils import save_image
     args = parser.get_args()
-
+    print('running config :', args)
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    USE_CUDA = torch.cuda.is_available()
+    
     # Reproducibility
     random_seed = args.random_seed
     torch.manual_seed(random_seed)
@@ -154,17 +185,24 @@ if __name__ == "__main__":
     np.random.seed(random_seed)
     random.seed(random_seed)
 
+    DEVICE = torch.device("cuda" if USE_CUDA else "cpu")
+    print("Using Device: ",DEVICE)
+
     data_loader = DataLoader(args)
-    dataiter = iter(data_loader.train_data_loader)
-    for batch_ndx, sample in enumerate(data_loader.train_data_loader):
-        for i in range(len(sample[0])):
-            print("shape: ", sample[0][i].shape, "label: ", sample[1][i])
-            save_image(sample[0][i].double(), "/root/anomaly_detection/temp/" + str(batch_ndx) + "_" + str(i) + "_" + str(sample[1][i]) + ".png", "PNG")
-    for batch_ndx, sample in enumerate(data_loader.valid_data_loader):
-        for i in range(len(sample[0])):
-            print("shape: ", sample[0][i].shape, "label: ", sample[1][i])
-            save_image(sample[0][i].double(), "/root/anomaly_detection/temp/" + str(batch_ndx) + "_" + str(i) + "_" + str(sample[1][i]) + ".png", "PNG")
-    for batch_ndx, sample in enumerate(data_loader.test_data_loader):
-        for i in range(len(sample[0])):
-            print("shape: ", sample[0][i].shape, "label: ", sample[1][i])
-            save_image(sample[0][i].double(), "/root/anomaly_detection/temp/" + str(batch_ndx) + "_" + str(i) + "_" + str(sample[1][i]) + ".png", "PNG")
+    # dataiter = iter(data_loader.train_data_loader)
+    for batch_idx, (batch_imgs, batch_label) in enumerate(data_loader.train_data_loader):
+    # for batch_ndx, sample in enumerate(data_loader.train_data_loader):
+        batch_imgs = batch_imgs.to(device=DEVICE, dtype=torch.float)
+        batch_label = batch_label.to(device=DEVICE, dtype=torch.float)
+        for i in range(len(batch_imgs)):
+            pass
+            # print("shape: ", batch_imgs[i].shape, "label: ", batch_label[i])
+            # save_image(batch_imgs[i].double(), "/root/anomaly_detection/temp/" + str(batch_idx) + "_" + str(i) + "_" + str(batch_label[i]) + ".png", "PNG")
+    for batch_idx, (batch_imgs, batch_label) in enumerate(data_loader.valid_data_loader):
+        for i in range(len(batch_imgs)):
+            print("shape: ", batch_imgs[i].shape, "label: ", batch_label[i])
+            # save_image(batch_imgs[i].double(), "/root/anomaly_detection/temp/" + str(batch_idx) + "_" + str(i) + "_" + str(batch_label[i]) + ".png", "PNG")
+    for batch_idx, (batch_imgs, batch_label) in enumerate(data_loader.test_data_loader):
+        for i in range(len(batch_imgs)):
+            print("shape: ", batch_imgs[i].shape, "label: ", batch_label[i])
+            # save_image(batch_imgs[i].double(), "/root/anomaly_detection/temp/" + str(batch_idx) + "_" + str(i) + "_" + str(batch_label[i]) + ".png", "PNG")
