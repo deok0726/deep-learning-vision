@@ -39,7 +39,9 @@ class DataLoader:
     
     def _preprocess_to_anomaly_detection_dataset(self, args, original_train_dataset, original_test_dataset):
         # Divide normal data according to the ratio of training set: validation set: test set
-        # 1. Combine original training set and test set
+        # ================================================================== #
+        #            1. Combine original training set and test set           #
+        # ================================================================== #
         total_ratio = args.train_ratio + args.valid_ratio + args.test_ratio
         train_ratio = args.train_ratio / total_ratio
         valid_ratio = args.valid_ratio / total_ratio
@@ -50,7 +52,9 @@ class DataLoader:
         targets = torch.cat((train_targets, test_targets))
         if isinstance(data, torch.ByteTensor):
             data = data.float().div(255)
-        # 2. Split training data, validation data, and test data according to the label
+        # ============================================================================= #
+        # 2. Split training data, validation data, and test data according to the label #
+        # ============================================================================= #
         anomaly_mask = targets == args.anomaly_class
         anomaly_index = torch.nonzero(anomaly_mask, as_tuple=True)
         normal_index = torch.nonzero(~anomaly_mask, as_tuple=True)
@@ -73,7 +77,10 @@ class DataLoader:
         test_length = len(normal_data) - train_length - valid_length
         train_data, valid_data, test_data = torch.split(normal_data, [train_length, valid_length, test_length])
         train_targets, valid_targets, test_targets = torch.split(normal_targets, [train_length, valid_length, test_length])
-        # 3. Adjusting the balance of the anomaly ratio of the test set of normal data and the data of abnormal data
+        # ============================================================================= #
+        #           3. Adjusting the balance of the anomaly ratio of the test           #
+        #               set of normal data and the data of abnormal data                #
+        # ============================================================================= #
         current_ratio = anomaly_data.shape[0] / (test_length + anomaly_data.shape[0])
         if current_ratio < args.anomaly_ratio:
             normal_count = int(len(anomaly_dataset) / args.anomaly_ratio - len(anomaly_dataset))
@@ -87,10 +94,14 @@ class DataLoader:
             anomaly_targets = anomaly_targets[anomaly_index]
         else:
             pass
-        # 4. concatenate data
+        # ================================================================== #
+        #                         4. concatenate data                        #
+        # ================================================================== #
         test_data = torch.cat((test_data, anomaly_data), 0)
         test_targets = torch.cat((test_targets, anomaly_targets), 0)
-        # 5. make dataset
+        # ================================================================== #
+        #                           5. make dataset                          #
+        # ================================================================== #
         train_dataset = torch.utils.data.TensorDataset(train_data, train_targets)
         valid_dataset = torch.utils.data.TensorDataset(valid_data, valid_targets)
         test_dataset = torch.utils.data.TensorDataset(test_data, test_targets)

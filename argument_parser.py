@@ -4,10 +4,11 @@ import os
 parser = argparse.ArgumentParser(description='anomaly_detection')
 
 # main
-parser.add_argument('--backbone_name', type=str, default='AE', help="model name")
+parser.add_argument('--model_name', type=str, default='AE', help="model name")
 parser.add_argument('--num_epoch', type=int, default=10, help="num_epoch")
 parser.add_argument('--batch_size', type=int, default=50, help="batch size")
 parser.add_argument('--learning_rate', type=float, default='0.001', help="learning rate")
+parser.add_argument('--train', action='store_true', default=False, help="start training")
 
 # data loader
 parser.add_argument('--random_seed', type=int, default=0, help="random seed")
