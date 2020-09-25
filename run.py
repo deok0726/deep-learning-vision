@@ -8,6 +8,7 @@ import argument_parser as parser
 from utils.utils import AverageMeter
 from main.trainers.trainer import Trainer
 from data_loader import DataLoader
+from modules import custom_metrics
 
 if __name__ == '__main__':
     # get arguments
@@ -45,15 +46,16 @@ if __name__ == '__main__':
     model = Model(n_channels=1).to(DEVICE, dtype=torch.float)
 
     # losses
-    losses = dict(
+    losses_dict = dict(
         MSE = torch.nn.MSELoss(reduction='none'),  # squared l2 loss
         L1 = torch.nn.L1Loss(reduction='none')  # l1 loss
     )
     
     # metrics
-    metrics = dict(
+    metrics_dict = dict(
         MSE = torch.nn.MSELoss(reduction='none'),
-        L1 = torch.nn.L1Loss(reduction='none')
+        L1 = torch.nn.L1Loss(reduction='none'),
+        ROC = custom_metrics.ROC(args.target_label)
     )
     
     # optimizer
@@ -61,7 +63,7 @@ if __name__ == '__main__':
 
     # train
     if args.train:
-        trainer = Trainer(args, data_loader, model, losses, optimizer, metrics, DEVICE)
+        trainer = Trainer(args, data_loader, model, losses_dict, optimizer, metrics_dict, DEVICE)
         trainer.train()
 
     # TBD: Test

@@ -11,6 +11,7 @@ parser.add_argument('--learning_rate', type=float, default='0.001', help="learni
 parser.add_argument('--train', action='store_true', default=False, help="start training")
 parser.add_argument('--exp_name', type=str, default='temp', help="experiment name")
 parser.add_argument('--tensorboard_shown_image_num', type=int, default=4, help="The number of the images shown in tensorboard")
+parser.add_argument('--target_label', type=int, default=1, help="target label")
 
 # data loader
 parser.add_argument('--random_seed', type=int, default=0, help="random seed")

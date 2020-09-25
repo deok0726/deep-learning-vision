@@ -9,6 +9,7 @@ import os
 import matplotlib.pyplot as plt
 import copy
 plt.rcParams.update({'axes.titlesize': 'small'})
+from sklearn import metrics
 # import numpy as np
 
 
@@ -78,14 +79,23 @@ class Trainer:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.train_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
+        total_loss_per_batch = 0
+        batch_diff_per_batch = batch_data - output_data
+        for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
+            total_loss_per_batch += loss_per_batch.mean()
+        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
+        total_loss_per_batch.backward()
         for metric_func_name, metric_func in self.metric_funcs.items():
-            metric_value = metric_func(batch_data, output_data)
+            if metric_func_name == 'ROC':
+                try:
+                    metric_value = metric_func(batch_diff_per_batch.cpu().detach().numpy(), batch_label.cpu().detach().numpy())
+                except Exception as e:
+                    metric_value = 0
+                    print(e)
+            else:
+                metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
             self.train_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
-        total_loss_per_batch = 0
-        for loss_per_batch in self.losses_per_batch.values():
-            total_loss_per_batch += loss_per_batch.mean()
-        total_loss_per_batch.backward()
         self.optimizer.step()
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
@@ -102,8 +112,16 @@ class Trainer:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.valid_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
+        batch_diff_per_batch = batch_data - output_data
+        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         for metric_func_name, metric_func in self.metric_funcs.items():
-            metric_value = metric_func(batch_data, output_data)
+            if metric_func_name == 'ROC':
+                try:
+                    metric_value = metric_func(batch_diff_per_batch.cpu().detach().numpy(), batch_label.cpu().detach().numpy())
+                except Exception as e:
+                    print(e)
+            else:
+                metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
             self.valid_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
