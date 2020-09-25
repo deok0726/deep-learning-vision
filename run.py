@@ -46,12 +46,14 @@ if __name__ == '__main__':
 
     # losses
     losses = dict(
-        mse = torch.nn.MSELoss()  # squared l2 loss
-        )
+        MSE = torch.nn.MSELoss(reduction='none'),  # squared l2 loss
+        L1 = torch.nn.L1Loss(reduction='none')  # l1 loss
+    )
     
     # metrics
     metrics = dict(
-        mse = torch.nn.MSELoss()
+        MSE = torch.nn.MSELoss(reduction='none'),
+        L1 = torch.nn.L1Loss(reduction='none')
     )
     
     # optimizer
@@ -61,3 +63,6 @@ if __name__ == '__main__':
     if args.train:
         trainer = Trainer(args, data_loader, model, losses, optimizer, metrics, DEVICE)
         trainer.train()
+
+    # TBD: Test
+    # TBD: add tensorboard projector to test data(https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html)

@@ -14,6 +14,8 @@ class DataLoader:
         source_transform_list = self._get_transform(args, is_target=False)
         target_transform_list = self._get_transform(args, is_target=True)
         train_dataset, valid_dataset, test_dataset = self._get_datasets(args, source_transform=source_transform_list, target_transform=target_transform_list)
+        sample_train_data = train_dataset.__getitem__(np.random.randint(train_dataset.__len__()))[0]
+        self.sample_train_data = sample_train_data.unsqueeze(0)
         self.train_data_loader = self._get_data_loader(args, train_dataset)
         self.valid_data_loader = self._get_data_loader(args, valid_dataset)
         self.test_data_loader = self._get_data_loader(args, test_dataset)
@@ -83,10 +85,10 @@ class DataLoader:
         # ============================================================================= #
         current_ratio = anomaly_data.shape[0] / (test_length + anomaly_data.shape[0])
         if current_ratio < args.anomaly_ratio:
-            normal_count = int(len(anomaly_dataset) / args.anomaly_ratio - len(anomaly_dataset))
+            normal_count = int(len(anomaly_data) / args.anomaly_ratio - len(anomaly_data))
             normal_index = torch.randperm(test_length)[:normal_count]
             test_data = test_data[normal_index]
-            test_targets = test_target[normal_index]
+            test_targets = test_targets[normal_index]
         elif current_ratio > args.anomaly_ratio:
             anomaly_count = int(test_length * args.anomaly_ratio / (1 - args.anomaly_ratio))
             anomaly_index = torch.randperm(anomaly_data.shape[0])[:anomaly_count]
@@ -200,14 +202,11 @@ if __name__ == "__main__":
     print("Using Device: ",DEVICE)
 
     data_loader = DataLoader(args)
-    # dataiter = iter(data_loader.train_data_loader)
     for batch_idx, (batch_imgs, batch_label) in enumerate(data_loader.train_data_loader):
-    # for batch_ndx, sample in enumerate(data_loader.train_data_loader):
         batch_imgs = batch_imgs.to(device=DEVICE, dtype=torch.float)
         batch_label = batch_label.to(device=DEVICE, dtype=torch.float)
         for i in range(len(batch_imgs)):
-            pass
-            # print("shape: ", batch_imgs[i].shape, "label: ", batch_label[i])
+            print("shape: ", batch_imgs[i].shape, "label: ", batch_label[i])
             # save_image(batch_imgs[i].double(), "/root/anomaly_detection/temp/" + str(batch_idx) + "_" + str(i) + "_" + str(batch_label[i]) + ".png", "PNG")
     for batch_idx, (batch_imgs, batch_label) in enumerate(data_loader.valid_data_loader):
         for i in range(len(batch_imgs)):
