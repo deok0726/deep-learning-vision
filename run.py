@@ -1,83 +1,70 @@
 import torch
 import torchvision
+import numpy as np
+import random
 import os
-# from data_tools.utils import AverageMeter
-# from utils import AverageMeter
-# from torch_utils import AverageMeter
-from utils.utils import AverageMeter
 import time, datetime
-
 import argument_parser as parser
-from main import trainer
+from utils.utils import AverageMeter
+from main.trainers.trainer import Trainer
+from data_loader import DataLoader
+from modules import custom_metrics
 
 if __name__ == '__main__':
-    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-    USE_CUDA = torch.cuda.is_available()
-    DEVICE = torch.device("cuda" if USE_CUDA else "cpu")
-    print("Using Device: ",DEVICE)
-
+    # get arguments
     args = parser.get_args()
     print('running config :', args)
 
-    # DATA
-    ## download mnist
-    train_data = torchvision.datasets.MNIST(root='data_tmp/', train=True, transform=torchvision.transforms.ToTensor(), download=True)
-    test_data  = torchvision.datasets.MNIST(root='data_tmp/', train=False, transform=torchvision.transforms.ToTensor(), download=True)
-    print(train_data[0][0].shape)
-    ## DataLoader tmp
-    train_data_loader = torch.utils.data.DataLoader(train_data, args.batch_size, shuffle=True)
-    test_data_loader = torch.utils.data.DataLoader(test_data, args.batch_size, shuffle=True)
-    ## mini batch
-    # example_mini_batch_img, example_mini_batch_label  = next(iter(train_data_loader))
-    # print(example_mini_batch_img.shape)
+    # set cuda device
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    USE_CUDA = torch.cuda.is_available()
+    
+    # Reproducibility
+    random_seed = args.random_seed
+    torch.manual_seed(random_seed)
+    np.random.seed(random_seed)
+    random.seed(random_seed)
+    if(USE_CUDA):
+        torch.cuda.manual_seed(random_seed)
+        # torch.cuda.manual_seed_all(random_seed) # if use multi-GPU
+        
+        # Deterministic operation(may have a negative single-run performance impact, depending on the composition of your model.)
+        # torch.backends.cudnn.deterministic = True
+        # torch.backends.cudnn.benchmark = False
+    
+    # Select Device
+    DEVICE = torch.device("cuda" if USE_CUDA else "cpu")
+    print("Using Device: ",DEVICE)
+    # TBD: Multi-GPU
 
-    # MODEL
-    # from models.AE import Autoencoder
-    # model = Autoencoder().to(DEVICE)
+    # Load Data
+    data_loader = DataLoader(args)
+
+    # Load Model
     from models.AE_tmp import Model
-    model = Model().to(DEVICE)
+    model = Model(n_channels=1).to(DEVICE, dtype=torch.float)
 
-    # loss & optimizer
+    # losses
+    losses_dict = dict(
+        MSE = torch.nn.MSELoss(reduction='none'),  # squared l2 loss
+        L1 = torch.nn.L1Loss(reduction='none')  # l1 loss
+    )
+    
+    # metrics
+    metrics_dict = dict(
+        MSE = torch.nn.MSELoss(reduction='none'),
+        L1 = torch.nn.L1Loss(reduction='none'),
+        ROC = custom_metrics.ROC(args.target_label)
+    )
+    
+    # optimizer
     optimizer = torch.optim.SGD(model.parameters(), lr = args.learning_rate)
-    loss = torch.nn.MSELoss()   # squared l2 loss
 
-    # experiment & train general
-    for epoch_idx in range(0,args.num_epoch):
-        batch_time = AverageMeter()
-        data_time = AverageMeter()
-        losses = AverageMeter()
-        model.train() # nn.Module
+    # train
+    if args.train:
+        trainer = Trainer(args, data_loader, model, losses_dict, optimizer, metrics_dict, DEVICE)
+        trainer.train()
 
-        end_time = time.time()
-        for batch_idx, (batch_imgs, batch_label) in enumerate(train_data_loader):
-            print('start')
-            print(batch_idx,batch_imgs.shape)
-            data_time.update(time.time() - end_time)
-            curr_time = datetime.datetime.now()
-            curr_time = datetime.datetime.strftime(curr_time, '%Y-%m-%d %H:%M:%S')
-            # train detail step 
-            batch_imgs = batch_imgs.cuda()
-            output_imgs = model(batch_imgs)
-            cost = loss(output_imgs, batch_imgs)
-            model.zero_grad()
-            cost.backward()
-            optimizer.step()
-            losses.update(cost.item(),batch_imgs.size(0))
-            #
-            batch_time.update(time.time() - end_time)
-            end_time = time.time()
-            print("current time :\t",curr_time)
-            print("epoch index :\t",epoch_idx)
-            print("batch index :\t",batch_idx+1)
-            print("learning rate :\t",optimizer.param_groups[0]['lr'])
-            print("batch_time :\t",batch_time.avg)
-            print("data_time :\t",data_time.avg)
-            print("loss :\t\t", losses.avg)
-        if (epoch_idx+1) % 1 == 0:
-            states = {
-                'epoch': epoch_idx + 1,
-                'state_dict': model.state_dict()
-                }
-            torch.save(states, os.path.join(args.save_dir, 'tmp_model_epoch{}.pth'.format(epoch_idx + 1)))
-                
+    # TBD: Test
+    # TBD: add tensorboard projector to test data(https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html)
