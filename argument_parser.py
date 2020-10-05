@@ -13,6 +13,7 @@ parser.add_argument('--test', action='store_true', default=False, help="start te
 parser.add_argument('--exp_name', type=str, default='temp', help="experiment name")
 parser.add_argument('--tensorboard_shown_image_num', type=int, default=4, help="The number of the images shown in tensorboard")
 parser.add_argument('--target_label', type=int, default=0, help="target label")
+parser.add_argument('--unique_anomaly', action='store_true', default=False, help="Unique anomaly class")
 
 # data loader
 parser.add_argument('--random_seed', type=int, default=0, help="random seed")
