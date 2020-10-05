@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# Refer to https://github.com/FishSmile-syx/ITAE-Pytorch-Anomaly_Detection/blob/master/model/ITAE.py
 # Refer to https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_parts.py
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""

@@ -6,9 +6,7 @@ class ROC(object):
         print('roc object init')
     def __call__(self, score, test_label):
         try:
-            test_label[test_label != self.target_label] = 0
-            test_label[test_label == self.target_label] = 1
-            fprs, tprs, _ = metrics.roc_curve(test_label, score)
+            fprs, tprs, _ = metrics.roc_curve(test_label, score, self.target_label)
             return metrics.auc(fprs, tprs)
         except Exception as e:
             print(e)
