@@ -67,7 +67,7 @@ if __name__ == '__main__':
         trainer.train()
 
     # TBD: add tensorboard projector to test data(https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html)
-    metrics_dict['ROC'] = custom_metrics.ROC(args.target_label)
+    metrics_dict['ROC'] = custom_metrics.ROC(args.target_label, args.unique_anomaly)
     if args.test:
         tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
         tester.test()
