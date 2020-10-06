@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from utils.utils import AverageMeter, matplotlib_imshow
+from modules.utils import AverageMeter, matplotlib_imshow
 from math import ceil
 import time, datetime
 import torch
@@ -14,12 +14,12 @@ from sklearn import metrics
 
 
 class Trainer:
-    def __init__(self, args, dataloader, model, loss_funcs: dict, optimizer, metric_funcs: dict, device):
+    def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
         self.args = args
         self.dataloader = dataloader
         self.model = model
-        self.loss_funcs = loss_funcs
         self.optimizer = optimizer
+        self.loss_funcs = loss_funcs
         self.metric_funcs = metric_funcs
         self.device = device
         self._set_training_constants()
@@ -37,11 +37,11 @@ class Trainer:
             # ================================================================== #
             self.model.train()
             self.end_time = time.time()
-            print(len(self.dataloader.train_data_loader))
+            # print(len(self.dataloader.train_data_loader))
             for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.train_data_loader), total=len(self.dataloader.train_data_loader), desc='Epoch %d' % self.epoch_idx):
                 self.batch_idx = batch_idx
                 self.global_step += 1
-                self._train_step(batch_data, batch_label)                
+                self._train_step(batch_data, batch_label)
                 if batch_idx % self.TRAIN_LOG_INTERVAL == 0:
                     print('Train Batch Step', 'batch idx', self.batch_idx, 'batch data shape', batch_data.shape)
                     self._log_progress()
@@ -80,20 +80,11 @@ class Trainer:
             self.losses_per_batch[loss_func_name] = loss_values
             self.train_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
         total_loss_per_batch = 0
-        batch_diff_per_batch = batch_data - output_data
         for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
             total_loss_per_batch += loss_per_batch.mean()
-        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         total_loss_per_batch.backward()
         for metric_func_name, metric_func in self.metric_funcs.items():
-            if metric_func_name == 'ROC':
-                try:
-                    metric_value = metric_func(batch_diff_per_batch.cpu().detach().numpy(), batch_label.cpu().detach().numpy())
-                except Exception as e:
-                    metric_value = 0
-                    print(e)
-            else:
-                metric_value = metric_func(batch_data, output_data)
+            metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
             self.train_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.optimizer.step()
@@ -112,16 +103,8 @@ class Trainer:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.valid_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
-        batch_diff_per_batch = batch_data - output_data
-        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         for metric_func_name, metric_func in self.metric_funcs.items():
-            if metric_func_name == 'ROC':
-                try:
-                    metric_value = metric_func(batch_diff_per_batch.cpu().detach().numpy(), batch_label.cpu().detach().numpy())
-                except Exception as e:
-                    print(e)
-            else:
-                metric_value = metric_func(batch_data, output_data)
+            metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
             self.valid_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
@@ -201,7 +184,7 @@ class Trainer:
             training_state = "valid"
             losses_per_epoch = self.valid_losses_per_epoch
             metric_per_epoch = self.valid_metrics_per_epoch
-        fig = plt.figure(figsize=(self.args.tensorboard_shown_image_num, self.args.tensorboard_shown_image_num))
+        fig = plt.figure(figsize=(4, self.args.tensorboard_shown_image_num))
         for idx in range(self.args.tensorboard_shown_image_num):
             losses = []
             metrics = []
@@ -210,8 +193,9 @@ class Trainer:
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
                 losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[idx].mean().item(), 3)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value.mean().item(), 3)))))
-            ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[idx].item()))
+                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[idx].mean().item(), 3)))))
+            # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[idx].item()))
+            ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[idx].item()))
             ax_batch = fig.add_subplot(2, self.args.tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             matplotlib_imshow(batch_data[idx], one_channel=self.one_channel)
             ax_batch.set_title("Ground Truth")

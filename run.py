@@ -5,10 +5,11 @@ import random
 import os
 import time, datetime
 import argument_parser as parser
-from utils.utils import AverageMeter
 from main.trainers.trainer import Trainer
+from main.testers.tester import Tester
 from data_loader import DataLoader
 from modules import custom_metrics
+from modules.utils import AverageMeter
 
 if __name__ == '__main__':
     # get arguments
@@ -54,8 +55,7 @@ if __name__ == '__main__':
     # metrics
     metrics_dict = dict(
         MSE = torch.nn.MSELoss(reduction='none'),
-        L1 = torch.nn.L1Loss(reduction='none'),
-        ROC = custom_metrics.ROC(args.target_label)
+        L1 = torch.nn.L1Loss(reduction='none')
     )
     
     # optimizer
@@ -63,8 +63,11 @@ if __name__ == '__main__':
 
     # train
     if args.train:
-        trainer = Trainer(args, data_loader, model, losses_dict, optimizer, metrics_dict, DEVICE)
+        trainer = Trainer(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
         trainer.train()
 
-    # TBD: Test
     # TBD: add tensorboard projector to test data(https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html)
+    metrics_dict['ROC'] = custom_metrics.ROC(args.target_label, args.unique_anomaly)
+    if args.test:
+        tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+        tester.test()

@@ -57,7 +57,10 @@ class DataLoader:
         # ============================================================================= #
         # 2. Split training data, validation data, and test data according to the label #
         # ============================================================================= #
-        anomaly_mask = targets == args.anomaly_class
+        if args.unique_anomaly:
+            anomaly_mask = targets == args.target_label
+        else:
+            anomaly_mask = targets != args.target_label
         anomaly_index = torch.nonzero(anomaly_mask, as_tuple=True)
         normal_index = torch.nonzero(~anomaly_mask, as_tuple=True)
         anomaly_data = data[anomaly_index]
