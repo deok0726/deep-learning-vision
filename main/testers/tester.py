@@ -22,7 +22,6 @@ class Tester:
 
     def test(self):
         self._restore_checkpoint()
-        # self.global_step = 0
         self.model.eval()
         self.end_time = time.time()
         print(len(self.dataloader.test_data_loader))
@@ -32,7 +31,6 @@ class Tester:
             if batch_idx % self.TEST_LOG_INTERVAL == 0:
                 print('Test Batch Step', 'batch idx', self.batch_idx, 'batch data shape', batch_data.shape)
                 self._log_progress()
-            # self.global_step += 1
 
     def _test_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)

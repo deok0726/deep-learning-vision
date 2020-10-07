@@ -197,6 +197,9 @@ class Trainer:
             # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[idx].item()))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[idx].item()))
             ax_batch = fig.add_subplot(2, self.args.tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
+            # if training_state == "train":
+            #     torchvision.utils.save_image(batch_data[idx].double(), "/root/anomaly_detection/temp/batch_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
+            #     torchvision.utils.save_image(output_data[idx].double(), "/root/anomaly_detection/temp/output_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
             matplotlib_imshow(batch_data[idx], one_channel=self.one_channel)
             ax_batch.set_title("Ground Truth")
         plt.tight_layout()

@@ -1,8 +1,9 @@
 from torch import nn
 
-class Autoencoder(nn.Module):
-    def __init__(self):
-        super(Autoencoder, self).__init__()
+class Model(nn.Module):
+    def __init__(self, n_channels):
+        super(Model, self).__init__()
+        self.n_channels = n_channels
         self.encoder = nn.Sequential(
             nn.Linear(28 * 28, (28 * 28)-(76*1)),
             nn.ReLU(True),
@@ -83,6 +84,9 @@ class Autoencoder(nn.Module):
         
 
     def forward(self, x):
-        encoded = self.encoder(x.view(50, 1*28*28))
-        decoded = self.decoder(encoded)
-        return decoded
+        if self.n_channels == 1:
+            encoded = self.encoder(x.view(-1, x.shape[-1]*x.shape[-2]))
+        elif self.n_channels == 3:
+            encoded = self.encoder(x.view(-1, x.shape[-1]*x.shape[-2]*x.shape[-3]))
+        # decoded = self.decoder(encoded).view(x.shape)
+        return self.decoder(encoded).view(x.shape)

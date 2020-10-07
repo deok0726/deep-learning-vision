@@ -1,10 +1,12 @@
 from torch import nn
 
-class Autoencoder(nn.Module):
-    def __init__(self, channel_num):
-        super(Autoencoder, self).__init__()
-        self.encoder = Encoder(channel_num)
-        self.decoder = Decoder(channel_num)
+
+# Refer to https://github.com/h19920918/memae/blob/master/model.py
+class Model(nn.Module):
+    def __init__(self, n_channels):
+        super(Model, self).__init__()
+        self.encoder = Encoder(n_channels)
+        self.decoder = Decoder(n_channels)
 
     def forward(self, x):
         z = self.encoder(x)
