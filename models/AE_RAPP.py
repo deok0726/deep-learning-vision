@@ -88,5 +88,4 @@ class Model(nn.Module):
             encoded = self.encoder(x.view(-1, x.shape[-1]*x.shape[-2]))
         elif self.n_channels == 3:
             encoded = self.encoder(x.view(-1, x.shape[-1]*x.shape[-2]*x.shape[-3]))
-        # decoded = self.decoder(encoded).view(x.shape)
         return self.decoder(encoded).view(x.shape)

@@ -14,11 +14,12 @@ from sklearn import metrics
 
 
 class Trainer:
-    def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
+    def __init__(self, args, dataloader, model, optimizer, lr_scheduler, loss_funcs: dict, metric_funcs: dict, device):
         self.args = args
         self.dataloader = dataloader
         self.model = model
         self.optimizer = optimizer
+        self.lr_scheduler = lr_scheduler
         self.loss_funcs = loss_funcs
         self.metric_funcs = metric_funcs
         self.device = device
@@ -66,6 +67,8 @@ class Trainer:
             self._reset_training_variables(is_valid=True)
             self._save_checkpoint()
             self.epoch_idx += 1
+            if self.lr_scheduler is not None:
+                self.lr_scheduler.step()
         self._log_hparams()
 
     def _train_step(self, batch_data, batch_label):
@@ -184,22 +187,22 @@ class Trainer:
             training_state = "valid"
             losses_per_epoch = self.valid_losses_per_epoch
             metric_per_epoch = self.valid_metrics_per_epoch
-        fig = plt.figure(figsize=(4, self.args.tensorboard_shown_image_num))
-        for idx in range(self.args.tensorboard_shown_image_num):
+        fig = plt.figure(figsize=(8, 8))
+        for idx in range(self.args.train_tensorboard_shown_image_num):
             losses = []
             metrics = []
-            ax_output = fig.add_subplot(2, self.args.tensorboard_shown_image_num, idx+self.args.tensorboard_shown_image_num+1, xticks=[], yticks=[])
+            ax_output = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num+1, xticks=[], yticks=[])
             matplotlib_imshow(output_data[idx], one_channel=self.one_channel)
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
-                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[idx].mean().item(), 3)))))
+                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[idx].mean().item(), 3)))))
+                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[idx].mean().item(), 10)))))
             # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[idx].item()))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[idx].item()))
-            ax_batch = fig.add_subplot(2, self.args.tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
+            ax_batch = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             # if training_state == "train":
-            #     torchvision.utils.save_image(batch_data[idx].double(), "/root/anomaly_detection/temp/batch_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
-            #     torchvision.utils.save_image(output_data[idx].double(), "/root/anomaly_detection/temp/output_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
+                # torchvision.utils.save_image(batch_data[idx].double(), "/root/anomaly_detection/temp/batch_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
+                # torchvision.utils.save_image(output_data[idx].double(), "/root/anomaly_detection/temp/output_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
             matplotlib_imshow(batch_data[idx], one_channel=self.one_channel)
             ax_batch.set_title("Ground Truth")
         plt.tight_layout()

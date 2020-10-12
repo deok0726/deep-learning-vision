@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # set cuda device
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
     USE_CUDA = torch.cuda.is_available()
     
     # Reproducibility
@@ -42,30 +42,15 @@ if __name__ == '__main__':
     # Load Data
     data_loader = DataLoader(args)
 
-    # Raw MNIST
-    # import torchvision.datasets as dset
-    # import torchvision.transforms as transforms
-    # mnist_train = dset.MNIST(args.dataset_root, train=True, transform=transforms.ToTensor(), target_transform=None, download=True)
-    # mnist_test = dset.MNIST(args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=None, download=True)
-    # train_loader = torch.utils.data.DataLoader(mnist_train,batch_size=args.batch_size, shuffle=True,num_workers=0,drop_last=True)
-    # test_loader = torch.utils.data.DataLoader(mnist_test,batch_size=args.batch_size, shuffle=False,num_workers=0,drop_last=True)
-    # class DL:
-    #     def __init__(self, train_loader, test_loader):
-    #         # sample_train_data = mnist_train.__getitem__(np.random.randint(mnist_train.__len__()))[0]
-    #         # self.sample_train_data = sample_train_data
-    #         # self.sample_train_data = sample_train_data.unsqueeze(0)
-    #         self.train_data_loader = train_loader
-    #         self.valid_data_loader = test_loader
-    # data_loader = DL(train_loader, test_loader)
-
     # Load Model
     # from models.AE_basic_1 import Model
     # from models.AE_basic_2 import Model
-    # from models.AE_RAPP import Model
-    from models.CAE_basic_1 import Model
+    from models.AE_RAPP import Model
+    # from models.CAE_basic_1 import Model
     # from models.CAE_basic_2 import Model
+    # from models.CAE_MvTec import Model
     # from models.CAE_MemAE import Model
-    # from models.CAE_ITAE import Model
+    # from models.CAE_ARNet import Model
     # model = Model().to(DEVICE, dtype=torch.float)
     model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
 
@@ -83,10 +68,23 @@ if __name__ == '__main__':
     
     # optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
+    if args.learning_rate_decay:
+        # lrs = np.linspace(args.learning_rate, args.end_learning_rate, args.num_epoch)
+        # lr_scheduler_function = lambda epoch: lrs[epoch]
+        # def lr_scheduler_function(epoch):
+        #     print("epoch: ", epoch)
+        #     print("decayed learning rate: ", lrs[epoch])
+        #     return lrs[epoch]
+        # lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_scheduler_function, last_epoch=0)
+        multiplier = (args.end_learning_rate / args.learning_rate) ** (1.0/(float(args.num_epoch)-1))
+        lr_scheduler_function = lambda epoch: multiplier
+        lr_scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer, lr_scheduler_function)
+    else:
+        lr_scheduler = None
 
     # train
     if args.train:
-        trainer = Trainer(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+        trainer = Trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
         trainer.train()
 
     # TBD: add tensorboard projector to test data(https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html)

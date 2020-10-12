@@ -41,7 +41,6 @@ class Encoder(nn.Module):
     def forward(self,x):
         out = self.layer1(x)
         out = self.layer2(out)
-        # out = out.view(x.shape[0], -1)
         return out
     
 class Decoder(nn.Module):
@@ -64,7 +63,6 @@ class Decoder(nn.Module):
         )
         
     def forward(self,x):
-        # out = x.view(x.shape[0],256,7,7)
         out = self.layer1(x)
         out = self.layer2(out)
         return out

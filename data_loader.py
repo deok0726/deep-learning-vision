@@ -16,22 +16,26 @@ class DataLoader:
         train_dataset, valid_dataset, test_dataset = self._get_datasets(args, source_transform=source_transform_list, target_transform=target_transform_list)
         sample_train_data = train_dataset.__getitem__(np.random.randint(train_dataset.__len__()))[0]
         self.sample_train_data = sample_train_data.unsqueeze(0)
-        self.train_data_loader = self._get_data_loader(args, train_dataset)
-        self.valid_data_loader = self._get_data_loader(args, valid_dataset)
-        self.test_data_loader = self._get_data_loader(args, test_dataset)
+        self.train_data_loader = self._get_data_loader(args, train_dataset, args.train_batch_size)
+        self.valid_data_loader = self._get_data_loader(args, valid_dataset, args.train_batch_size)
+        self.test_data_loader = self._get_data_loader(args, test_dataset, args.test_batch_size)
+        print("train data size: ", len(self.train_data_loader)*args.train_batch_size)
+        print("valid data size: ", len(self.valid_data_loader)*args.train_batch_size)
+        print("test data size: ", len(self.test_data_loader)*args.test_batch_size)
 
     def _get_datasets(self, args, source_transform, target_transform):
         if args.dataset_name == 'MNIST':
             train_dataset = MNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
-            test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
+            test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'FMNIST':
             train_dataset = FashionMNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
-            test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
+            test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
-        elif args.dataset_name == 'MVTEC':
+        elif args.dataset_name == 'MvTec':
             train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
             test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
             train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
             valid_length = int(len(train_dataset) * (args.valid_ratio / (args.train_ratio + args.valid_ratio)))
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
@@ -105,8 +109,8 @@ class DataLoader:
         test_dataset = customTensorDataset(test_data, test_targets, original_test_dataset.transform, original_test_dataset.target_transform)
         return train_dataset, valid_dataset, test_dataset
 
-    def _get_data_loader(self, args, dataset):
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, shuffle=args.shuffle, num_workers=args.num_workers, drop_last=True)
+    def _get_data_loader(self, args, dataset, batch_size):
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=args.shuffle, num_workers=args.num_workers, drop_last=True)
         return dataloader
     
     def _get_transform(self, args, is_target):
@@ -117,6 +121,8 @@ class DataLoader:
             if args.grayscale:
                 transforms_list.append(transforms.Grayscale())
                 args.channel_num = 1
+            if args.random_rotation:
+                transforms_list.append(transforms.RandomRotation(360))
             transforms_list.append(transforms.ToTensor())
             if args.normalize:
                 if args.channel_num == 3:

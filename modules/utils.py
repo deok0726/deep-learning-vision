@@ -37,4 +37,5 @@ def matplotlib_imshow(img, one_channel=False):
     if one_channel:
         plt.imshow(npimg, cmap="gray") # or Greys
     else:
-        plt.imshow(np.transpose(npimg, (1, 2, 0)))
+        plt.imshow(np.transpose(np.clip(npimg, 0, 1), (1, 2, 0)))
+        # plt.imshow(np.transpose(((np.clip(npimg, 0, 1)*255).astype('uint8')), (1, 2, 0)))

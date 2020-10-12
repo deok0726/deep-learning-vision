@@ -71,7 +71,7 @@ class Model(nn.Module):
 
     def __init__(self, n_channels=3, bilinear=True):
         super(Model, self).__init__()
-        self.in_conv = DoubleConv(1, 64)
+        self.in_conv = DoubleConv(n_channels, 64)
         self.down1 = Down(64, 128)
         self.down2 = Down(128, 256)
         self.down3 = Down(256, 512)
