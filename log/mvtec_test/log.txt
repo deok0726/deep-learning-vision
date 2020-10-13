@@ -1,0 +1,1002 @@
+2020-10-14 04:24:45,497 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:24:45,497 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:24:45,497 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:24:45,497 - root - INFO - Dataset: mvtec
+2020-10-14 04:24:45,497 - root - INFO - Normal class: 0
+2020-10-14 04:24:45,497 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:24:45,497 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:24:45,497 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:24:45,497 - root - INFO - Computation device: cpu
+2020-10-14 04:24:45,497 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:33:02,048 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:33:02,048 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:33:02,048 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:33:02,048 - root - INFO - Dataset: mvtec
+2020-10-14 04:33:02,048 - root - INFO - Normal class: 0
+2020-10-14 04:33:02,048 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:33:02,048 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:33:02,048 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:33:02,049 - root - INFO - Computation device: cpu
+2020-10-14 04:33:02,049 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:36:14,385 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:36:14,385 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:36:14,385 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:36:14,385 - root - INFO - Dataset: mvtec
+2020-10-14 04:36:14,385 - root - INFO - Normal class: 0
+2020-10-14 04:36:14,386 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:36:14,386 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:36:14,386 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:36:14,386 - root - INFO - Computation device: cpu
+2020-10-14 04:36:14,386 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:36:31,127 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:36:31,127 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:36:31,127 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:36:31,127 - root - INFO - Dataset: mvtec
+2020-10-14 04:36:31,127 - root - INFO - Normal class: 0
+2020-10-14 04:36:31,127 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:36:31,127 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:36:31,127 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:36:31,128 - root - INFO - Computation device: cpu
+2020-10-14 04:36:31,128 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:41:56,004 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:41:56,004 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:41:56,004 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:41:56,004 - root - INFO - Dataset: mvtec
+2020-10-14 04:41:56,004 - root - INFO - Normal class: 0
+2020-10-14 04:41:56,004 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:41:56,004 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:41:56,004 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:41:56,004 - root - INFO - Computation device: cpu
+2020-10-14 04:41:56,004 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:42:09,047 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:42:09,047 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:42:09,047 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:42:09,047 - root - INFO - Dataset: mvtec
+2020-10-14 04:42:09,047 - root - INFO - Normal class: 0
+2020-10-14 04:42:09,047 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:42:09,047 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:42:09,047 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:42:09,048 - root - INFO - Computation device: cpu
+2020-10-14 04:42:09,048 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:44:42,418 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:44:42,418 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:44:42,418 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:44:42,418 - root - INFO - Dataset: mvtec
+2020-10-14 04:44:42,418 - root - INFO - Normal class: 0
+2020-10-14 04:44:42,418 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:44:42,418 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:44:42,419 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:44:42,419 - root - INFO - Computation device: cpu
+2020-10-14 04:44:42,419 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:44:59,564 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:44:59,564 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:44:59,564 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:44:59,564 - root - INFO - Dataset: mvtec
+2020-10-14 04:44:59,564 - root - INFO - Normal class: 0
+2020-10-14 04:44:59,564 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:44:59,564 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:44:59,564 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:44:59,564 - root - INFO - Computation device: cpu
+2020-10-14 04:44:59,564 - root - INFO - Number of dataloader workers: 0
+2020-10-14 04:45:50,746 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 04:45:50,746 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 04:45:50,746 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 04:45:50,746 - root - INFO - Dataset: mvtec
+2020-10-14 04:45:50,746 - root - INFO - Normal class: 0
+2020-10-14 04:45:50,746 - root - INFO - Network: cifar10_LeNet
+2020-10-14 04:45:50,746 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 04:45:50,746 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 04:45:50,747 - root - INFO - Computation device: cpu
+2020-10-14 04:45:50,747 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:15:37,599 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:15:37,599 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:15:37,599 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:15:37,599 - root - INFO - Dataset: mvtec
+2020-10-14 06:15:37,599 - root - INFO - Normal class: 0
+2020-10-14 06:15:37,599 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:15:37,599 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:15:37,599 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:15:37,599 - root - INFO - Computation device: cpu
+2020-10-14 06:15:37,600 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:16:06,243 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:16:06,243 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:16:06,244 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:16:06,244 - root - INFO - Dataset: mvtec
+2020-10-14 06:16:06,244 - root - INFO - Normal class: 0
+2020-10-14 06:16:06,244 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:16:06,244 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:16:06,244 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:16:06,244 - root - INFO - Computation device: cpu
+2020-10-14 06:16:06,244 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:16:47,470 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:16:47,471 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:16:47,471 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:16:47,471 - root - INFO - Dataset: mvtec
+2020-10-14 06:16:47,471 - root - INFO - Normal class: 0
+2020-10-14 06:16:47,471 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:16:47,471 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:16:47,471 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:16:47,471 - root - INFO - Computation device: cpu
+2020-10-14 06:16:47,471 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:17:03,877 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:17:03,877 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:17:03,877 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:17:03,877 - root - INFO - Dataset: mvtec
+2020-10-14 06:17:03,877 - root - INFO - Normal class: 0
+2020-10-14 06:17:03,877 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:17:03,877 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:17:03,878 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:17:03,878 - root - INFO - Computation device: cpu
+2020-10-14 06:17:03,878 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:18:29,309 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:18:29,309 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:18:29,309 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:18:29,309 - root - INFO - Dataset: mvtec
+2020-10-14 06:18:29,309 - root - INFO - Normal class: 0
+2020-10-14 06:18:29,309 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:18:29,309 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:18:29,309 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:18:29,310 - root - INFO - Computation device: cpu
+2020-10-14 06:18:29,310 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:20:31,300 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:20:31,300 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:20:31,300 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:20:31,301 - root - INFO - Dataset: mvtec
+2020-10-14 06:20:31,301 - root - INFO - Normal class: 0
+2020-10-14 06:20:31,301 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:20:31,301 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:20:31,301 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:20:31,301 - root - INFO - Computation device: cpu
+2020-10-14 06:20:31,301 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:22:23,513 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:22:23,513 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:22:23,513 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:22:23,513 - root - INFO - Dataset: mvtec
+2020-10-14 06:22:23,513 - root - INFO - Normal class: 0
+2020-10-14 06:22:23,514 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:22:23,514 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:22:23,514 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:22:23,514 - root - INFO - Computation device: cpu
+2020-10-14 06:22:23,514 - root - INFO - Number of dataloader workers: 0
+2020-10-14 06:22:51,031 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 06:22:51,031 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 06:22:51,031 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 06:22:51,031 - root - INFO - Dataset: mvtec
+2020-10-14 06:22:51,031 - root - INFO - Normal class: 0
+2020-10-14 06:22:51,031 - root - INFO - Network: cifar10_LeNet
+2020-10-14 06:22:51,031 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 06:22:51,031 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 06:22:51,031 - root - INFO - Computation device: cpu
+2020-10-14 06:22:51,032 - root - INFO - Number of dataloader workers: 0
+2020-10-14 09:49:07,254 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 09:49:07,254 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 09:49:07,254 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 09:49:07,255 - root - INFO - Dataset: mvtec
+2020-10-14 09:49:07,255 - root - INFO - Normal class: 0
+2020-10-14 09:49:07,255 - root - INFO - Network: cifar10_LeNet
+2020-10-14 09:49:07,255 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 09:49:07,255 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 09:49:07,255 - root - INFO - Computation device: cpu
+2020-10-14 09:49:07,255 - root - INFO - Number of dataloader workers: 0
+2020-10-14 09:56:31,372 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 09:56:31,372 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 09:56:31,372 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 09:56:31,372 - root - INFO - Dataset: mvtec
+2020-10-14 09:56:31,372 - root - INFO - Normal class: 0
+2020-10-14 09:56:31,372 - root - INFO - Network: cifar10_LeNet
+2020-10-14 09:56:31,372 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 09:56:31,372 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 09:56:31,372 - root - INFO - Computation device: cpu
+2020-10-14 09:56:31,372 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:07:10,719 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:07:10,719 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:07:10,719 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:07:10,719 - root - INFO - Dataset: mvtec
+2020-10-14 10:07:10,719 - root - INFO - Normal class: 0
+2020-10-14 10:07:10,719 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:07:10,719 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:07:10,720 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:07:10,720 - root - INFO - Computation device: cpu
+2020-10-14 10:07:10,720 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:09:38,003 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:09:38,003 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:09:38,003 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:09:38,003 - root - INFO - Dataset: mvtec
+2020-10-14 10:09:38,003 - root - INFO - Normal class: 0
+2020-10-14 10:09:38,003 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:09:38,003 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:09:38,003 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:09:38,004 - root - INFO - Computation device: cpu
+2020-10-14 10:09:38,004 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:09:51,412 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:09:51,412 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:09:51,412 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:09:51,412 - root - INFO - Dataset: mvtec
+2020-10-14 10:09:51,412 - root - INFO - Normal class: 0
+2020-10-14 10:09:51,412 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:09:51,412 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:09:51,412 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:09:51,413 - root - INFO - Computation device: cpu
+2020-10-14 10:09:51,413 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:10:06,321 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:10:06,321 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:10:06,321 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:10:06,321 - root - INFO - Dataset: mvtec
+2020-10-14 10:10:06,321 - root - INFO - Normal class: 0
+2020-10-14 10:10:06,321 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:10:06,321 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:10:06,321 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:10:06,321 - root - INFO - Computation device: cpu
+2020-10-14 10:10:06,321 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:10:23,793 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:10:23,793 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:10:23,793 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:10:23,793 - root - INFO - Dataset: mvtec
+2020-10-14 10:10:23,793 - root - INFO - Normal class: 0
+2020-10-14 10:10:23,793 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:10:23,793 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:10:23,793 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:10:23,793 - root - INFO - Computation device: cpu
+2020-10-14 10:10:23,793 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:12:09,851 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:12:09,851 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:12:09,851 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:12:09,851 - root - INFO - Dataset: mvtec
+2020-10-14 10:12:09,851 - root - INFO - Normal class: 0
+2020-10-14 10:12:09,851 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:12:09,852 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:12:09,852 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:12:09,852 - root - INFO - Computation device: cpu
+2020-10-14 10:12:09,852 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:12:50,191 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:12:50,192 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:12:50,192 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:12:50,192 - root - INFO - Dataset: mvtec
+2020-10-14 10:12:50,192 - root - INFO - Normal class: 0
+2020-10-14 10:12:50,192 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:12:50,192 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:12:50,192 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:12:50,192 - root - INFO - Computation device: cpu
+2020-10-14 10:12:50,192 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:13:34,167 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:13:34,167 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:13:34,167 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:13:34,167 - root - INFO - Dataset: mvtec
+2020-10-14 10:13:34,167 - root - INFO - Normal class: 0
+2020-10-14 10:13:34,167 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:13:34,167 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:13:34,167 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:13:34,167 - root - INFO - Computation device: cpu
+2020-10-14 10:13:34,167 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:13:48,161 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:13:48,162 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:13:48,162 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:13:48,162 - root - INFO - Dataset: mvtec
+2020-10-14 10:13:48,162 - root - INFO - Normal class: 0
+2020-10-14 10:13:48,162 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:13:48,162 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:13:48,162 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:13:48,162 - root - INFO - Computation device: cpu
+2020-10-14 10:13:48,162 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:14:49,777 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:14:49,777 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:14:49,777 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:14:49,777 - root - INFO - Dataset: mvtec
+2020-10-14 10:14:49,777 - root - INFO - Normal class: 0
+2020-10-14 10:14:49,777 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:14:49,777 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:14:49,777 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:14:49,777 - root - INFO - Computation device: cpu
+2020-10-14 10:14:49,777 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:14:59,674 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:14:59,674 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:14:59,674 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:14:59,674 - root - INFO - Dataset: mvtec
+2020-10-14 10:14:59,674 - root - INFO - Normal class: 0
+2020-10-14 10:14:59,674 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:14:59,674 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:14:59,674 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:14:59,674 - root - INFO - Computation device: cpu
+2020-10-14 10:14:59,674 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:17:49,360 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:17:49,360 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:17:49,360 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:17:49,360 - root - INFO - Dataset: mvtec
+2020-10-14 10:17:49,360 - root - INFO - Normal class: 0
+2020-10-14 10:17:49,361 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:17:49,361 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:17:49,361 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:17:49,361 - root - INFO - Computation device: cpu
+2020-10-14 10:17:49,361 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:18:43,487 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:18:43,487 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:18:43,488 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:18:43,488 - root - INFO - Dataset: mvtec
+2020-10-14 10:18:43,488 - root - INFO - Normal class: 0
+2020-10-14 10:18:43,488 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:18:43,488 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:18:43,488 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:18:43,488 - root - INFO - Computation device: cpu
+2020-10-14 10:18:43,488 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:19:20,410 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:19:20,410 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:19:20,410 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:19:20,410 - root - INFO - Dataset: mvtec
+2020-10-14 10:19:20,410 - root - INFO - Normal class: 0
+2020-10-14 10:19:20,410 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:19:20,410 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:19:20,410 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:19:20,410 - root - INFO - Computation device: cpu
+2020-10-14 10:19:20,410 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:38:11,937 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:38:11,937 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:38:11,937 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:38:11,937 - root - INFO - Dataset: mvtec
+2020-10-14 10:38:11,937 - root - INFO - Normal class: 0
+2020-10-14 10:38:11,938 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:38:11,938 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:38:11,938 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:38:11,938 - root - INFO - Computation device: cpu
+2020-10-14 10:38:11,938 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:38:11,942 - root - INFO - Pretraining: True
+2020-10-14 10:38:11,943 - root - INFO - Pretraining optimizer: adam
+2020-10-14 10:38:11,943 - root - INFO - Pretraining learning rate: 0.001
+2020-10-14 10:38:11,943 - root - INFO - Pretraining epochs: 100
+2020-10-14 10:38:11,943 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-14 10:38:11,943 - root - INFO - Pretraining batch size: 128
+2020-10-14 10:38:11,943 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-14 10:38:11,955 - root - INFO - Starting pretraining...
+2020-10-14 10:39:29,151 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:39:29,151 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:39:29,151 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:39:29,151 - root - INFO - Dataset: mvtec
+2020-10-14 10:39:29,151 - root - INFO - Normal class: 0
+2020-10-14 10:39:29,151 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:39:29,152 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:39:29,152 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:39:29,152 - root - INFO - Computation device: cpu
+2020-10-14 10:39:29,152 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:39:29,160 - root - INFO - Pretraining: True
+2020-10-14 10:39:29,160 - root - INFO - Pretraining optimizer: adam
+2020-10-14 10:39:29,160 - root - INFO - Pretraining learning rate: 0.001
+2020-10-14 10:39:29,160 - root - INFO - Pretraining epochs: 100
+2020-10-14 10:39:29,160 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-14 10:39:29,160 - root - INFO - Pretraining batch size: 128
+2020-10-14 10:39:29,161 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-14 10:39:29,175 - root - INFO - Starting pretraining...
+2020-10-14 10:41:00,717 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:41:00,717 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:41:00,717 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:41:00,717 - root - INFO - Dataset: mvtec
+2020-10-14 10:41:00,717 - root - INFO - Normal class: 0
+2020-10-14 10:41:00,717 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:41:00,717 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:41:00,717 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:41:00,718 - root - INFO - Computation device: cpu
+2020-10-14 10:41:00,718 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:41:00,723 - root - INFO - Pretraining: True
+2020-10-14 10:41:00,723 - root - INFO - Pretraining optimizer: adam
+2020-10-14 10:41:00,723 - root - INFO - Pretraining learning rate: 0.001
+2020-10-14 10:41:00,723 - root - INFO - Pretraining epochs: 100
+2020-10-14 10:41:00,723 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-14 10:41:00,723 - root - INFO - Pretraining batch size: 128
+2020-10-14 10:41:00,723 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-14 10:41:00,733 - root - INFO - Starting pretraining...
+2020-10-14 10:41:15,538 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:41:15,538 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:41:15,538 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:41:15,538 - root - INFO - Dataset: mvtec
+2020-10-14 10:41:15,538 - root - INFO - Normal class: 0
+2020-10-14 10:41:15,538 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:41:15,538 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:41:15,538 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:41:15,538 - root - INFO - Computation device: cpu
+2020-10-14 10:41:15,538 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:41:15,543 - root - INFO - Pretraining: True
+2020-10-14 10:41:15,543 - root - INFO - Pretraining optimizer: adam
+2020-10-14 10:41:15,543 - root - INFO - Pretraining learning rate: 0.001
+2020-10-14 10:41:15,543 - root - INFO - Pretraining epochs: 100
+2020-10-14 10:41:15,543 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-14 10:41:15,543 - root - INFO - Pretraining batch size: 128
+2020-10-14 10:41:15,543 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-14 10:41:15,553 - root - INFO - Starting pretraining...
+2020-10-14 10:41:29,274 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-14 10:41:29,274 - root - INFO - Data path is /hd/mvtec/.
+2020-10-14 10:41:29,274 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-14 10:41:29,274 - root - INFO - Dataset: mvtec
+2020-10-14 10:41:29,274 - root - INFO - Normal class: 0
+2020-10-14 10:41:29,274 - root - INFO - Network: cifar10_LeNet
+2020-10-14 10:41:29,274 - root - INFO - Deep SVDD objective: one-class
+2020-10-14 10:41:29,274 - root - INFO - Nu-paramerter: 0.10
+2020-10-14 10:41:29,275 - root - INFO - Computation device: cpu
+2020-10-14 10:41:29,275 - root - INFO - Number of dataloader workers: 0
+2020-10-14 10:41:29,279 - root - INFO - Pretraining: True
+2020-10-14 10:41:29,279 - root - INFO - Pretraining optimizer: adam
+2020-10-14 10:41:29,280 - root - INFO - Pretraining learning rate: 0.001
+2020-10-14 10:41:29,280 - root - INFO - Pretraining epochs: 100
+2020-10-14 10:41:29,280 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-14 10:41:29,280 - root - INFO - Pretraining batch size: 128
+2020-10-14 10:41:29,280 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-14 10:41:29,289 - root - INFO - Starting pretraining...
+2020-10-15 06:12:21,657 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:12:21,657 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:12:21,657 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:12:21,657 - root - INFO - Dataset: mvtec
+2020-10-15 06:12:21,657 - root - INFO - Normal class: 0
+2020-10-15 06:12:21,657 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:12:21,657 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:12:21,658 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:12:21,658 - root - INFO - Computation device: cpu
+2020-10-15 06:12:21,658 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:12:21,664 - root - INFO - Pretraining: True
+2020-10-15 06:12:21,665 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:12:21,665 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:12:21,665 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:12:21,665 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:12:21,665 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:12:21,665 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:12:21,675 - root - INFO - Starting pretraining...
+2020-10-15 06:13:24,659 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:13:24,659 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:13:24,659 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:13:24,659 - root - INFO - Dataset: mvtec
+2020-10-15 06:13:24,659 - root - INFO - Normal class: 0
+2020-10-15 06:13:24,660 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:13:24,660 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:13:24,660 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:13:24,660 - root - INFO - Computation device: cpu
+2020-10-15 06:13:24,660 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:13:24,665 - root - INFO - Pretraining: True
+2020-10-15 06:13:24,665 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:13:24,665 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:13:24,665 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:13:24,665 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:13:24,665 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:13:24,665 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:13:24,674 - root - INFO - Starting pretraining...
+2020-10-15 06:16:51,620 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:16:51,620 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:16:51,620 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:16:51,620 - root - INFO - Dataset: mvtec
+2020-10-15 06:16:51,621 - root - INFO - Normal class: 0
+2020-10-15 06:16:51,621 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:16:51,621 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:16:51,621 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:16:51,621 - root - INFO - Computation device: cpu
+2020-10-15 06:16:51,621 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:16:51,625 - root - INFO - Pretraining: True
+2020-10-15 06:16:51,625 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:16:51,625 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:16:51,626 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:16:51,626 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:16:51,626 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:16:51,626 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:16:51,635 - root - INFO - Starting pretraining...
+2020-10-15 06:17:58,071 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:17:58,071 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:17:58,071 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:17:58,071 - root - INFO - Dataset: mvtec
+2020-10-15 06:17:58,072 - root - INFO - Normal class: 0
+2020-10-15 06:17:58,072 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:17:58,072 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:17:58,072 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:17:58,072 - root - INFO - Computation device: cpu
+2020-10-15 06:17:58,072 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:17:58,076 - root - INFO - Pretraining: True
+2020-10-15 06:17:58,076 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:17:58,076 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:17:58,076 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:17:58,077 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:17:58,077 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:17:58,077 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:17:58,086 - root - INFO - Starting pretraining...
+2020-10-15 06:18:52,175 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:18:52,180 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:18:52,180 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:18:52,180 - root - INFO - Dataset: mvtec
+2020-10-15 06:18:52,180 - root - INFO - Normal class: 0
+2020-10-15 06:18:52,180 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:18:52,180 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:18:52,180 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:18:52,180 - root - INFO - Computation device: cpu
+2020-10-15 06:18:52,180 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:18:52,185 - root - INFO - Pretraining: True
+2020-10-15 06:18:52,185 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:18:52,185 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:18:52,185 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:18:52,185 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:18:52,185 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:18:52,185 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:18:52,194 - root - INFO - Starting pretraining...
+2020-10-15 06:25:25,233 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:25:25,233 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:25:25,233 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:25:25,233 - root - INFO - Dataset: mvtec
+2020-10-15 06:25:25,233 - root - INFO - Normal class: 0
+2020-10-15 06:25:25,233 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:25:25,233 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:25:25,233 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:25:25,234 - root - INFO - Computation device: cpu
+2020-10-15 06:25:25,234 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:25:25,241 - root - INFO - Pretraining: True
+2020-10-15 06:25:25,241 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:25:25,241 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:25:25,241 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:25:25,241 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:25:25,241 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:25:25,241 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:25:25,251 - root - INFO - Starting pretraining...
+2020-10-15 06:33:57,444 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:33:57,445 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:33:57,445 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:33:57,445 - root - INFO - Dataset: mvtec
+2020-10-15 06:33:57,445 - root - INFO - Normal class: 0
+2020-10-15 06:33:57,445 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:33:57,445 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:33:57,445 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:33:57,445 - root - INFO - Computation device: cpu
+2020-10-15 06:33:57,445 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:33:57,453 - root - INFO - Pretraining: True
+2020-10-15 06:33:57,453 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:33:57,453 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:33:57,453 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:33:57,454 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:33:57,454 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:33:57,454 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:33:57,465 - root - INFO - Starting pretraining...
+2020-10-15 06:35:46,848 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:35:46,848 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:35:46,848 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:35:46,848 - root - INFO - Dataset: mvtec
+2020-10-15 06:35:46,849 - root - INFO - Normal class: 0
+2020-10-15 06:35:46,849 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:35:46,849 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:35:46,849 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:35:46,849 - root - INFO - Computation device: cpu
+2020-10-15 06:35:46,849 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:35:46,854 - root - INFO - Pretraining: True
+2020-10-15 06:35:46,854 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:35:46,854 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:35:46,854 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:35:46,854 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:35:46,854 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:35:46,854 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:35:46,864 - root - INFO - Starting pretraining...
+2020-10-15 06:37:11,781 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:37:11,781 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:37:11,781 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:37:11,781 - root - INFO - Dataset: mvtec
+2020-10-15 06:37:11,781 - root - INFO - Normal class: 0
+2020-10-15 06:37:11,781 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:37:11,781 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:37:11,781 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:37:11,781 - root - INFO - Computation device: cpu
+2020-10-15 06:37:11,781 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:37:11,786 - root - INFO - Pretraining: True
+2020-10-15 06:37:11,786 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:37:11,786 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:37:11,786 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:37:11,786 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:37:11,786 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:37:11,786 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:37:11,796 - root - INFO - Starting pretraining...
+2020-10-15 06:37:33,829 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:37:33,829 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:37:33,829 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:37:33,829 - root - INFO - Dataset: mvtec
+2020-10-15 06:37:33,829 - root - INFO - Normal class: 0
+2020-10-15 06:37:33,829 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:37:33,829 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:37:33,829 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:37:33,829 - root - INFO - Computation device: cpu
+2020-10-15 06:37:33,829 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:37:33,834 - root - INFO - Pretraining: True
+2020-10-15 06:37:33,834 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:37:33,834 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:37:33,834 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:37:33,834 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:37:33,834 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:37:33,834 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:37:33,843 - root - INFO - Starting pretraining...
+2020-10-15 06:37:53,143 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:37:53,143 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:37:53,143 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:37:53,144 - root - INFO - Dataset: mvtec
+2020-10-15 06:37:53,144 - root - INFO - Normal class: 0
+2020-10-15 06:37:53,144 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:37:53,144 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:37:53,144 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:37:53,144 - root - INFO - Computation device: cpu
+2020-10-15 06:37:53,144 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:37:53,153 - root - INFO - Pretraining: True
+2020-10-15 06:37:53,153 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:37:53,153 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:37:53,153 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:37:53,153 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:37:53,153 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:37:53,153 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:37:53,171 - root - INFO - Starting pretraining...
+2020-10-15 06:40:26,607 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:40:26,607 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:40:26,608 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:40:26,608 - root - INFO - Dataset: mvtec
+2020-10-15 06:40:26,608 - root - INFO - Normal class: 0
+2020-10-15 06:40:26,608 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:40:26,608 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:40:26,608 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:40:26,608 - root - INFO - Computation device: cpu
+2020-10-15 06:40:26,608 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:40:26,613 - root - INFO - Pretraining: True
+2020-10-15 06:40:26,613 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:40:26,613 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:40:26,613 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:40:26,613 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:40:26,613 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:40:26,614 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:40:26,624 - root - INFO - Starting pretraining...
+2020-10-15 06:40:42,767 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:40:42,767 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:40:42,767 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:40:42,767 - root - INFO - Dataset: mvtec
+2020-10-15 06:40:42,767 - root - INFO - Normal class: 0
+2020-10-15 06:40:42,767 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:40:42,767 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:40:42,767 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:40:42,768 - root - INFO - Computation device: cpu
+2020-10-15 06:40:42,768 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:40:42,772 - root - INFO - Pretraining: True
+2020-10-15 06:40:42,772 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:40:42,772 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:40:42,772 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:40:42,772 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:40:42,773 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:40:42,773 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:40:42,787 - root - INFO - Starting pretraining...
+2020-10-15 06:41:41,127 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:41:41,127 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:41:41,127 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:41:41,127 - root - INFO - Dataset: mvtec
+2020-10-15 06:41:41,127 - root - INFO - Normal class: 0
+2020-10-15 06:41:41,127 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:41:41,127 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:41:41,127 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:41:41,127 - root - INFO - Computation device: cpu
+2020-10-15 06:41:41,127 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:41:41,132 - root - INFO - Pretraining: True
+2020-10-15 06:41:41,132 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:41:41,132 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:41:41,132 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:41:41,132 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:41:41,132 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:41:41,132 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:41:41,141 - root - INFO - Starting pretraining...
+2020-10-15 06:42:13,795 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:42:13,796 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:42:13,796 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:42:13,796 - root - INFO - Dataset: mvtec
+2020-10-15 06:42:13,796 - root - INFO - Normal class: 0
+2020-10-15 06:42:13,796 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:42:13,796 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:42:13,796 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:42:13,796 - root - INFO - Computation device: cpu
+2020-10-15 06:42:13,796 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:42:13,802 - root - INFO - Pretraining: True
+2020-10-15 06:42:13,802 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:42:13,802 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:42:13,803 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:42:13,803 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:42:13,803 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:42:13,803 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:42:13,814 - root - INFO - Starting pretraining...
+2020-10-15 06:43:50,876 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:43:50,876 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:43:50,877 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:43:50,877 - root - INFO - Dataset: mvtec
+2020-10-15 06:43:50,877 - root - INFO - Normal class: 0
+2020-10-15 06:43:50,877 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:43:50,877 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:43:50,877 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:43:50,877 - root - INFO - Computation device: cpu
+2020-10-15 06:43:50,877 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:43:50,885 - root - INFO - Pretraining: True
+2020-10-15 06:43:50,885 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:43:50,885 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:43:50,885 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:43:50,885 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:43:50,885 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:43:50,885 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:43:50,902 - root - INFO - Starting pretraining...
+2020-10-15 06:53:15,813 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:53:15,814 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:53:15,814 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:53:15,814 - root - INFO - Dataset: mvtec
+2020-10-15 06:53:15,814 - root - INFO - Normal class: 0
+2020-10-15 06:53:15,814 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:53:15,814 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:53:15,814 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:53:15,814 - root - INFO - Computation device: cpu
+2020-10-15 06:53:15,814 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:53:15,822 - root - INFO - Pretraining: True
+2020-10-15 06:53:15,822 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:53:15,822 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:53:15,823 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:53:15,823 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:53:15,823 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:53:15,823 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:53:15,838 - root - INFO - Starting pretraining...
+2020-10-15 06:54:06,142 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:54:06,143 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:54:06,143 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:54:06,143 - root - INFO - Dataset: mvtec
+2020-10-15 06:54:06,143 - root - INFO - Normal class: 0
+2020-10-15 06:54:06,143 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:54:06,143 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:54:06,143 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:54:06,144 - root - INFO - Computation device: cpu
+2020-10-15 06:54:06,144 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:54:06,158 - root - INFO - Pretraining: True
+2020-10-15 06:54:06,159 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:54:06,159 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:54:06,159 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:54:06,159 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:54:06,159 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:54:06,160 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:54:06,176 - root - INFO - Starting pretraining...
+2020-10-15 06:55:05,678 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:55:05,678 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:55:05,678 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:55:05,678 - root - INFO - Dataset: mvtec
+2020-10-15 06:55:05,678 - root - INFO - Normal class: 0
+2020-10-15 06:55:05,678 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:55:05,678 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:55:05,678 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:55:05,679 - root - INFO - Computation device: cpu
+2020-10-15 06:55:05,679 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:55:05,684 - root - INFO - Pretraining: True
+2020-10-15 06:55:05,684 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:55:05,684 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:55:05,684 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:55:05,684 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:55:05,684 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:55:05,684 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:55:05,694 - root - INFO - Starting pretraining...
+2020-10-15 06:55:34,939 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:55:34,939 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:55:34,939 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:55:34,939 - root - INFO - Dataset: mvtec
+2020-10-15 06:55:34,939 - root - INFO - Normal class: 0
+2020-10-15 06:55:34,939 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:55:34,939 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:55:34,939 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:55:34,940 - root - INFO - Computation device: cpu
+2020-10-15 06:55:34,940 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:55:34,945 - root - INFO - Pretraining: True
+2020-10-15 06:55:34,945 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:55:34,945 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:55:34,945 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:55:34,945 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:55:34,945 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:55:34,945 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:55:34,955 - root - INFO - Starting pretraining...
+2020-10-15 06:57:29,023 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:57:29,023 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:57:29,023 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:57:29,023 - root - INFO - Dataset: mvtec
+2020-10-15 06:57:29,023 - root - INFO - Normal class: 0
+2020-10-15 06:57:29,023 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:57:29,023 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:57:29,023 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:57:29,023 - root - INFO - Computation device: cpu
+2020-10-15 06:57:29,024 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:57:29,029 - root - INFO - Pretraining: True
+2020-10-15 06:57:29,029 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:57:29,029 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:57:29,029 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:57:29,029 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:57:29,029 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:57:29,029 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:57:29,038 - root - INFO - Starting pretraining...
+2020-10-15 06:58:35,932 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:58:35,933 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:58:35,933 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:58:35,933 - root - INFO - Dataset: mvtec
+2020-10-15 06:58:35,933 - root - INFO - Normal class: 0
+2020-10-15 06:58:35,933 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:58:35,933 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:58:35,933 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:58:35,933 - root - INFO - Computation device: cpu
+2020-10-15 06:58:35,933 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:58:35,938 - root - INFO - Pretraining: True
+2020-10-15 06:58:35,938 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:58:35,938 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:58:35,938 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:58:35,938 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:58:35,938 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:58:35,939 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:58:35,948 - root - INFO - Starting pretraining...
+2020-10-15 06:59:18,926 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 06:59:18,927 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 06:59:18,927 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 06:59:18,927 - root - INFO - Dataset: mvtec
+2020-10-15 06:59:18,927 - root - INFO - Normal class: 0
+2020-10-15 06:59:18,927 - root - INFO - Network: cifar10_LeNet
+2020-10-15 06:59:18,927 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 06:59:18,927 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 06:59:18,927 - root - INFO - Computation device: cpu
+2020-10-15 06:59:18,927 - root - INFO - Number of dataloader workers: 0
+2020-10-15 06:59:18,936 - root - INFO - Pretraining: True
+2020-10-15 06:59:18,936 - root - INFO - Pretraining optimizer: adam
+2020-10-15 06:59:18,936 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 06:59:18,936 - root - INFO - Pretraining epochs: 100
+2020-10-15 06:59:18,936 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 06:59:18,936 - root - INFO - Pretraining batch size: 128
+2020-10-15 06:59:18,937 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 06:59:18,950 - root - INFO - Starting pretraining...
+2020-10-15 09:49:49,948 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 09:49:49,949 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 09:49:49,949 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 09:49:49,949 - root - INFO - Dataset: mvtec
+2020-10-15 09:49:49,949 - root - INFO - Normal class: 0
+2020-10-15 09:49:49,949 - root - INFO - Network: cifar10_LeNet
+2020-10-15 09:49:49,949 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 09:49:49,949 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 09:49:49,950 - root - INFO - Computation device: cpu
+2020-10-15 09:49:49,950 - root - INFO - Number of dataloader workers: 0
+2020-10-15 09:49:49,959 - root - INFO - Pretraining: True
+2020-10-15 09:49:49,960 - root - INFO - Pretraining optimizer: adam
+2020-10-15 09:49:49,960 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 09:49:49,960 - root - INFO - Pretraining epochs: 100
+2020-10-15 09:49:49,960 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 09:49:49,960 - root - INFO - Pretraining batch size: 128
+2020-10-15 09:49:49,961 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 09:49:49,980 - root - INFO - Starting pretraining...
+2020-10-15 09:50:07,228 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 09:50:07,229 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 09:50:07,229 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 09:50:07,229 - root - INFO - Dataset: mvtec
+2020-10-15 09:50:07,229 - root - INFO - Normal class: 0
+2020-10-15 09:50:07,229 - root - INFO - Network: cifar10_LeNet
+2020-10-15 09:50:07,229 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 09:50:07,229 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 09:50:07,229 - root - INFO - Computation device: cpu
+2020-10-15 09:50:07,229 - root - INFO - Number of dataloader workers: 0
+2020-10-15 09:50:07,234 - root - INFO - Pretraining: True
+2020-10-15 09:50:07,234 - root - INFO - Pretraining optimizer: adam
+2020-10-15 09:50:07,234 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 09:50:07,234 - root - INFO - Pretraining epochs: 100
+2020-10-15 09:50:07,234 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 09:50:07,234 - root - INFO - Pretraining batch size: 128
+2020-10-15 09:50:07,234 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 09:50:07,244 - root - INFO - Starting pretraining...
+2020-10-15 10:55:13,461 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 10:55:13,461 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 10:55:13,461 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 10:55:13,461 - root - INFO - Dataset: mvtec
+2020-10-15 10:55:13,461 - root - INFO - Normal class: 0
+2020-10-15 10:55:13,461 - root - INFO - Network: cifar10_LeNet
+2020-10-15 10:55:13,461 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 10:55:13,461 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 10:55:13,462 - root - INFO - Computation device: cpu
+2020-10-15 10:55:13,462 - root - INFO - Number of dataloader workers: 0
+2020-10-15 10:55:37,899 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 10:55:37,899 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 10:55:37,899 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 10:55:37,899 - root - INFO - Dataset: mvtec
+2020-10-15 10:55:37,899 - root - INFO - Normal class: 0
+2020-10-15 10:55:37,899 - root - INFO - Network: cifar10_LeNet
+2020-10-15 10:55:37,899 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 10:55:37,899 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 10:55:37,899 - root - INFO - Computation device: cpu
+2020-10-15 10:55:37,899 - root - INFO - Number of dataloader workers: 0
+2020-10-15 10:56:18,204 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 10:56:18,204 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 10:56:18,204 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 10:56:18,204 - root - INFO - Dataset: mvtec
+2020-10-15 10:56:18,205 - root - INFO - Normal class: 0
+2020-10-15 10:56:18,205 - root - INFO - Network: cifar10_LeNet
+2020-10-15 10:56:18,205 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 10:56:18,205 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 10:56:18,205 - root - INFO - Computation device: cpu
+2020-10-15 10:56:18,205 - root - INFO - Number of dataloader workers: 0
+2020-10-15 10:57:40,595 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 10:57:40,595 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 10:57:40,595 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 10:57:40,595 - root - INFO - Dataset: mvtec
+2020-10-15 10:57:40,595 - root - INFO - Normal class: 0
+2020-10-15 10:57:40,595 - root - INFO - Network: cifar10_LeNet
+2020-10-15 10:57:40,595 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 10:57:40,595 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 10:57:40,595 - root - INFO - Computation device: cpu
+2020-10-15 10:57:40,596 - root - INFO - Number of dataloader workers: 0
+2020-10-15 10:57:40,601 - root - INFO - Pretraining: True
+2020-10-15 10:57:40,601 - root - INFO - Pretraining optimizer: adam
+2020-10-15 10:57:40,601 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 10:57:40,601 - root - INFO - Pretraining epochs: 100
+2020-10-15 10:57:40,601 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 10:57:40,601 - root - INFO - Pretraining batch size: 128
+2020-10-15 10:57:40,601 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 10:57:40,611 - root - INFO - Starting pretraining...
+2020-10-15 11:00:31,955 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 11:00:31,956 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 11:00:31,956 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 11:00:31,956 - root - INFO - Dataset: mvtec
+2020-10-15 11:00:31,956 - root - INFO - Normal class: 0
+2020-10-15 11:00:31,956 - root - INFO - Network: cifar10_LeNet
+2020-10-15 11:00:31,956 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 11:00:31,956 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 11:00:31,956 - root - INFO - Computation device: cpu
+2020-10-15 11:00:31,956 - root - INFO - Number of dataloader workers: 0
+2020-10-15 11:01:09,427 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 11:01:09,427 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 11:01:09,427 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 11:01:09,427 - root - INFO - Dataset: mvtec
+2020-10-15 11:01:09,427 - root - INFO - Normal class: 0
+2020-10-15 11:01:09,427 - root - INFO - Network: cifar10_LeNet
+2020-10-15 11:01:09,427 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 11:01:09,427 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 11:01:09,428 - root - INFO - Computation device: cpu
+2020-10-15 11:01:09,428 - root - INFO - Number of dataloader workers: 0
+2020-10-15 11:01:43,849 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 11:01:43,850 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 11:01:43,850 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 11:01:43,850 - root - INFO - Dataset: mvtec
+2020-10-15 11:01:43,850 - root - INFO - Normal class: 0
+2020-10-15 11:01:43,850 - root - INFO - Network: cifar10_LeNet
+2020-10-15 11:01:43,850 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 11:01:43,850 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 11:01:43,850 - root - INFO - Computation device: cpu
+2020-10-15 11:01:43,850 - root - INFO - Number of dataloader workers: 0
+2020-10-15 11:11:16,515 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 11:11:16,516 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 11:11:16,516 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 11:11:16,516 - root - INFO - Dataset: mvtec
+2020-10-15 11:11:16,516 - root - INFO - Normal class: 0
+2020-10-15 11:11:16,516 - root - INFO - Network: cifar10_LeNet
+2020-10-15 11:11:16,516 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 11:11:16,516 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 11:11:16,516 - root - INFO - Computation device: cpu
+2020-10-15 11:11:16,516 - root - INFO - Number of dataloader workers: 0
+2020-10-15 11:12:02,029 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-15 11:12:02,029 - root - INFO - Data path is /hd/mvtec/.
+2020-10-15 11:12:02,029 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-15 11:12:02,029 - root - INFO - Dataset: mvtec
+2020-10-15 11:12:02,029 - root - INFO - Normal class: 0
+2020-10-15 11:12:02,029 - root - INFO - Network: cifar10_LeNet
+2020-10-15 11:12:02,029 - root - INFO - Deep SVDD objective: one-class
+2020-10-15 11:12:02,030 - root - INFO - Nu-paramerter: 0.10
+2020-10-15 11:12:02,030 - root - INFO - Computation device: cpu
+2020-10-15 11:12:02,030 - root - INFO - Number of dataloader workers: 0
+2020-10-15 11:12:02,038 - root - INFO - Pretraining: True
+2020-10-15 11:12:02,038 - root - INFO - Pretraining optimizer: adam
+2020-10-15 11:12:02,038 - root - INFO - Pretraining learning rate: 0.001
+2020-10-15 11:12:02,038 - root - INFO - Pretraining epochs: 100
+2020-10-15 11:12:02,038 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-15 11:12:02,038 - root - INFO - Pretraining batch size: 128
+2020-10-15 11:12:02,038 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-15 11:12:02,048 - root - INFO - Starting pretraining...
+2020-10-16 00:18:44,137 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-16 00:18:44,137 - root - INFO - Data path is /hd/mvtec/.
+2020-10-16 00:18:44,137 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-16 00:18:44,138 - root - INFO - Dataset: mvtec
+2020-10-16 00:18:44,138 - root - INFO - Normal class: 0
+2020-10-16 00:18:44,138 - root - INFO - Network: cifar10_LeNet
+2020-10-16 00:18:44,138 - root - INFO - Deep SVDD objective: one-class
+2020-10-16 00:18:44,138 - root - INFO - Nu-paramerter: 0.10
+2020-10-16 00:37:51,735 - root - INFO - Log file is ../log/mvtec_test/log.txt.
+2020-10-16 00:37:51,735 - root - INFO - Data path is /hd/mvtec/.
+2020-10-16 00:37:51,735 - root - INFO - Export path is ../log/mvtec_test.
+2020-10-16 00:37:51,736 - root - INFO - Dataset: mvtec
+2020-10-16 00:37:51,736 - root - INFO - Normal class: 0
+2020-10-16 00:37:51,736 - root - INFO - Network: cifar10_LeNet
+2020-10-16 00:37:51,736 - root - INFO - Deep SVDD objective: one-class
+2020-10-16 00:37:51,736 - root - INFO - Nu-paramerter: 0.10
+2020-10-16 00:37:51,736 - root - INFO - Computation device: cpu
+2020-10-16 00:37:51,736 - root - INFO - Number of dataloader workers: 0
+2020-10-16 00:37:52,361 - root - INFO - Pretraining: True
+2020-10-16 00:37:52,361 - root - INFO - Pretraining optimizer: adam
+2020-10-16 00:37:52,361 - root - INFO - Pretraining learning rate: 0.001
+2020-10-16 00:37:52,361 - root - INFO - Pretraining epochs: 100
+2020-10-16 00:37:52,361 - root - INFO - Pretraining learning rate scheduler milestones: ()
+2020-10-16 00:37:52,361 - root - INFO - Pretraining batch size: 128
+2020-10-16 00:37:52,361 - root - INFO - Pretraining weight decay: 1e-06
+2020-10-16 00:37:52,371 - root - INFO - Starting pretraining...
