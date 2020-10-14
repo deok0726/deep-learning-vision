@@ -43,6 +43,10 @@ class Tester:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.test_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
+        total_loss_per_batch = 0
+        for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
+            total_loss_per_batch += loss_per_batch.mean()
+        self.test_losses_per_epoch['total_loss'].update(total_loss_per_batch.item())
         # batch_diff_per_batch = batch_data - output_data
         batch_diff_per_batch = (batch_data - output_data) ** 2
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
@@ -57,7 +61,7 @@ class Tester:
                 self.test_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
-        if self.batch_idx == len(self.dataloader.test_data_loader)-1:
+        if self.batch_idx == (len(self.dataloader.test_data_loader)-1):
             if "ROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['ROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
                 self.metrics_per_batch['ROC'] = metric_value
@@ -79,7 +83,9 @@ class Tester:
         self.metrics_per_batch = {}
         self.batch_time = AverageMeter()
         self.data_time = AverageMeter()
-        self.test_losses_per_epoch = {}
+        self.test_losses_per_epoch = {
+            'total_loss': AverageMeter()
+            }
         self.test_metrics_per_epoch = {}
         for loss_name in self.loss_funcs.keys():
             self.test_losses_per_epoch[loss_name] = AverageMeter()
@@ -87,7 +93,7 @@ class Tester:
             self.test_metrics_per_epoch[metric_name] = AverageMeter()
         self.diffs_per_data = []
         self.labels_per_data = []
-        self.tensorboard_writer_test = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'test'))
+        self.tensorboard_writer_test = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'test'), max_queue=100)
 
     def _restore_checkpoint(self):
         ckpts_list = os.listdir(self.CHECKPOINT_SAVE_DIR)
@@ -127,10 +133,17 @@ class Tester:
         self.tensorboard_writer_test.add_figure("test", fig, global_step=self.epoch_idx)
         for loss_name, loss_value_per_epoch in losses_per_epoch.items():
             scalar_tag = [loss_name, '/loss']
+            print('tester loss scalar_tag: ', scalar_tag)
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), loss_value_per_epoch.avg, self.epoch_idx)
+            print('tester loss loss_value_per_epoch.avg: ', loss_value_per_epoch.avg)
+            print('tester loss self.epoch_idx: ', self.epoch_idx)
         for metric_name, metric_value_per_epoch in metric_per_epoch.items():
             scalar_tag = [metric_name, '/metric']
+            print('tester metric scalar_tag: ', scalar_tag)
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
+            print('tester metric metric_value_per_epoch.avg: ', metric_value_per_epoch.avg)
+            print('tester metric self.epoch_idx: ', self.epoch_idx)
+        self.tensorboard_writer_test.flush()
 
     def _log_progress(self):
         self.data_time.update(time.time() - self.end_time)

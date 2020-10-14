@@ -11,16 +11,16 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.encoder = Encoder(n_channels)
         self.decoder = Decoder(n_channels)
-        self.memory_module = MemoryModule(mem_dim=100, fea_dim=64)
+        self.memory_module = MemoryModule(mem_dim=100, fea_dim=64, shrink_thres=shrink_thres)
         self.rec_criterion = nn.MSELoss(reduction='none')
         self.return_values = namedtuple("return_values", 'output mem_weight')
 
     def forward(self, x):
         z = self.encoder(x)
-        f = self.memory_module(z)        
+        f = self.memory_module(z)
         mem_weight = f['mem_weight']
         # output = self.decoder(z)
-        output = self.decoder(f['output'].view(-1, 64, 4, 4))
+        output = self.decoder(f['output'])
         return self.return_values(output, mem_weight)
         # return output
     
@@ -93,46 +93,83 @@ class Decoder(nn.Module):
         return x
 
 class MemoryUnit(nn.Module):
-    def __init__(self, mem_dim, fea_dim):
+    def __init__(self, mem_dim, fea_dim, shrink_thres=0.0025):
         super(MemoryUnit, self).__init__()
         self.mem_dim = mem_dim
         self.fea_dim = fea_dim
-        self.weight = Parameter(torch.Tensor(self.mem_dim, self.fea_dim * 4 * 4))  # M x C(fea_dim * h * w)
+        self.weight = Parameter(torch.Tensor(self.mem_dim, self.fea_dim))  # M x C
         self.bias = None
-        self.shrink_thres = 1 / self.weight.shape[0]
-        self.cosine_similarity = nn.CosineSimilarity(dim=2,)
-        self.relu = nn.ReLU(inplace=True)
+        self.shrink_thres = shrink_thres
         self.reset_parameters()
 
     def reset_parameters(self):
-        nn.init.kaiming_uniform_(self.weight)
+        stdv = 1. / math.sqrt(self.weight.size(1))
+        self.weight.data.uniform_(-stdv, stdv)
+        if self.bias is not None:
+            self.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
-        batch = x.shape[0]
-        ex_mem = self.weight.unsqueeze(0).repeat(batch, 1, 1)
-        ex_z = x.unsqueeze(1).repeat(1, self.mem_dim, 1)
-        mem_logit = self.cosine_similarity(ex_z, ex_mem)
-        mem_weight = F.softmax(mem_logit, dim=1)
+        mem_weight = F.linear(x, self.weight)  # Fea x Mem^T, (TxC) x (CxM) = TxM
+        mem_weight = F.softmax(mem_weight, dim=1)  # TxM
+        # ReLU based shrinkage, hard shrinkage for positive value
         if(self.shrink_thres>0):
-            mem_weight = (self.relu(mem_weight - self.shrink_thres) * mem_weight) / (torch.abs(mem_weight - self.shrink_thres) + 1e-12)
-            mem_weight = mem_weight / mem_weight.norm(p=1, dim=1).unsqueeze(1).expand(batch, self.mem_dim)
-        output = torch.mm(mem_weight, self.weight)
+            mem_weight = hard_shrink_relu(mem_weight, lambd=self.shrink_thres)
+            mem_weight = F.normalize(mem_weight, p=1, dim=1)
+        mem_trans = self.weight.permute(1, 0)  # Mem^T, MxC
+        output = F.linear(mem_weight, mem_trans)  # mem_weight x Mem^T^T = AW x Mem, (TxM) x (MxC) = TxC
+        # return output
         return {'output': output, 'mem_weight': mem_weight}  # output, mem_weight
 
-# Refer to https://github.com/h19920918/memae/blob/master/model.py
+# Refer to https://github.com/donggong1/memae-anomaly-detection/blob/master/models/memory_module.py
+# NxCxHxW -> (NxHxW)xC -> addressing Mem, (NxHxW)xC -> NxCxHxW
 class MemoryModule(nn.Module):
-    def __init__(self, mem_dim, fea_dim):
+    def __init__(self, mem_dim, fea_dim, shrink_thres=0.0025, device='cuda'):
         super(MemoryModule, self).__init__()
         self.mem_dim = mem_dim
         self.fea_dim = fea_dim
-        self.memory = MemoryUnit(self.mem_dim, self.fea_dim)
+        self.shrink_thres = shrink_thres
+        self.memory = MemoryUnit(self.mem_dim, self.fea_dim, self.shrink_thres)
 
-    def forward(self, x):
-        batch = x.data.shape[0]
-        x = x.view(batch, -1)
+    def forward(self, input):
+        s = input.data.shape
+        l = len(s)
+
+        if l == 3:
+            x = input.permute(0, 2, 1)
+        elif l == 4:
+            x = input.permute(0, 2, 3, 1)
+        elif l == 5:
+            x = input.permute(0, 2, 3, 4, 1)
+        else:
+            x = []
+            print('wrong feature map size')
+        x = x.contiguous()
+        x = x.view(-1, s[1])
+        #
         y_and = self.memory(x)
+        #
         y = y_and['output']
         mem_weight = y_and['mem_weight']
+
+        if l == 3:
+            y = y.view(s[0], s[2], s[1])
+            y = y.permute(0, 2, 1)
+            mem_weight = mem_weight.view(s[0], s[2], self.mem_dim)
+            mem_weight = mem_weight.permute(0, 2, 1)
+        elif l == 4:
+            y = y.view(s[0], s[2], s[3], s[1])
+            y = y.permute(0, 3, 1, 2)
+            mem_weight = mem_weight.view(s[0], s[2], s[3], self.mem_dim)
+            mem_weight = mem_weight.permute(0, 3, 1, 2)
+        elif l == 5:
+            y = y.view(s[0], s[2], s[3], s[4], s[1])
+            y = y.permute(0, 4, 1, 2, 3)
+            mem_weight = mem_weight.view(s[0], s[2], s[3], s[4], self.mem_dim)
+            mem_weight = mem_weight.permute(0, 4, 1, 2, 3)
+        else:
+            y = x
+            mem_weight = mem_weight
+            print('wrong feature map size')
         return {'output': y, 'mem_weight': mem_weight}
 
 # relu based hard shrinkage function, only works for positive values

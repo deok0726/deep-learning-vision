@@ -85,6 +85,7 @@ class Trainer:
         total_loss_per_batch = 0
         for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
             total_loss_per_batch += loss_per_batch.mean()
+        self.train_losses_per_epoch['total_loss'].update(total_loss_per_batch.item())
         total_loss_per_batch.backward()
         for metric_func_name, metric_func in self.metric_funcs.items():
             metric_value = metric_func(batch_data, output_data)
@@ -106,6 +107,7 @@ class Trainer:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.valid_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
+        self.valid_losses_per_epoch['total_loss'].update(valid_losses_per_epoch.item())
         for metric_func_name, metric_func in self.metric_funcs.items():
             metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
@@ -131,9 +133,13 @@ class Trainer:
         self.metrics_per_batch = {}
         self.batch_time = AverageMeter()
         self.data_time = AverageMeter()
-        self.train_losses_per_epoch = {}
+        self.train_losses_per_epoch = {
+            'total_loss': AverageMeter()
+        }
         self.train_metrics_per_epoch = {}
-        self.valid_losses_per_epoch = {}
+        self.valid_losses_per_epoch = {
+            'total_loss': AverageMeter()
+        }
         self.valid_metrics_per_epoch = {}
         for loss_name in self.loss_funcs.keys():
             self.train_losses_per_epoch[loss_name] = AverageMeter()
@@ -141,19 +147,19 @@ class Trainer:
         for metric_name in self.metric_funcs.keys():
             self.train_metrics_per_epoch[metric_name] = AverageMeter()
             self.valid_metrics_per_epoch[metric_name] = AverageMeter()
-        self.tensorboard_writer_train = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'train'))
-        self.tensorboard_writer_valid = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'valid'))
+        self.tensorboard_writer_train = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'train'), max_queue=100)
+        self.tensorboard_writer_valid = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'valid'), max_queue=100)
     
     def _reset_training_variables(self, is_valid=False):
         self.batch_time.reset()
         self.data_time.reset()
         if is_valid:
-            for loss_name in self.loss_funcs.keys():
+            for loss_name in self.valid_losses_per_epoch.keys():
                 self.valid_losses_per_epoch[loss_name].reset()
             for metric_name in self.metric_funcs.keys():
                 self.valid_metrics_per_epoch[metric_name].reset()
         else:
-            for loss_name in self.loss_funcs.keys():
+            for loss_name in self.train_losses_per_epoch.keys():
                 self.train_losses_per_epoch[loss_name].reset()
             for metric_name in self.metric_funcs.keys():
                 self.train_metrics_per_epoch[metric_name].reset()
@@ -165,6 +171,10 @@ class Trainer:
             'optimizer_state_dict': self.optimizer.state_dict()
             }
         torch.save(states, os.path.join(self.CHECKPOINT_SAVE_DIR, 'epoch_{}.tar'.format(self.epoch_idx)))
+        ckpts_list = os.listdir(self.CHECKPOINT_SAVE_DIR)
+        if ckpts_list and (len(ckpts_list) > 1): # save latest checkpoint only
+            oldest_epoch = sorted(list(map(int, [epoch.split('_')[-1].split('.')[0] for epoch in ckpts_list])))[0]
+            os.remove(os.path.join(self.CHECKPOINT_SAVE_DIR, 'epoch_{}.tar'.format(oldest_epoch)))
         print('Checkpoint saved epoch ', self.epoch_idx)
 
     def _restore_checkpoint(self):
@@ -224,6 +234,8 @@ class Trainer:
                 self.tensorboard_writer_valid.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
             else:
                 self.tensorboard_writer_train.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
+        self.tensorboard_writer_train.flush()
+        self.tensorboard_writer_valid.flush()
         
     def _log_hparams(self):
         # train_losses_and_metrics = {}

@@ -31,14 +31,17 @@ parser.add_argument('--normalize', action='store_true', default=False, help="Nor
 parser.add_argument('--random_rotation', action='store_true', default=False, help="Random Rotation transformation")
 parser.add_argument('--random_crop', action='store_true', default=False, help="Random Crop transformation")
 parser.add_argument('--crop_size', type=int, default=300, help="Cropped image size")
-parser.add_argument('--train_ratio', type=float, default=2*9/10, help="training dataset ratio")
-parser.add_argument('--valid_ratio', type=float, default=2*1/10, help="validation dataset ratio")
-parser.add_argument('--test_ratio', type=float, default=1, help="test dataset ratio")
-parser.add_argument('--anomaly_ratio', type=float, default=0.1, help="anomaly data ratio")
+parser.add_argument('--train_ratio', type=float, default=0.6, help="training dataset ratio")
+parser.add_argument('--valid_ratio', type=float, default=0.3, help="validation dataset ratio")
+parser.add_argument('--test_ratio', type=float, default=0.1, help="test dataset ratio")
+parser.add_argument('--anomaly_ratio', type=float, default=0.3, help="anomaly data ratio")
 
 # save
 parser.add_argument('--checkpoint_dir', type=str, default='/hd/checkpoints/', help="ckpt dir")
 parser.add_argument('--tensorboard_dir', type=str, default='/hd/tensorboard_logs/', help="ckpt dir")
+
+# model args
+parser.add_argument('--entropy_loss_coef', type=float, default=0.0002, help="entropy loss weight for memae model")
 
 def get_args():
     args = parser.parse_args()
