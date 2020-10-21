@@ -13,12 +13,12 @@ class DoubleConv(nn.Module):
         self.double_conv = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
-            # nn.ReLU(inplace=True), # or leakyRelu
-            nn.LeakyReLU(0.2, inplace=True),
+            nn.ReLU(inplace=True), # or leakyRelu
+            # nn.LeakyReLU(0.2, inplace=True),
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm2d(out_channels),
-            # nn.ReLU(inplace=True) # or leakyRelu
-            nn.LeakyReLU(0.2, inplace=True)
+            nn.ReLU(inplace=True) # or leakyRelu
+            # nn.LeakyReLU(0.2, inplace=True)
         )
 
     def forward(self, x):
@@ -71,9 +71,9 @@ class Up(nn.Module):
 class Model(nn.Module):
     """ ITAE model """
 
-    def __init__(self, n_channels=3, bilinear=True):
+    def __init__(self, in_channels=1, out_channels=3, bilinear=True):
         super(Model, self).__init__()
-        self.in_conv = DoubleConv(n_channels, 64)
+        self.in_conv = DoubleConv(in_channels, 64)
         self.down1 = Down(64, 128)
         self.down2 = Down(128, 256)
         self.down3 = Down(256, 512)
@@ -83,8 +83,8 @@ class Model(nn.Module):
         self.up3 = Up(256, 64, bilinear)
         self.up4 = Up(128, 64)
         # seems that the structure in paper does not contain 'tanh'
-        # self.out_conv = nn.Conv2d(64, n_channels, kernel_size=3, stride=1, padding=1, bias=False)# Unet use 1*1conv to be out_conv
-        self.out_conv = nn.Conv2d(64, n_channels, kernel_size=3, stride=1, padding=1)# Unet use 1*1conv to be out_conv
+        # self.out_conv = nn.Conv2d(64, out_channels, kernel_size=3, stride=1, padding=1, bias=False)# Unet use 1*1conv to be out_conv
+        self.out_conv = nn.Conv2d(64, out_channels, kernel_size=3, stride=1, padding=1)# Unet use 1*1conv to be out_conv
         self.rec_criterion = nn.MSELoss(reduction='none')
 
     def forward(self, x):

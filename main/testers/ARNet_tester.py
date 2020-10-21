@@ -54,7 +54,7 @@ class ARNetTester(Tester):
         if not transformed_batch_data.is_contiguous():
             transformed_batch_data = transformed_batch_data.contiguous()
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if self.args.channel_num == 3:
+        if transformed_batch_data.shape[2] == 3:
             transformed_batch_data = torch.mean(transformed_batch_data, dim=2, keepdim=True) # channel dim 2
         b, t, c, h, w = transformed_batch_data.shape
         original_batch_data = original_batch_data.flatten(0, 1)
@@ -92,7 +92,7 @@ class ARNetTester(Tester):
         original_batch_data = original_batch_data.transpose(0, 1)
         original_batch_label = original_batch_label.transpose(0, 1)
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if self.args.channel_num == 3:
+        if transformed_batch_data.shape[2] == 3:
             transformed_batch_data = torch.mean(transformed_batch_data, dim=2, keepdim=True) # channel dim 2
         b, t, c, h, w = transformed_batch_data.shape
         transformed_batch_data = transformed_batch_data.flatten(0, 1)

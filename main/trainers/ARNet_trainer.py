@@ -27,7 +27,7 @@ class ARNetTrainer(Trainer):
         if not transformed_batch_data.is_contiguous():
             transformed_batch_data = transformed_batch_data.contiguous()
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if self.args.channel_num == 3:
+        if transformed_batch_data.shape[1] == 3:
             transformed_batch_data = torch.mean(transformed_batch_data, dim=1, keepdim=True) # channel dim 1
         batch_data = batch_data.to(self.device)
         transformed_batch_data = transformed_batch_data.to(self.device)
@@ -68,7 +68,7 @@ class ARNetTrainer(Trainer):
         if not transformed_batch_data.is_contiguous():
             transformed_batch_data = transformed_batch_data.contiguous()
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if self.args.channel_num == 3:
+        if transformed_batch_data.shape[1] == 3:
             transformed_batch_data = torch.mean(transformed_batch_data, dim=1, keepdim=True) # channel dim 1
         batch_data = batch_data.to(self.device)
         transformed_batch_data = transformed_batch_data.to(self.device)
@@ -130,7 +130,7 @@ class ARNetTrainer(Trainer):
             matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_batch.set_title("Ground Truth")
             ax_transfomred_batch = fig.add_subplot(3, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
-            matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
+            matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=True, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_transfomred_batch.set_title("Transformed Batch Data")
         plt.tight_layout()
         if is_valid:

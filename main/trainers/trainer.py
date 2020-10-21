@@ -31,8 +31,8 @@ class Trainer:
         self.epoch_idx = 0
         self._restore_checkpoint()
         self.global_step = self.epoch_idx*len(self.dataloader.train_data_loader)
-        self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
-        self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        # self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        # self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
         for epoch_idx in tqdm(range(self.args.num_epoch), desc='Train'):
             # ================================================================== #
             #                         training                                   #
