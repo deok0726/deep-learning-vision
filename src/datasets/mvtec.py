@@ -12,7 +12,7 @@ from skimage import io
 
 class MVTEC_Dataset(TorchvisionDataset):
 
-    def __init__(self, root: str, normal_class=0):
+    def __init__(self, root: str, normal_class: int):
         super().__init__(root)
 
         self.n_classes = 2  # 0: normal, 1: outlier
@@ -45,6 +45,7 @@ class MyMVTEC(Dataset):
         self.transform = transform
         self.target_transform = target_transform
         self.mvtec_part = sorted(os.listdir(root))[normal_class]
+        print('Normal class is', self.mvtec_part)
         self.root = os.path.join(root, self.mvtec_part)
         self.train_dir = os.path.join(self.root, "train/good/")
         self.test_dir = os.path.join(self.root, "test/")
@@ -63,7 +64,7 @@ class MyMVTEC(Dataset):
                 self.test_target.extend([0]*len(test_folders_data))
             else:
                 self.test_target.extend([1]*len(test_folders_data))
-
+        
     def __len__(self):
         if self.train:
             return len(self.train_data)
@@ -84,8 +85,6 @@ class MyMVTEC(Dataset):
             img = io.imread(self.test_data[index])
             target = self.test_target[index]
 
-            
-            
         # doing this so that it is consistent with all other datasets
         # to return a PIL Image
         img = Image.fromarray(img)
@@ -93,7 +92,7 @@ class MyMVTEC(Dataset):
         if self.transform is not None:
             img = self.transform(img)
 
-        if self.target_transform is not None:
-            target = self.target_transform(target)
+        # if self.target_transform is not None:
+        #     target = self.target_transform(target)
 
         return img, target, index  # only line changed

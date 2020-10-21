@@ -1,4 +1,5 @@
 import sys
+import os
 import click
 import torch
 import logging
@@ -16,7 +17,7 @@ from datasets.main import load_dataset
 ################################################################################
 @click.command()
 @click.argument('dataset_name', type=click.Choice(['mnist', 'cifar10', 'mvtec']))
-@click.argument('net_name', type=click.Choice(['mnist_LeNet', 'cifar10_LeNet', 'cifar10_LeNet_ELU']))
+@click.argument('net_name', type=click.Choice(['mnist_LeNet', 'cifar10_LeNet', 'cifar10_LeNet_ELU', 'mvtec_LeNet']))
 @click.argument('xp_path', type=click.Path(exists=True))
 @click.argument('data_path', type=click.Path(exists=True), default="/hd/mvtec/")
 @click.option('--load_config', type=click.Path(exists=True), default=None,
@@ -179,6 +180,10 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, ob
         if dataset_name == 'cifar10':
             X_normals = torch.tensor(np.transpose(dataset.test_set.test_data[idx_sorted[:32], ...], (0, 3, 1, 2)))
             X_outliers = torch.tensor(np.transpose(dataset.test_set.test_data[idx_sorted[-32:], ...], (0, 3, 1, 2)))
+        
+        # if dataset_name == 'mvtec':
+        #     X_normals = torch.tensor(np.transpose(dataset.test_set.test_target[idx_sorted[:32], ...], (0, 3, 1, 2)))
+        #     X_outliers = torch.tensor(np.transpose(dataset.test_set.test_target[idx_sorted[-32:], ...], (0, 3, 1, 2)))
 
         plot_images_grid(X_normals, export_img=xp_path + '/normals', title='Most normal examples', padding=2)
         plot_images_grid(X_outliers, export_img=xp_path + '/outliers', title='Most anomalous examples', padding=2)
@@ -190,4 +195,6 @@ def main(dataset_name, net_name, xp_path, data_path, load_config, load_model, ob
 
 
 if __name__ == '__main__':
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
     main()

@@ -55,6 +55,8 @@ class AETrainer(BaseTrainer):
 
                 # Update network parameters via backpropagation: forward + backward + optimize
                 outputs = ae_net(inputs)
+                # print(inputs.size())
+                # print(outputs.size())
                 scores = torch.sum((outputs - inputs) ** 2, dim=tuple(range(1, outputs.dim())))
                 loss = torch.mean(scores)
                 loss.backward()
@@ -81,7 +83,7 @@ class AETrainer(BaseTrainer):
         ae_net = ae_net.to(self.device)
 
         # Get test data loader
-        _, test_loader = dataset.loaders(batch_size=self.batch_size, num_workers=self.n_jobs_dataloader)
+        _, test_loader = dataset.loaders(batch_size=self.batch_size, num_workers=self.n_jobs_dataloader, shuffle_test=True)
 
         # Testing
         logger.info('Testing autoencoder...')

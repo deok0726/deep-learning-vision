@@ -640,3 +640,88 @@
 2020-10-15 06:20:05,593 - root - INFO - Pretraining batch size: 128
 2020-10-15 06:20:05,593 - root - INFO - Pretraining weight decay: 1e-06
 2020-10-15 06:20:05,609 - root - INFO - Starting pretraining...
+2020-10-19 05:57:28,555 - root - INFO - Log file is ../log/cifar10_test/log.txt.
+2020-10-19 05:57:28,560 - root - INFO - Data path is ../data.
+2020-10-19 05:57:28,560 - root - INFO - Export path is ../log/cifar10_test.
+2020-10-19 05:57:28,560 - root - INFO - Dataset: cifar10
+2020-10-19 05:57:28,561 - root - INFO - Normal class: 3
+2020-10-19 05:57:28,561 - root - INFO - Network: cifar10_LeNet
+2020-10-19 05:57:28,561 - root - INFO - Deep SVDD objective: one-class
+2020-10-19 05:57:28,561 - root - INFO - Nu-paramerter: 0.10
+2020-10-19 05:57:29,308 - root - INFO - Computation device: cuda
+2020-10-19 05:57:29,308 - root - INFO - Number of dataloader workers: 0
+2020-10-19 05:57:30,593 - root - INFO - Pretraining: True
+2020-10-19 05:57:30,593 - root - INFO - Pretraining optimizer: adam
+2020-10-19 05:57:30,599 - root - INFO - Pretraining learning rate: 0.0001
+2020-10-19 05:57:30,599 - root - INFO - Pretraining epochs: 350
+2020-10-19 05:57:30,599 - root - INFO - Pretraining learning rate scheduler milestones: (250,)
+2020-10-19 05:57:30,599 - root - INFO - Pretraining batch size: 200
+2020-10-19 05:57:30,599 - root - INFO - Pretraining weight decay: 5e-07
+2020-10-19 05:57:31,445 - root - INFO - Starting pretraining...
+2020-10-19 05:57:33,951 - root - INFO -   Epoch 1/350	 Time: 2.506	 Loss: 97.77599869
+2020-10-19 05:57:35,727 - root - INFO -   Epoch 2/350	 Time: 1.776	 Loss: 19.76404816
+2020-10-19 05:57:37,533 - root - INFO -   Epoch 3/350	 Time: 1.805	 Loss: 12.52581829
+2020-10-19 05:57:39,335 - root - INFO -   Epoch 4/350	 Time: 1.802	 Loss: 10.53655640
+2020-10-19 05:57:41,143 - root - INFO -   Epoch 5/350	 Time: 1.808	 Loss: 9.43382931
+2020-10-19 05:57:50,722 - root - INFO - Log file is ../log/cifar10_test/log.txt.
+2020-10-19 05:57:50,722 - root - INFO - Data path is ../data.
+2020-10-19 05:57:50,722 - root - INFO - Export path is ../log/cifar10_test.
+2020-10-19 05:57:50,722 - root - INFO - Dataset: cifar10
+2020-10-19 05:57:50,722 - root - INFO - Normal class: 3
+2020-10-19 05:57:50,722 - root - INFO - Network: cifar10_LeNet
+2020-10-19 05:57:50,722 - root - INFO - Deep SVDD objective: one-class
+2020-10-19 05:57:50,722 - root - INFO - Nu-paramerter: 0.10
+2020-10-19 05:57:51,506 - root - INFO - Computation device: cuda
+2020-10-19 05:57:51,507 - root - INFO - Number of dataloader workers: 0
+2020-10-19 05:57:52,856 - root - INFO - Pretraining: False
+2020-10-19 05:57:52,856 - root - INFO - Training optimizer: adam
+2020-10-19 05:57:52,856 - root - INFO - Training learning rate: 0.0001
+2020-10-19 05:57:52,856 - root - INFO - Training epochs: 150
+2020-10-19 05:57:52,856 - root - INFO - Training learning rate scheduler milestones: (50,)
+2020-10-19 05:57:52,856 - root - INFO - Training batch size: 200
+2020-10-19 05:57:52,857 - root - INFO - Training weight decay: 5e-07
+2020-10-19 05:57:53,660 - root - INFO - Initializing center c...
+2020-10-19 05:57:55,179 - root - INFO - Center c initialized.
+2020-10-19 05:57:55,179 - root - INFO - Starting training...
+2020-10-19 05:57:56,237 - root - INFO -   Epoch 1/150	 Time: 1.058	 Loss: 8.25659526
+2020-10-19 05:57:57,300 - root - INFO -   Epoch 2/150	 Time: 1.062	 Loss: 1.18179392
+2020-10-19 09:18:09,873 - root - INFO - Log file is ../log/cifar10_test/log.txt.
+2020-10-19 09:18:09,879 - root - INFO - Data path is ../data.
+2020-10-19 09:18:09,879 - root - INFO - Export path is ../log/cifar10_test.
+2020-10-19 09:18:09,879 - root - INFO - Dataset: cifar10
+2020-10-19 09:18:09,879 - root - INFO - Normal class: 3
+2020-10-19 09:18:09,879 - root - INFO - Network: cifar10_LeNet
+2020-10-19 09:18:09,879 - root - INFO - Deep SVDD objective: one-class
+2020-10-19 09:18:09,879 - root - INFO - Nu-paramerter: 0.10
+2020-10-19 09:18:10,043 - root - INFO - Computation device: cuda
+2020-10-19 09:18:10,044 - root - INFO - Number of dataloader workers: 0
+2020-10-19 09:18:11,437 - root - INFO - Pretraining: False
+2020-10-19 09:18:11,437 - root - INFO - Training optimizer: adam
+2020-10-19 09:18:11,437 - root - INFO - Training learning rate: 0.0001
+2020-10-19 09:18:11,438 - root - INFO - Training epochs: 150
+2020-10-19 09:18:11,438 - root - INFO - Training learning rate scheduler milestones: (50,)
+2020-10-19 09:18:11,438 - root - INFO - Training batch size: 200
+2020-10-19 09:18:11,438 - root - INFO - Training weight decay: 5e-07
+2020-10-19 09:18:13,260 - root - INFO - Initializing center c...
+2020-10-19 09:24:28,397 - root - INFO - Log file is ../log/cifar10_test/log.txt.
+2020-10-19 09:24:28,397 - root - INFO - Data path is ../data.
+2020-10-19 09:24:28,397 - root - INFO - Export path is ../log/cifar10_test.
+2020-10-19 09:24:28,397 - root - INFO - Dataset: cifar10
+2020-10-19 09:24:28,397 - root - INFO - Normal class: 3
+2020-10-19 09:24:28,397 - root - INFO - Network: cifar10_LeNet
+2020-10-19 09:24:28,397 - root - INFO - Deep SVDD objective: one-class
+2020-10-19 09:24:28,398 - root - INFO - Nu-paramerter: 0.10
+2020-10-19 09:24:28,750 - root - INFO - Computation device: cuda
+2020-10-19 09:24:28,750 - root - INFO - Number of dataloader workers: 0
+2020-10-19 09:24:29,994 - root - INFO - Pretraining: False
+2020-10-19 09:24:29,994 - root - INFO - Training optimizer: adam
+2020-10-19 09:24:29,994 - root - INFO - Training learning rate: 0.0001
+2020-10-19 09:24:29,994 - root - INFO - Training epochs: 150
+2020-10-19 09:24:29,994 - root - INFO - Training learning rate scheduler milestones: (50,)
+2020-10-19 09:24:29,994 - root - INFO - Training batch size: 200
+2020-10-19 09:24:29,994 - root - INFO - Training weight decay: 5e-07
+2020-10-19 09:24:30,924 - root - INFO - Initializing center c...
+2020-10-19 09:24:32,678 - root - INFO - Center c initialized.
+2020-10-19 09:24:32,678 - root - INFO - Starting training...
+2020-10-19 09:24:33,776 - root - INFO -   Epoch 1/150	 Time: 1.098	 Loss: 6.72760170
+2020-10-19 09:24:34,982 - root - INFO -   Epoch 2/150	 Time: 1.206	 Loss: 1.07643259
