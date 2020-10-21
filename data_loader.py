@@ -26,18 +26,20 @@ class DataLoader:
     def _get_datasets(self, args, source_transform, target_transform):
         if args.dataset_name == 'MNIST':
             train_dataset = MNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
-            test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
+            test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
+            # test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'FMNIST':
             train_dataset = FashionMNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
-            test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
+            test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
+            # test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'MvTec':
             train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
             test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
             # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
             train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
-            valid_length = int(len(train_dataset) * (args.valid_ratio / (args.train_ratio + args.valid_ratio)))
+            valid_length = len(train_dataset) - train_length
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
         else:
             raise Exception('Wrong dataset name')
@@ -94,6 +96,8 @@ class DataLoader:
             anomaly_count = int(test_length * args.anomaly_ratio / (1 - args.anomaly_ratio))
             anomaly_data = anomaly_data[:anomaly_count]
             anomaly_targets = anomaly_targets[:anomaly_count]
+        elif args.anomaly_ratio == -1:
+            pass
         else:
             pass
         # ================================================================== #

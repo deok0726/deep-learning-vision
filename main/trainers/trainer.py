@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import copy
 plt.rcParams.update({'axes.titlesize': 'small'})
 from sklearn import metrics
+from numpy.random import randint
 # import numpy as np
 
 
@@ -70,6 +71,8 @@ class Trainer:
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
         self._log_hparams()
+        self.tensorboard_writer_train.close()
+        self.tensorboard_writer_valid.close()
 
     def _train_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)
@@ -201,19 +204,20 @@ class Trainer:
         for idx in range(self.args.train_tensorboard_shown_image_num):
             losses = []
             metrics = []
+            random_sample_idx = randint(0, output_data.shape[0])
             ax_output = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num+1, xticks=[], yticks=[])
-            matplotlib_imshow(output_data[idx], one_channel=self.one_channel)
+            matplotlib_imshow(output_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
-                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[idx].mean().item(), 10)))))
+                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[idx].mean().item(), 10)))))
-            # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[idx].item()))
-            ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[idx].item()))
+                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
+            # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
+            ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_batch = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             # if training_state == "train":
-                # torchvision.utils.save_image(batch_data[idx].double(), "/root/anomaly_detection/temp/batch_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
-                # torchvision.utils.save_image(output_data[idx].double(), "/root/anomaly_detection/temp/output_" + str(idx) + "_" + str(idx) + "_" + str(batch_label[idx]) + ".png", "PNG")
-            matplotlib_imshow(batch_data[idx], one_channel=self.one_channel)
+                # torchvision.utils.save_image(batch_data[random_sample_idx].double(), "/root/anomaly_detection/temp/batch_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
+                # torchvision.utils.save_image(output_data[random_sample_idx].double(), "/root/anomaly_detection/temp/output_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
+            matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_batch.set_title("Ground Truth")
         plt.tight_layout()
         if is_valid:

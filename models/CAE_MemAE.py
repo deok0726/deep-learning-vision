@@ -7,11 +7,16 @@ from collections import namedtuple
 
 # Refer to https://github.com/h19920918/memae/blob/master/model.py
 class Model(nn.Module):
-    def __init__(self, n_channels, mem_dim=100, shrink_thres=0.0025):
+    def __init__(self, n_channels, mem_dim=100):
         super(Model, self).__init__()
-        self.encoder = Encoder(n_channels)
-        self.decoder = Decoder(n_channels)
-        self.memory_module = MemoryModule(mem_dim=100, fea_dim=64)
+        self.conv_channel_num = 16
+        self.input_h = 4
+        self.input_w = 4
+        # self.input_h = 88
+        # self.input_w = 88
+        self.encoder = Encoder(n_channels, self.conv_channel_num)
+        self.decoder = Decoder(n_channels, self.conv_channel_num)
+        self.memory_module = MemoryModule(mem_dim=mem_dim, fea_dim=self.conv_channel_num*4, input_h=self.input_h, input_w=self.input_w)
         self.rec_criterion = nn.MSELoss(reduction='none')
         self.return_values = namedtuple("return_values", 'output mem_weight')
 
@@ -20,7 +25,7 @@ class Model(nn.Module):
         f = self.memory_module(z)        
         mem_weight = f['mem_weight']
         # output = self.decoder(z)
-        output = self.decoder(f['output'].view(-1, 64, 4, 4))
+        output = self.decoder(f['output'].view(-1, self.conv_channel_num*4, self.input_h, self.input_w))
         return self.return_values(output, mem_weight)
         # return output
     
@@ -45,15 +50,15 @@ class Model(nn.Module):
         return rec_loss
 
 class Encoder(nn.Module):
-    def __init__(self, image_channel_num):
+    def __init__(self, image_channel_num, conv_channel_num):
         super(Encoder, self).__init__()
-        self.conv1 = nn.Conv2d(image_channel_num, 16, kernel_size=1,stride=2, padding=1)
-        self.bn1 = nn.BatchNorm2d(16)
+        self.conv1 = nn.Conv2d(image_channel_num, conv_channel_num, kernel_size=1,stride=2, padding=1)
+        self.bn1 = nn.BatchNorm2d(conv_channel_num)
         self.relu = nn.ReLU()
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3,stride=2, padding=1)
-        self.bn2 = nn.BatchNorm2d(32)
-        self.conv3 = nn.Conv2d(32, 64, kernel_size=3,stride=2, padding=1)
-        self.bn3 = nn.BatchNorm2d(64)
+        self.conv2 = nn.Conv2d(conv_channel_num, conv_channel_num*2, kernel_size=3,stride=2, padding=1)
+        self.bn2 = nn.BatchNorm2d(conv_channel_num*2)
+        self.conv3 = nn.Conv2d(conv_channel_num*2, conv_channel_num*4, kernel_size=3,stride=2, padding=1)
+        self.bn3 = nn.BatchNorm2d(conv_channel_num*4)
     
     def forward(self, x):
         x = self.conv1(x)
@@ -70,13 +75,13 @@ class Encoder(nn.Module):
         return x
 
 class Decoder(nn.Module):
-    def __init__(self, image_channel_num):
+    def __init__(self, image_channel_num, conv_channel_num):
         super(Decoder, self).__init__()
-        self.deconv1 = nn.ConvTranspose2d(64, 32, kernel_size=3,stride=2, padding=1, output_padding=1)
-        self.bn1 = nn.BatchNorm2d(32)
-        self.deconv2 = nn.ConvTranspose2d(32, 16, kernel_size=2,stride=2, padding=1, output_padding=1)
-        self.bn2 = nn.BatchNorm2d(16)
-        self.deconv3 = nn.ConvTranspose2d(16, image_channel_num, kernel_size=2,stride=2, padding=1)
+        self.deconv1 = nn.ConvTranspose2d(conv_channel_num*4, conv_channel_num*2, kernel_size=3,stride=2, padding=1, output_padding=1)
+        self.bn1 = nn.BatchNorm2d(conv_channel_num*2)
+        self.deconv2 = nn.ConvTranspose2d(conv_channel_num*2, conv_channel_num, kernel_size=2,stride=2, padding=1, output_padding=1)
+        self.bn2 = nn.BatchNorm2d(conv_channel_num)
+        self.deconv3 = nn.ConvTranspose2d(conv_channel_num, image_channel_num, kernel_size=2,stride=2, padding=1)
         self.relu = nn.ReLU()
     
     def forward(self, x):
@@ -93,11 +98,11 @@ class Decoder(nn.Module):
         return x
 
 class MemoryUnit(nn.Module):
-    def __init__(self, mem_dim, fea_dim):
+    def __init__(self, mem_dim, fea_dim, input_h=4, input_w=4):
         super(MemoryUnit, self).__init__()
         self.mem_dim = mem_dim
         self.fea_dim = fea_dim
-        self.weight = Parameter(torch.Tensor(self.mem_dim, self.fea_dim * 4 * 4))  # M x C(fea_dim * h * w)
+        self.weight = Parameter(torch.Tensor(self.mem_dim, self.fea_dim * input_h * input_w))  # M x C(fea_dim * h * w)
         self.bias = None
         self.shrink_thres = 1 / self.weight.shape[0]
         self.cosine_similarity = nn.CosineSimilarity(dim=2,)
@@ -121,11 +126,11 @@ class MemoryUnit(nn.Module):
 
 # Refer to https://github.com/h19920918/memae/blob/master/model.py
 class MemoryModule(nn.Module):
-    def __init__(self, mem_dim, fea_dim):
+    def __init__(self, mem_dim, fea_dim, input_h, input_w):
         super(MemoryModule, self).__init__()
         self.mem_dim = mem_dim
         self.fea_dim = fea_dim
-        self.memory = MemoryUnit(self.mem_dim, self.fea_dim)
+        self.memory = MemoryUnit(self.mem_dim, self.fea_dim, input_h, input_w)
 
     def forward(self, x):
         batch = x.data.shape[0]

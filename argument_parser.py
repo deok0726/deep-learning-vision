@@ -11,6 +11,7 @@ parser.add_argument('--train_batch_size', type=int, default=16, help="train batc
 parser.add_argument('--test_batch_size', type=int, default=4, help="test batch size")
 parser.add_argument('--learning_rate', type=float, default='0.001', help="learning rate")
 parser.add_argument('--learning_rate_decay', action='store_true', default=False, help="apply learning rate decay")
+parser.add_argument('--learning_rate_decay_ratio', type=float, default='0.5', help="learning rate decay ratio")
 parser.add_argument('--end_learning_rate', type=float, default='0.0001', help="learning rate")
 parser.add_argument('--train', action='store_true', default=False, help="start training")
 parser.add_argument('--test', action='store_true', default=False, help="start testing")
@@ -19,6 +20,7 @@ parser.add_argument('--train_tensorboard_shown_image_num', type=int, default=4, 
 parser.add_argument('--test_tensorboard_shown_image_num', type=int, default=1, help="The number of the test images shown in tensorboard")
 parser.add_argument('--target_label', type=int, default=0, help="target label")
 parser.add_argument('--unique_anomaly', action='store_true', default=False, help="Unique anomaly class")
+parser.add_argument('--reproducibility', action='store_true', default=False, help="Reproducibility On")
 
 # data loader
 parser.add_argument('--dataset_name', type=str, default='MNIST', help="dataset name")

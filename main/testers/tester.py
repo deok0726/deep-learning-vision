@@ -32,6 +32,7 @@ class Tester:
             if batch_idx % self.TEST_LOG_INTERVAL == 0:
                 print('Test Batch Step', 'batch idx', self.batch_idx, 'batch data shape', batch_data.shape)
                 self._log_progress()
+        self.tensorboard_writer_test.close()
 
     def _test_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)
@@ -114,35 +115,36 @@ class Tester:
         for idx in range(self.args.test_tensorboard_shown_image_num):
             losses = []
             metrics = []
+            random_sample_idx = np.random.randint(0, output_data.shape[0])
             ax_output = fig.add_subplot(2, self.args.test_tensorboard_shown_image_num, idx+self.args.test_tensorboard_shown_image_num+1, xticks=[], yticks=[])
-            matplotlib_imshow(output_data[idx], one_channel=self.one_channel)
+            matplotlib_imshow(output_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
-                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[idx].mean().item(), 10)))))
+                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
                 if metric_per_batch_name == 'ROC':
                     pass
                 else:
-                    metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[idx].mean().item(), 10)))))
+                    metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
             if 'ROC' in metric_per_epoch.keys():
                 metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_epoch['ROC'].avg, 10)))))
-            ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[idx].item()))
+            ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_batch = fig.add_subplot(2, self.args.test_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
-            matplotlib_imshow(batch_data[idx], one_channel=self.one_channel)
+            matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_batch.set_title("Ground Truth")
         plt.tight_layout()
         self.tensorboard_writer_test.add_figure("test", fig, global_step=self.epoch_idx)
         for loss_name, loss_value_per_epoch in losses_per_epoch.items():
             scalar_tag = [loss_name, '/loss']
-            print('tester loss scalar_tag: ', scalar_tag)
+            # print('tester loss scalar_tag: ', scalar_tag)
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), loss_value_per_epoch.avg, self.epoch_idx)
-            print('tester loss loss_value_per_epoch.avg: ', loss_value_per_epoch.avg)
-            print('tester loss self.epoch_idx: ', self.epoch_idx)
+            # print('tester loss loss_value_per_epoch.avg: ', loss_value_per_epoch.avg)
+            # print('tester loss self.epoch_idx: ', self.epoch_idx)
         for metric_name, metric_value_per_epoch in metric_per_epoch.items():
             scalar_tag = [metric_name, '/metric']
-            print('tester metric scalar_tag: ', scalar_tag)
+            # print('tester metric scalar_tag: ', scalar_tag)
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
-            print('tester metric metric_value_per_epoch.avg: ', metric_value_per_epoch.avg)
-            print('tester metric self.epoch_idx: ', self.epoch_idx)
+            # print('tester metric metric_value_per_epoch.avg: ', metric_value_per_epoch.avg)
+            # print('tester metric self.epoch_idx: ', self.epoch_idx)
         self.tensorboard_writer_test.flush()
 
     def _log_progress(self):

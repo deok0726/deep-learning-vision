@@ -54,8 +54,6 @@ class MemAETrainer(Trainer):
             output_data = self.model(batch_data)
             mem_weight = getattr(output_data, 'mem_weight')
             output_data = getattr(output_data ,'output')
-            # mem_weight = output_data['mem_weight']
-            # output_data = output_data['output']
         for loss_func_name, loss_func in self.loss_funcs.items():
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
