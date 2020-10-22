@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from utils.utils import AverageMeter, matplotlib_imshow
+from modules.utils import AverageMeter, matplotlib_imshow
 from math import ceil
 import time, datetime
 import torch
@@ -10,16 +10,18 @@ import matplotlib.pyplot as plt
 import copy
 plt.rcParams.update({'axes.titlesize': 'small'})
 from sklearn import metrics
+from numpy.random import randint
 # import numpy as np
 
 
 class Trainer:
-    def __init__(self, args, dataloader, model, loss_funcs: dict, optimizer, metric_funcs: dict, device):
+    def __init__(self, args, dataloader, model, optimizer, lr_scheduler, loss_funcs: dict, metric_funcs: dict, device):
         self.args = args
         self.dataloader = dataloader
         self.model = model
-        self.loss_funcs = loss_funcs
         self.optimizer = optimizer
+        self.lr_scheduler = lr_scheduler
+        self.loss_funcs = loss_funcs
         self.metric_funcs = metric_funcs
         self.device = device
         self._set_training_constants()
@@ -29,19 +31,19 @@ class Trainer:
         self.epoch_idx = 0
         self._restore_checkpoint()
         self.global_step = self.epoch_idx*len(self.dataloader.train_data_loader)
-        self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
-        self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        # self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        # self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
         for epoch_idx in tqdm(range(self.args.num_epoch), desc='Train'):
             # ================================================================== #
             #                         training                                   #
             # ================================================================== #
             self.model.train()
             self.end_time = time.time()
-            print(len(self.dataloader.train_data_loader))
+            # print(len(self.dataloader.train_data_loader))
             for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.train_data_loader), total=len(self.dataloader.train_data_loader), desc='Epoch %d' % self.epoch_idx):
                 self.batch_idx = batch_idx
                 self.global_step += 1
-                self._train_step(batch_data, batch_label)                
+                self._train_step(batch_data, batch_label)
                 if batch_idx % self.TRAIN_LOG_INTERVAL == 0:
                     print('Train Batch Step', 'batch idx', self.batch_idx, 'batch data shape', batch_data.shape)
                     self._log_progress()
@@ -66,7 +68,11 @@ class Trainer:
             self._reset_training_variables(is_valid=True)
             self._save_checkpoint()
             self.epoch_idx += 1
+            if self.lr_scheduler is not None:
+                self.lr_scheduler.step()
         self._log_hparams()
+        self.tensorboard_writer_train.close()
+        self.tensorboard_writer_valid.close()
 
     def _train_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)
@@ -80,20 +86,12 @@ class Trainer:
             self.losses_per_batch[loss_func_name] = loss_values
             self.train_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
         total_loss_per_batch = 0
-        batch_diff_per_batch = batch_data - output_data
         for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
             total_loss_per_batch += loss_per_batch.mean()
-        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
+        self.train_losses_per_epoch['total_loss'].update(total_loss_per_batch.item())
         total_loss_per_batch.backward()
         for metric_func_name, metric_func in self.metric_funcs.items():
-            if metric_func_name == 'ROC':
-                try:
-                    metric_value = metric_func(batch_diff_per_batch.cpu().detach().numpy(), batch_label.cpu().detach().numpy())
-                except Exception as e:
-                    metric_value = 0
-                    print(e)
-            else:
-                metric_value = metric_func(batch_data, output_data)
+            metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
             self.train_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.optimizer.step()
@@ -112,16 +110,9 @@ class Trainer:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.valid_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
-        batch_diff_per_batch = batch_data - output_data
-        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
+        self.valid_losses_per_epoch['total_loss'].update(valid_losses_per_epoch.item())
         for metric_func_name, metric_func in self.metric_funcs.items():
-            if metric_func_name == 'ROC':
-                try:
-                    metric_value = metric_func(batch_diff_per_batch.cpu().detach().numpy(), batch_label.cpu().detach().numpy())
-                except Exception as e:
-                    print(e)
-            else:
-                metric_value = metric_func(batch_data, output_data)
+            metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
             self.valid_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
@@ -145,9 +136,13 @@ class Trainer:
         self.metrics_per_batch = {}
         self.batch_time = AverageMeter()
         self.data_time = AverageMeter()
-        self.train_losses_per_epoch = {}
+        self.train_losses_per_epoch = {
+            'total_loss': AverageMeter()
+        }
         self.train_metrics_per_epoch = {}
-        self.valid_losses_per_epoch = {}
+        self.valid_losses_per_epoch = {
+            'total_loss': AverageMeter()
+        }
         self.valid_metrics_per_epoch = {}
         for loss_name in self.loss_funcs.keys():
             self.train_losses_per_epoch[loss_name] = AverageMeter()
@@ -155,19 +150,19 @@ class Trainer:
         for metric_name in self.metric_funcs.keys():
             self.train_metrics_per_epoch[metric_name] = AverageMeter()
             self.valid_metrics_per_epoch[metric_name] = AverageMeter()
-        self.tensorboard_writer_train = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'train'))
-        self.tensorboard_writer_valid = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'valid'))
+        self.tensorboard_writer_train = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'train'), max_queue=100)
+        self.tensorboard_writer_valid = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'valid'), max_queue=100)
     
     def _reset_training_variables(self, is_valid=False):
         self.batch_time.reset()
         self.data_time.reset()
         if is_valid:
-            for loss_name in self.loss_funcs.keys():
+            for loss_name in self.valid_losses_per_epoch.keys():
                 self.valid_losses_per_epoch[loss_name].reset()
             for metric_name in self.metric_funcs.keys():
                 self.valid_metrics_per_epoch[metric_name].reset()
         else:
-            for loss_name in self.loss_funcs.keys():
+            for loss_name in self.train_losses_per_epoch.keys():
                 self.train_losses_per_epoch[loss_name].reset()
             for metric_name in self.metric_funcs.keys():
                 self.train_metrics_per_epoch[metric_name].reset()
@@ -179,6 +174,10 @@ class Trainer:
             'optimizer_state_dict': self.optimizer.state_dict()
             }
         torch.save(states, os.path.join(self.CHECKPOINT_SAVE_DIR, 'epoch_{}.tar'.format(self.epoch_idx)))
+        ckpts_list = os.listdir(self.CHECKPOINT_SAVE_DIR)
+        if ckpts_list and (len(ckpts_list) > 1): # save latest checkpoint only
+            oldest_epoch = sorted(list(map(int, [epoch.split('_')[-1].split('.')[0] for epoch in ckpts_list])))[0]
+            os.remove(os.path.join(self.CHECKPOINT_SAVE_DIR, 'epoch_{}.tar'.format(oldest_epoch)))
         print('Checkpoint saved epoch ', self.epoch_idx)
 
     def _restore_checkpoint(self):
@@ -201,19 +200,24 @@ class Trainer:
             training_state = "valid"
             losses_per_epoch = self.valid_losses_per_epoch
             metric_per_epoch = self.valid_metrics_per_epoch
-        fig = plt.figure(figsize=(self.args.tensorboard_shown_image_num, self.args.tensorboard_shown_image_num))
-        for idx in range(self.args.tensorboard_shown_image_num):
+        fig = plt.figure(figsize=(8, 8))
+        for idx in range(self.args.train_tensorboard_shown_image_num):
             losses = []
             metrics = []
-            ax_output = fig.add_subplot(2, self.args.tensorboard_shown_image_num, idx+self.args.tensorboard_shown_image_num+1, xticks=[], yticks=[])
-            matplotlib_imshow(output_data[idx], one_channel=self.one_channel)
+            random_sample_idx = randint(0, output_data.shape[0])
+            ax_output = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num+1, xticks=[], yticks=[])
+            matplotlib_imshow(output_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
-                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[idx].mean().item(), 3)))))
+                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value.mean().item(), 3)))))
-            ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[idx].item()))
-            ax_batch = fig.add_subplot(2, self.args.tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
-            matplotlib_imshow(batch_data[idx], one_channel=self.one_channel)
+                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
+            # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
+            ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
+            ax_batch = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
+            # if training_state == "train":
+                # torchvision.utils.save_image(batch_data[random_sample_idx].double(), "/root/anomaly_detection/temp/batch_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
+                # torchvision.utils.save_image(output_data[random_sample_idx].double(), "/root/anomaly_detection/temp/output_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
+            matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_batch.set_title("Ground Truth")
         plt.tight_layout()
         if is_valid:
@@ -234,6 +238,8 @@ class Trainer:
                 self.tensorboard_writer_valid.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
             else:
                 self.tensorboard_writer_train.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
+        self.tensorboard_writer_train.flush()
+        self.tensorboard_writer_valid.flush()
         
     def _log_hparams(self):
         # train_losses_and_metrics = {}

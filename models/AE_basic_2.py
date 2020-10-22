@@ -1,8 +1,10 @@
 from torch import nn
 
-class Autoencoder(nn.Module):
+
+# Refer to https://github.com/L1aoXingyu/pytorch-beginner/blob/master/08-AutoEncoder/simple_autoencoder.py
+class Model(nn.Module):
     def __init__(self):
-        super(Autoencoder, self).__init__()
+        super(Model, self).__init__()
         self.encoder = nn.Sequential(
             nn.Linear(28 * 28, 128),
             nn.ReLU(True),
@@ -22,6 +24,5 @@ class Autoencoder(nn.Module):
             nn.Tanh())
 
     def forward(self, x):
-        encoded = self.encoder(x.view(50, 1*28*28))
-        decoded = self.decoder(encoded)
-        return decoded
+        encoded = self.encoder(x.view(x.shape[0], -1))
+        return self.decoder(encoded).view(x.shape)
