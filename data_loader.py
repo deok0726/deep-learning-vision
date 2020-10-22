@@ -16,24 +16,30 @@ class DataLoader:
         train_dataset, valid_dataset, test_dataset = self._get_datasets(args, source_transform=source_transform_list, target_transform=target_transform_list)
         sample_train_data = train_dataset.__getitem__(np.random.randint(train_dataset.__len__()))[0]
         self.sample_train_data = sample_train_data.unsqueeze(0)
-        self.train_data_loader = self._get_data_loader(args, train_dataset)
-        self.valid_data_loader = self._get_data_loader(args, valid_dataset)
-        self.test_data_loader = self._get_data_loader(args, test_dataset)
+        self.train_data_loader = self._get_data_loader(args, train_dataset, args.train_batch_size)
+        self.valid_data_loader = self._get_data_loader(args, valid_dataset, args.train_batch_size)
+        self.test_data_loader = self._get_data_loader(args, test_dataset, args.test_batch_size)
+        print("train data size: ", len(self.train_data_loader)*args.train_batch_size)
+        print("valid data size: ", len(self.valid_data_loader)*args.train_batch_size)
+        print("test data size: ", len(self.test_data_loader)*args.test_batch_size)
 
     def _get_datasets(self, args, source_transform, target_transform):
         if args.dataset_name == 'MNIST':
             train_dataset = MNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
             test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
+            # test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'FMNIST':
             train_dataset = FashionMNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
             test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
+            # test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
-        elif args.dataset_name == 'MVTEC':
+        elif args.dataset_name == 'MvTec':
             train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
             test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
             train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
-            valid_length = int(len(train_dataset) * (args.valid_ratio / (args.train_ratio + args.valid_ratio)))
+            valid_length = len(train_dataset) - train_length
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
         else:
             raise Exception('Wrong dataset name')
@@ -48,12 +54,8 @@ class DataLoader:
         train_ratio = args.train_ratio / total_ratio
         valid_ratio = args.valid_ratio / total_ratio
         test_ratio = args.test_ratio / total_ratio
-        train_data, train_targets = original_train_dataset.data, original_train_dataset.targets
-        test_data, test_targets = original_test_dataset.data, original_test_dataset.targets
-        data = torch.cat((train_data, test_data))
-        targets = torch.cat((train_targets, test_targets))
-        if isinstance(data, torch.ByteTensor):
-            data = data.float().div(255)
+        data = torch.cat((original_train_dataset.data, original_test_dataset.data))
+        targets = torch.cat((original_train_dataset.targets, original_test_dataset.targets))
         # ============================================================================= #
         # 2. Split training data, validation data, and test data according to the label #
         # ============================================================================= #
@@ -64,18 +66,17 @@ class DataLoader:
         anomaly_index = torch.nonzero(anomaly_mask, as_tuple=True)
         normal_index = torch.nonzero(~anomaly_mask, as_tuple=True)
         anomaly_data = data[anomaly_index]
-        anomaly_data = anomaly_data.unsqueeze(1)
         anomaly_targets = targets[anomaly_index]
         normal_data = data[normal_index]
-        normal_data = normal_data.unsqueeze(1)
         normal_targets = targets[normal_index]
         # shuffle
-        normal_shuffle_idx = torch.randperm(normal_data.shape[0])
-        anomaly_shuffle_idx = torch.randperm(anomaly_data.shape[0])
-        normal_data = normal_data[normal_shuffle_idx]
-        normal_targets = normal_targets[normal_shuffle_idx]
-        anomaly_data = anomaly_data[anomaly_shuffle_idx]
-        anomaly_targets = anomaly_targets[anomaly_shuffle_idx]
+        if args.shuffle:
+            normal_shuffle_idx = np.random.permutation(normal_data.shape[0])
+            anomaly_shuffle_idx = np.random.permutation(anomaly_data.shape[0])
+            normal_data = normal_data[normal_shuffle_idx]
+            normal_targets = normal_targets[normal_shuffle_idx]
+            anomaly_data = anomaly_data[anomaly_shuffle_idx]
+            anomaly_targets = anomaly_targets[anomaly_shuffle_idx]
         # split
         train_length = int(len(normal_data) * train_ratio)
         valid_length = int(len(normal_data) * valid_ratio)
@@ -89,14 +90,14 @@ class DataLoader:
         current_ratio = anomaly_data.shape[0] / (test_length + anomaly_data.shape[0])
         if current_ratio < args.anomaly_ratio:
             normal_count = int(len(anomaly_data) / args.anomaly_ratio - len(anomaly_data))
-            normal_index = torch.randperm(test_length)[:normal_count]
-            test_data = test_data[normal_index]
-            test_targets = test_targets[normal_index]
+            test_data = test_data[:normal_count]
+            test_targets = test_targets[:normal_count]
         elif current_ratio > args.anomaly_ratio:
             anomaly_count = int(test_length * args.anomaly_ratio / (1 - args.anomaly_ratio))
-            anomaly_index = torch.randperm(anomaly_data.shape[0])[:anomaly_count]
-            anomaly_data = anomaly_data[anomaly_index]
-            anomaly_targets = anomaly_targets[anomaly_index]
+            anomaly_data = anomaly_data[:anomaly_count]
+            anomaly_targets = anomaly_targets[:anomaly_count]
+        elif args.anomaly_ratio == -1:
+            pass
         else:
             pass
         # ================================================================== #
@@ -107,13 +108,13 @@ class DataLoader:
         # ================================================================== #
         #                           5. make dataset                          #
         # ================================================================== #
-        train_dataset = torch.utils.data.TensorDataset(train_data, train_targets)
-        valid_dataset = torch.utils.data.TensorDataset(valid_data, valid_targets)
-        test_dataset = torch.utils.data.TensorDataset(test_data, test_targets)
+        train_dataset = customTensorDataset(train_data, train_targets, original_train_dataset.transform, original_train_dataset.target_transform)
+        valid_dataset = customTensorDataset(valid_data, valid_targets, original_test_dataset.transform, original_test_dataset.target_transform)
+        test_dataset = customTensorDataset(test_data, test_targets, original_test_dataset.transform, original_test_dataset.target_transform)
         return train_dataset, valid_dataset, test_dataset
 
-    def _get_data_loader(self, args, dataset):
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, shuffle=args.shuffle, num_workers=args.num_workers)
+    def _get_data_loader(self, args, dataset, batch_size):
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=args.shuffle, num_workers=args.num_workers, drop_last=True)
         return dataloader
     
     def _get_transform(self, args, is_target):
@@ -124,6 +125,8 @@ class DataLoader:
             if args.grayscale:
                 transforms_list.append(transforms.Grayscale())
                 args.channel_num = 1
+            if args.random_rotation:
+                transforms_list.append(transforms.RandomRotation(360))
             transforms_list.append(transforms.ToTensor())
             if args.normalize:
                 if args.channel_num == 3:
@@ -167,21 +170,26 @@ class ImageDataset(torch.utils.data.Dataset):
         return x, y
 
 class customTensorDataset(torch.utils.data.Dataset):
-    def __init__(self, *tensors, transform=None, target_transform=None):
-        assert all(tensors[0].shape[0] == tensor.shape[0] for tensor in tensors), 'tensor dimension mismatch'
-        self.tensors = tensors
+    def __init__(self, data, target, transform=None, target_transform=None):
+        assert data.shape[0] == target.shape[0], 'tensor dimension mismatch'
+        self.data = data
+        self.target = target
         self.transform = transform
         self.target_transform = target_transform
 
     def __getitem__(self, index):
-        x = self.tensors[0]
-        y = self.tensors[1]
-        x = self.transform(x)
-        y = self.target_transform(y)
-        return tuple(x, y)
+        img = self.data[index]
+        target = int(self.target[index])
+        # doing this so that it is consistent with all other datasets to return a PIL Image
+        img = Image.fromarray(img.numpy(), mode='L')
+        if self.transform is not None:
+            img = self.transform(img)
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+        return img, target
 
     def __len__(self):
-        return self.tensors[0].size(0)
+        return self.data.shape[0]
 
 if __name__ == "__main__":
     from torchvision.utils import save_image
