@@ -33,6 +33,8 @@ parser.add_argument('--normalize', action='store_true', default=False, help="Nor
 parser.add_argument('--random_rotation', action='store_true', default=False, help="Random Rotation transformation")
 parser.add_argument('--random_crop', action='store_true', default=False, help="Random Crop transformation")
 parser.add_argument('--crop_size', type=int, default=300, help="Cropped image size")
+parser.add_argument('--resize', action='store_true', default=False, help="Resize transformation")
+parser.add_argument('--resize_size', type=int, default=300, help="Cropped image size")
 parser.add_argument('--train_ratio', type=float, default=0.6, help="training dataset ratio")
 parser.add_argument('--valid_ratio', type=float, default=0.3, help="validation dataset ratio")
 parser.add_argument('--test_ratio', type=float, default=0.1, help="test dataset ratio")

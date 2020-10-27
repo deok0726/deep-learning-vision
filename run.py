@@ -12,7 +12,7 @@ from modules import custom_metrics
 from modules.utils import AverageMeter
 
 
-def load_additional_loss(losses_name):
+def load_loss(losses_name):
     losses_dict = {}
     if 'MSE' in losses_name:
         losses_dict['MSE'] = torch.nn.MSELoss(reduction='none') # l2 loss
@@ -27,11 +27,26 @@ def load_model(args):
             model = Model(in_channels=1, out_channels=3, bilinear=False).to(DEVICE, dtype=torch.float)
         else:
             model = Model(in_channels=1, out_channels=1, bilinear=False).to(DEVICE, dtype=torch.float)
+        # x = torch.rand(1,1,300,300).to(DEVICE, dtype=torch.float)
+        # _children = model.children()
+        # for layer in _children:
+        #     print(layer)
+        #     x = layer(x)
+        #     print(x.shape)
+        # _modules = model.modules()
+        # for layer in _modules:
+        #     print(layer)
+        #     x = layer(x)
+        #     print(x.shape)
+        # print('test')
     elif args.model_name=='MemAE':
         from models.CAE_MemAE import Model
         model = Model(n_channels=args.channel_num, mem_dim = 100).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MvTec':
         from models.CAE_MvTec import Model
+        model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
+    elif args.model_name=='RaPP':
+        from models.AE_RaPP import Model
         model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
     else:
         raise NotImplementedError
@@ -41,17 +56,19 @@ def load_optimizer_with_lr_scheduler(args):
     optimizer = None
     lr_scheduler = None
     if args.model_name=='ARNet':
-        # optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate)
-        optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate)
+        # optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
         if args.learning_rate_decay:
-            lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 25, gamma=args.learning_rate_decay_ratio)
+            lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 25*8, gamma=args.learning_rate_decay_ratio)
     elif args.model_name=='MemAE':
+        optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
+    elif args.model_name=='MvTec':
         optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
         if args.learning_rate_decay:
             multiplier = (args.end_learning_rate / args.learning_rate) ** (1.0/(float(args.num_epoch)-1))
             lr_scheduler_function = lambda epoch: multiplier
             lr_scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer, lr_scheduler_function)
-    elif args.model_name=='MvTec':
+    elif args.model_name=='RaPP':
         optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
     else:
         raise NotImplementedError
@@ -86,7 +103,7 @@ if __name__ == '__main__':
 
     # set cuda device
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     USE_CUDA = torch.cuda.is_available()
     
     # Reproducibility
@@ -116,8 +133,8 @@ if __name__ == '__main__':
     
 
     # losses
-    losses_dict = load_additional_loss([
-        # 'MSE', 
+    losses_dict = load_loss([
+        'MSE', 
         # 'L1'
         ])
 

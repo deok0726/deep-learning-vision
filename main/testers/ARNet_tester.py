@@ -133,11 +133,13 @@ class ARNetTester(Tester):
             batch_diff_per_batch[transform_indexes[i]] = batch_diff_per_batch[transform_indexes[i]] / self.transform_avg_diff[i]
         for i in range(b):
             batch_diff_per_batch_avg[i] = batch_diff_per_batch[t*i:t*(i+1)].mean()
+        
         # for i in range(len(batch_diff_per_batch_avg)):
         #     for j in range(t):
-        #         if original_batch_label[t*i+j].item() == 0:
-        #             save_image(original_batch_data[t*i+j].double(), "/root/anomaly_detection/temp/" + str(i)+'_'+str(j)+ "_gt_" + str(original_batch_label[t*i+j].item()) +'_' + str(batch_diff_per_batch[t*i+j].double().mean().item())+".png", "PNG")
-        #             save_image(output_data[t*i+j].double(), "/root/anomaly_detection/temp/" + str(i)+'_'+str(j) + "_output_" +str(original_batch_label[t*i+j].item()) + '_' + str(batch_diff_per_batch[t*i+j].double().mean().item())+".png", "PNG")
+        #         # if original_batch_label[t*i+j].item() == 0:
+        #         save_image(original_batch_data[t*i+j].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(i)+'_'+str(j)+ "_gt_" + str(original_batch_label[t*i+j].item()) +'_' + str(batch_diff_per_batch[t*i+j].double().mean().item())+".png", "PNG")
+        #         save_image(output_data[t*i+j].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(i)+'_'+str(j) + "_output_" +str(original_batch_label[t*i+j].item()) + '_' + str(batch_diff_per_batch[t*i+j].double().mean().item())+".png", "PNG")
+        
         self.diffs_per_data.extend(batch_diff_per_batch_avg.cpu().detach().numpy())
         self.labels_per_data.extend(input_batch_label.cpu().detach().numpy())
         for metric_func_name, metric_func in self.metric_funcs.items():

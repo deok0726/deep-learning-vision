@@ -110,7 +110,10 @@ class Trainer:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.valid_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
-        self.valid_losses_per_epoch['total_loss'].update(valid_losses_per_epoch.item())
+        total_loss_per_batch = 0
+        for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
+            total_loss_per_batch += loss_per_batch.mean()
+        self.valid_losses_per_epoch['total_loss'].update(total_loss_per_batch.item())
         for metric_func_name, metric_func in self.metric_funcs.items():
             metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
