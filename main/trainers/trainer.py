@@ -70,7 +70,7 @@ class Trainer:
             self.epoch_idx += 1
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
-        self._log_hparams()
+        # self._log_hparams()
         self.tensorboard_writer_train.close()
         self.tensorboard_writer_valid.close()
 

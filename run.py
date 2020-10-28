@@ -56,8 +56,8 @@ def load_optimizer_with_lr_scheduler(args):
     optimizer = None
     lr_scheduler = None
     if args.model_name=='ARNet':
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate)
-        # optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
+        # optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate)
+        optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
         if args.learning_rate_decay:
             lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 25*8, gamma=args.learning_rate_decay_ratio)
     elif args.model_name=='MemAE':
@@ -81,6 +81,9 @@ def load_trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict,
     elif args.model_name=='MemAE':
         from main.trainers.MemAE_trainer import MemAETrainer
         trainer = MemAETrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
+    elif args.model_name=='MvTec':
+        from main.trainers.MvTec_trainer import MvTecTrainer
+        trainer = MvTecTrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
     else:
         trainer = Trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
     return trainer
@@ -92,6 +95,9 @@ def load_tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, 
     elif args.model_name=='MemAE':
         from main.testers.MemAE_tester import MemAETester
         tester = MemAETester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+    elif args.model_name=='MvTec':
+        from main.testers.MvTec_tester import MvTecTester
+        tester = MvTecTester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
     else:
         tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
     return tester
@@ -103,7 +109,7 @@ if __name__ == '__main__':
 
     # set cuda device
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
     USE_CUDA = torch.cuda.is_available()
     
     # Reproducibility
@@ -134,7 +140,7 @@ if __name__ == '__main__':
 
     # losses
     losses_dict = load_loss([
-        'MSE', 
+        # 'MSE', 
         # 'L1'
         ])
 

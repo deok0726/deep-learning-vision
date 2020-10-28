@@ -29,7 +29,7 @@ class Tester:
         for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_data_loader), total=len(self.dataloader.test_data_loader), desc='Test'):
             self.batch_idx = batch_idx
             self._test_step(batch_data, batch_label)
-            if batch_idx % self.TEST_LOG_INTERVAL == 0:
+            if (batch_idx % self.TEST_LOG_INTERVAL == 0) or (batch_idx + 1 == len(self.dataloader.test_data_loader)):
                 print('Test Batch Step', 'batch idx', self.batch_idx, 'batch data shape', batch_data.shape)
                 self._log_progress()
         self.tensorboard_writer_test.close()
@@ -67,7 +67,7 @@ class Tester:
                 metric_value = self.metric_funcs['ROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
                 self.metrics_per_batch['ROC'] = metric_value
                 self.test_metrics_per_epoch['ROC'].update(metric_value)
-            self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch, True)
+            self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch)
 
     def _set_testing_constants(self):
         self.CHECKPOINT_SAVE_DIR = os.path.join(os.path.join(self.args.checkpoint_dir, self.args.model_name), self.args.exp_name)
@@ -108,7 +108,7 @@ class Tester:
         else:
             print('No checkpoints to restore')
     
-    def _log_tensorboard(self, batch_data, batch_label, output_data, losses_per_batch, metrics_per_batch, is_valid=False):
+    def _log_tensorboard(self, batch_data, batch_label, output_data, losses_per_batch, metrics_per_batch):
         losses_per_epoch = self.test_losses_per_epoch
         metric_per_epoch = self.test_metrics_per_epoch
         fig = plt.figure(figsize=(8, 8))

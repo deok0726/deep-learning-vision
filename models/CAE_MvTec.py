@@ -7,11 +7,23 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.encoder = Encoder(n_channels)
         self.decoder = Decoder(n_channels)
+        self.rec_criterion = nn.MSELoss(reduction='none')
 
     def forward(self, x):
         z = self.encoder(x)
         y = self.decoder(z)
         return y
+    
+    def get_losses_name(self):
+        return ['rec_loss']
+
+    def get_losses(self, args_for_losses):
+        rec_loss = self._get_recon_loss(args_for_losses['x'], args_for_losses['y'])
+        return {'rec_loss': rec_loss}
+
+    def _get_recon_loss(self, x, y):
+        rec_loss = self.rec_criterion(y, x)
+        return rec_loss
 
 class Encoder(nn.Module):
     def __init__(self, image_channel_num):
@@ -103,5 +115,5 @@ class Decoder(nn.Module):
         # x = self.leakyRelu(x)
         x = self.relu(x)
         x = self.deconv9(x)
-        x = tanh(x)
+        # x = tanh(x)
         return x

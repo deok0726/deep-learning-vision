@@ -4,7 +4,7 @@ import time
 import torch
 import numpy as np
 
-class MemAETester(Tester):
+class MvTecTester(Tester):
     def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
         super().__init__(args, dataloader, model, optimizer, loss_funcs, metric_funcs, device)
     
@@ -14,16 +14,11 @@ class MemAETester(Tester):
         batch_label = batch_label.to(self.device)
         with torch.no_grad():
             output_data = self.model(batch_data)
-            mem_weight = getattr(output_data, 'mem_weight')
-            output_data = getattr(output_data ,'output')
         for loss_func_name, loss_func in self.loss_funcs.items():
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.test_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
         args_for_losses = {
-            'batch_size':self.args.train_batch_size,
-            'weight': mem_weight,
-            'entropy_loss_coef': self.args.entropy_loss_coef,
             'x': batch_data,
             'y': output_data
             }
