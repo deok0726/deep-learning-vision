@@ -38,7 +38,7 @@ class DataLoader:
             train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
             test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
             # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
-            test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
             train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
             valid_length = len(train_dataset) - train_length
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])

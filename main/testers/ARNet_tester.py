@@ -5,7 +5,9 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+import torchvision
 from torchvision.utils import save_image
+from itertools import combinations, product
 
 class ARNetTester(Tester):
     def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
@@ -17,6 +19,19 @@ class ARNetTester(Tester):
             '180': lambda x, d1, d2: x.flip(d1).flip(d2),
             '270': lambda x, d1, d2: x.transpose(d1, d2).flip(d2)
             }
+        self.transformation_functions = dict(
+            rotate = dict(
+                rotate_90 = lambda x: x.transpose(-2, -1).flip(-2),
+                rotate_180 = lambda x: x.flip(-2).flip(-1),
+                rotate_270 = lambda x: x.transpose(-2, -1).flip(-1),
+            ),
+            hflips = dict(
+                hflip = torchvision.transforms.functional.hflip
+            ),
+            vflips = dict(
+                vflip = torchvision.transforms.functional.vflip
+            )
+        )
         self.anomaly_criterion = torch.nn.L1Loss(reduction='none')
         self.transform_avg_diff = None
     
@@ -40,76 +55,168 @@ class ARNetTester(Tester):
     
     def _get_expectation_error_step(self, input_batch_data):
         original_batch_data = []
-        transformed_batch_data = []
+        transformed_batch_data_all = []
+        all_types_products = []
         #TBD: speed up
+        # Graying: This operation averages each pixel value along the channel dimension of images.
+        if input_batch_data.shape[1] == 3:
+            grayed_batch_data = torch.mean(input_batch_data, dim=1, keepdim=True) # channel dim 2
         # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
-        for angle in self.angles:
-            original_batch_data.append(input_batch_data)
-            transformed_batch_data.append(self.rotate_funtions[str(angle)](input_batch_data, -2, -1))
-        original_batch_data = torch.stack(original_batch_data, dim=0) # num of angles, B, C, H, W
-        transformed_batch_data = torch.stack(transformed_batch_data, dim=0) # num of angles, B, C, H, W
-        original_batch_data = torch.transpose(original_batch_data, 0, 1) # num of angles, B
-        transformed_batch_data = torch.transpose(transformed_batch_data, 0, 1) # B, num of angles, C, H, W
+        # hflip
+        # vflip
+        for k in range(len(self.transformation_functions.keys())):
+            transformation_combinations = list(combinations(self.transformation_functions.keys(), k+1)) 
+            for transformation_combination in transformation_combinations: # ex) ['rotate', 'hflips']
+                all_types = []
+                for transformation_function in transformation_combination:
+                    all_types.append(list(self.transformation_functions[transformation_function].keys()))
+                types_products = list(product(*all_types))
+                for types_product in types_products:
+                    all_types_products.append(types_product)
+                    for idx, transformation_function in enumerate(transformation_combination):
+                        if idx == 0:
+                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](grayed_batch_data)
+                        else:
+                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](transformed_batch_data)
+                    transformed_batch_data_all.append(transformed_batch_data)
+                    original_batch_data.append(input_batch_data)
+        original_batch_data = torch.stack(original_batch_data, dim=0) # num of transformations, B, C, H, W
+        transformed_batch_data_all = torch.stack(transformed_batch_data_all, dim=0) # num of transformations, B, C, H, W
+        original_batch_data = torch.transpose(original_batch_data, 0, 1) # num of transformations, B
+        transformed_batch_data_all = torch.transpose(transformed_batch_data_all, 0, 1) # B, num of transformations, C, H, W
         if not original_batch_data.is_contiguous():
             original_batch_data = original_batch_data.contiguous()
-        if not transformed_batch_data.is_contiguous():
-            transformed_batch_data = transformed_batch_data.contiguous()
-        # Graying: This operation averages each pixel value along the channel dimension of images.
-        if transformed_batch_data.shape[2] == 3:
-            transformed_batch_data = torch.mean(transformed_batch_data, dim=2, keepdim=True) # channel dim 2
-        b, t, c, h, w = transformed_batch_data.shape
+        if not transformed_batch_data_all.is_contiguous():
+            transformed_batch_data_all = transformed_batch_data_all.contiguous()
+        b, t, c, h, w = transformed_batch_data_all.shape
         original_batch_data = original_batch_data.flatten(0, 1)
-        transformed_batch_data = transformed_batch_data.flatten(0, 1)
+        transformed_batch_data_all = transformed_batch_data_all.flatten(0, 1)
         original_batch_data = original_batch_data.to(self.device)
-        transformed_batch_data = transformed_batch_data.to(self.device)
+        transformed_batch_data_all = transformed_batch_data_all.to(self.device)
+        output_data = []
         with torch.no_grad():
-            output_data = self.model(transformed_batch_data)
+            for chunk_idx in range(b*t):
+                output_data.append(self.model(transformed_batch_data_all[chunk_idx].unsqueeze(0)))
+        output_data = torch.stack(output_data, dim=0).squeeze()
         batch_diff_per_batch = self.anomaly_criterion(original_batch_data, output_data)
         transform_indexes = [0]*t
         transform_avg_diff = torch.zeros(t)
         for i in range(t):
             transform_indexes[i] = list(range(i, b*t, t))
             transform_avg_diff[i] = batch_diff_per_batch[transform_indexes[i]].mean() # b*t, c, h, w
+        
+        # save transformed images
+        # for t_idx, indexes in enumerate(transform_indexes):
+        #     for i in range(b):
+        #         save_image(original_batch_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3) + "_gt_"+str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
+        #         save_image(transformed_batch_data_all[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_transformed_"+str(all_types_products[t_idx])+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
+        #         save_image(output_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_output_"+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
+        
         if self.transform_avg_diff is None:
             self.transform_avg_diff = transform_avg_diff
         else:
             self.transform_avg_diff += transform_avg_diff
 
+    # def _get_expectation_error_step(self, input_batch_data):
+    #     original_batch_data = []
+    #     transformed_batch_data = []
+    #     #TBD: speed up
+    #     # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
+    #     for angle in self.angles:
+    #         original_batch_data.append(input_batch_data)
+    #         transformed_batch_data.append(self.rotate_funtions[str(angle)](input_batch_data, -2, -1))
+    #     original_batch_data = torch.stack(original_batch_data, dim=0) # num of angles, B, C, H, W
+    #     transformed_batch_data = torch.stack(transformed_batch_data, dim=0) # num of angles, B, C, H, W
+    #     original_batch_data = torch.transpose(original_batch_data, 0, 1) # num of angles, B
+    #     transformed_batch_data = torch.transpose(transformed_batch_data, 0, 1) # B, num of angles, C, H, W
+    #     if not original_batch_data.is_contiguous():
+    #         original_batch_data = original_batch_data.contiguous()
+    #     if not transformed_batch_data.is_contiguous():
+    #         transformed_batch_data = transformed_batch_data.contiguous()
+    #     # Graying: This operation averages each pixel value along the channel dimension of images.
+    #     if transformed_batch_data.shape[2] == 3:
+    #         transformed_batch_data = torch.mean(transformed_batch_data, dim=2, keepdim=True) # channel dim 2
+    #     b, t, c, h, w = transformed_batch_data.shape
+    #     original_batch_data = original_batch_data.flatten(0, 1)
+    #     transformed_batch_data = transformed_batch_data.flatten(0, 1)
+    #     original_batch_data = original_batch_data.to(self.device)
+    #     transformed_batch_data = transformed_batch_data.to(self.device)
+    #     with torch.no_grad():
+    #         output_data = self.model(transformed_batch_data)
+    #     batch_diff_per_batch = self.anomaly_criterion(original_batch_data, output_data)
+    #     transform_indexes = [0]*t
+    #     transform_avg_diff = torch.zeros(t)
+    #     for i in range(t):
+    #         transform_indexes[i] = list(range(i, b*t, t))
+    #         transform_avg_diff[i] = batch_diff_per_batch[transform_indexes[i]].mean() # b*t, c, h, w
+    #     if self.transform_avg_diff is None:
+    #         self.transform_avg_diff = transform_avg_diff
+    #     else:
+    #         self.transform_avg_diff += transform_avg_diff
+
     def _test_step(self, input_batch_data, input_batch_label):
         self.data_time.update(time.time() - self.end_time)
         original_batch_data = []
-        transformed_batch_data = []
+        transformed_batch_data_all = []
         original_batch_label = []
+        all_types_products = []
         #TBD: speed up
+        # Graying: This operation averages each pixel value along the channel dimension of images.
+        if input_batch_data.shape[1] == 3:
+            grayed_batch_data = torch.mean(input_batch_data, dim=1, keepdim=True) # channel dim 2
         # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
-        for angle in self.angles:
-            transformed_batch_data.append(self.rotate_funtions[str(angle)](input_batch_data, -2, -1))
-            original_batch_data.append(input_batch_data)
-            original_batch_label.append(input_batch_label)
-        transformed_batch_data = torch.stack(transformed_batch_data, dim=0) # num of angles, B, C, H, W
+        # hflip
+        # vflip
+        for k in range(len(self.transformation_functions.keys())):
+            transformation_combinations = list(combinations(self.transformation_functions.keys(), k+1)) 
+            for transformation_combination in transformation_combinations: # ex) ['rotate', 'hflips']
+                all_types = []
+                for transformation_function in transformation_combination:
+                    all_types.append(list(self.transformation_functions[transformation_function].keys()))
+                types_products = list(product(*all_types))
+                for types_product in types_products:
+                    all_types_products.append(types_product)
+                    for idx, transformation_function in enumerate(transformation_combination):
+                        if idx == 0:
+                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](grayed_batch_data)
+                        else:
+                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](transformed_batch_data)
+                    transformed_batch_data_all.append(transformed_batch_data)
+                    original_batch_data.append(input_batch_data)
+                    original_batch_label.append(input_batch_label)
+        # for angle in self.angles:
+        #     transformed_batch_data_all.append(self.rotate_funtions[str(angle)](input_batch_data, -2, -1))
+        #     original_batch_data.append(input_batch_data)
+        #     original_batch_label.append(input_batch_label)
+        transformed_batch_data_all = torch.stack(transformed_batch_data_all, dim=0) # num of angles, B, C, H, W
         original_batch_data = torch.stack(original_batch_data, dim=0) # num of angles, B, C, H, W
         original_batch_label = torch.stack(original_batch_label, dim=0) # num of angles, B
-        transformed_batch_data = transformed_batch_data.transpose(0, 1)
+        transformed_batch_data_all = transformed_batch_data_all.transpose(0, 1)
         original_batch_data = original_batch_data.transpose(0, 1)
         original_batch_label = original_batch_label.transpose(0, 1)
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if transformed_batch_data.shape[2] == 3:
-            transformed_batch_data = torch.mean(transformed_batch_data, dim=2, keepdim=True) # channel dim 2
-        b, t, c, h, w = transformed_batch_data.shape
-        transformed_batch_data = transformed_batch_data.flatten(0, 1)
-        original_batch_data = original_batch_data.flatten(0, 1)
-        original_batch_label = original_batch_label.flatten(0, 1)
+        # if transformed_batch_data_all.shape[2] == 3:
+        #     transformed_batch_data_all = torch.mean(transformed_batch_data_all, dim=2, keepdim=True) # channel dim 2
         if not original_batch_data.is_contiguous():
             original_batch_data = original_batch_data.contiguous()
-        if not transformed_batch_data.is_contiguous():
-            transformed_batch_data = transformed_batch_data.contiguous()
+        if not transformed_batch_data_all.is_contiguous():
+            transformed_batch_data_all = transformed_batch_data_all.contiguous()
         if not original_batch_label.is_contiguous():
             original_batch_label = original_batch_label.contiguous()
+        b, t, c, h, w = transformed_batch_data_all.shape
+        transformed_batch_data_all = transformed_batch_data_all.flatten(0, 1)
+        original_batch_data = original_batch_data.flatten(0, 1)
+        original_batch_label = original_batch_label.flatten(0, 1)
         original_batch_data = original_batch_data.to(self.device)
-        transformed_batch_data = transformed_batch_data.to(self.device)
+        transformed_batch_data_all = transformed_batch_data_all.to(self.device)
         original_batch_label = original_batch_label.to(self.device)
+        # with torch.no_grad():
+        #     output_data = self.model(transformed_batch_data_all)
+        output_data = []
         with torch.no_grad():
-            output_data = self.model(transformed_batch_data)
+            for chunk_idx in range(b*t):
+                output_data.append(self.model(transformed_batch_data_all[chunk_idx].unsqueeze(0)))
+        output_data = torch.stack(output_data, dim=0).squeeze()
         for loss_func_name, loss_func in self.loss_funcs.items():
             loss_values = loss_func(original_batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
@@ -132,8 +239,16 @@ class ARNetTester(Tester):
         for i in range(t):
             transform_indexes[i] = list(range(i, b*t, t))
             batch_diff_per_batch[transform_indexes[i]] = batch_diff_per_batch[transform_indexes[i]] / self.transform_avg_diff[i]
+            # batch_diff_per_batch[transform_indexes[i]] = batch_diff_per_batch[transform_indexes[i]] * self.transform_avg_diff[i] # 분모가 1보다 작을 때
         for i in range(b):
             batch_diff_per_batch_avg[i] = batch_diff_per_batch[t*i:t*(i+1)].mean()
+        
+        # save transformed images
+        # for t_idx, indexes in enumerate(transform_indexes):
+        #     for i in range(b):
+        #         save_image(original_batch_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3) + "_gt_"+str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
+        #         save_image(transformed_batch_data_all[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_transformed_"+str(all_types_products[t_idx])+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
+        #         save_image(output_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_output_"+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
         
         # for i in range(len(batch_diff_per_batch_avg)):
         #     for j in range(t):
@@ -158,14 +273,14 @@ class ARNetTester(Tester):
                 self.metrics_per_batch['ROC'] = metric_value
                 self.test_metrics_per_epoch['ROC'].update(metric_value)
             # self._log_tensorboard(original_batch_data, original_batch_label, output_data, self.losses_per_batch, self.metrics_per_batch, True)
-            self._log_tensorboard(original_batch_data, original_batch_label, transformed_batch_data, output_data, self.losses_per_batch, self.metrics_per_batch)
+            self._log_tensorboard(original_batch_data, original_batch_label, transformed_batch_data_all, output_data, self.losses_per_batch, self.metrics_per_batch)
 
     def _set_testing_variables(self):
         super()._set_testing_variables()
         for loss_name in self.model.get_losses_name():
             self.test_losses_per_epoch[loss_name] = AverageMeter()
     
-    def _log_tensorboard(self, batch_data, batch_label, transformed_batch_data, output_data, losses_per_batch, metrics_per_batch):
+    def _log_tensorboard(self, batch_data, batch_label, transformed_batch_data_all, output_data, losses_per_batch, metrics_per_batch):
         losses_per_epoch = self.test_losses_per_epoch
         metric_per_epoch = self.test_metrics_per_epoch
         fig = plt.figure(figsize=(8, 12))
@@ -189,7 +304,7 @@ class ARNetTester(Tester):
             matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_batch.set_title("Ground Truth")
             ax_transfomred_batch = fig.add_subplot(3, self.args.test_tensorboard_shown_image_num, idx+self.args.test_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
-            matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=True, normalized=self.args.normalize, mean=0.5, std=0.5)
+            matplotlib_imshow(transformed_batch_data_all[random_sample_idx], one_channel=True, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_transfomred_batch.set_title("Transformed Batch Data")
         plt.tight_layout()
         self.tensorboard_writer_test.add_figure("test", fig, global_step=self.epoch_idx)
