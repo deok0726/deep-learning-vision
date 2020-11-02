@@ -33,6 +33,12 @@ def load_model(args):
     elif args.model_name=='MvTec':
         from models.CAE_MvTec import Model
         model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
+    elif args.model_name=='VAE':
+        from models.VAE import Model
+        model = Model(n_channels=1, latent_dim=10).to(DEVICE, dtype=torch.float)
+    elif args.model_name=='AAE':
+        from models.AAE import Model
+        model = Model(n_channels=1, latent_dim=10).to(DEVICE, dtype=torch.float)
     else:
         raise NotImplementedError
     return model
