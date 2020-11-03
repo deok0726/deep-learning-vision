@@ -21,6 +21,7 @@ parser.add_argument('--test_tensorboard_shown_image_num', type=int, default=1, h
 parser.add_argument('--target_label', type=int, default=0, help="target label")
 parser.add_argument('--unique_anomaly', action='store_true', default=False, help="Unique anomaly class")
 parser.add_argument('--reproducibility', action='store_true', default=False, help="Reproducibility On")
+parser.add_argument('--save_result_images', action='store_true', default=False, help="saving result images")
 
 # data loader
 parser.add_argument('--dataset_name', type=str, default='MNIST', help="dataset name")
@@ -54,7 +55,8 @@ def get_args():
     os.path.join(args.checkpoint_dir, args.model_name),
     os.path.join(args.tensorboard_dir, args.model_name),
     os.path.join(os.path.join(args.checkpoint_dir, args.model_name), args.exp_name),
-    os.path.join(os.path.join(args.tensorboard_dir, args.model_name), args.exp_name)
+    os.path.join(os.path.join(args.tensorboard_dir, args.model_name), args.exp_name),
+    os.path.join(os.path.join(os.path.join(args.tensorboard_dir, args.model_name), args.exp_name), 'test_results')
     ]
     for directory in directories:
         if not os.path.exists(directory):

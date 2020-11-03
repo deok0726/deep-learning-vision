@@ -42,6 +42,12 @@ class DataLoader:
             train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
             valid_length = len(train_dataset) - train_length
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
+        elif args.dataset_name == 'GMS':
+            train_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform, args=args)
+            test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform, args=args)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
+            train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         else:
             raise Exception('Wrong dataset name')
         return train_dataset, valid_dataset, test_dataset
@@ -94,7 +100,7 @@ class DataLoader:
             test_data = test_data[:normal_count]
             test_targets = test_targets[:normal_count]
         elif current_ratio > args.anomaly_ratio:
-            anomaly_count = int(test_length * args.anomaly_ratio / (1 - args.anomaly_ratio))
+            anomaly_count = int((test_length + anomaly_data.shape[0]) * args.anomaly_ratio / (1 - args.anomaly_ratio))
             anomaly_data = anomaly_data[:anomaly_count]
             anomaly_targets = anomaly_targets[:anomaly_count]
         elif args.anomaly_ratio == -1:
@@ -142,7 +148,8 @@ class DataLoader:
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, root, train=True, transform=None, target_transform=None):
-        self.image_paths = []
+        # self.image_paths = []
+        self.data = []
         self.targets = []
         if(train):
             root_dir = os.path.join(root, 'train')
@@ -151,20 +158,70 @@ class ImageDataset(torch.utils.data.Dataset):
         for folder in os.listdir(root_dir):
             folder_path = os.path.join(root_dir, folder)
             images_in_folder = sorted(os.listdir(folder_path))
-            self.image_paths.extend([os.path.join(folder_path, image) for image in images_in_folder])
+            # self.image_paths.extend([os.path.join(folder_path, image) for image in images_in_folder])
+            self.data.extend([os.path.join(folder_path, image) for image in images_in_folder])
             if folder == 'good':
                 self.targets.extend([0]*len(images_in_folder))
             else:
                 self.targets.extend([1]*len(images_in_folder))
-        assert len(self.image_paths) == len(self.targets), 'images and label number mismatch'
+        # assert len(self.image_paths) == len(self.targets), 'images and label number mismatch'
+        assert len(self.data) == len(self.targets), 'images and label number mismatch'
         self.transform = transform
         self.target_transform = target_transform
 
     def __len__(self):
-        return len(self.image_paths)
+        # return len(self.image_paths)
+        return len(self.data)
         
     def __getitem__(self, idx):
-        x = Image.open(self.image_paths[idx])
+        # x = Image.open(self.image_paths[idx])
+        x = Image.open(self.data[idx])
+        y = self.targets[idx]
+        if self.transform is not None:
+            x = self.transform(x)
+        if self.target_transform is not None:
+            y = self.target_transform(y)
+        return x, y
+
+class ImageDatasetPreLoadImages(torch.utils.data.Dataset):
+    def __init__(self, root, train=True, transform=None, target_transform=None, args=None):
+        # self.image_paths = []
+        self.data = []
+        self.targets = []
+        if(train):
+            root_dir = os.path.join(root, 'train')
+        else:
+            root_dir = os.path.join(root, 'test')
+        for folder in os.listdir(root_dir):
+            folder_path = os.path.join(root_dir, folder)
+            images_in_folder = sorted(os.listdir(folder_path))
+            if args.resize:
+                self.data.extend([
+                    torch.tensor(np.asarray(Image.open(os.path.join(folder_path, image)).resize((args.resize_size, args.resize_size))))
+                    for image in images_in_folder])
+            else:
+                self.data.extend([
+                    torch.tensor(np.asarray(Image.open(os.path.join(folder_path, image))))
+                    for image in images_in_folder])
+            if folder == 'good':
+                self.targets.extend(torch.tensor([0]*len(images_in_folder)))
+            else:
+                self.targets.extend(torch.tensor([1]*len(images_in_folder)))
+        # assert len(self.image_paths) == len(self.targets), 'images and label number mismatch'
+        assert len(self.data) == len(self.targets), 'images and label number mismatch'
+        self.data = torch.stack(self.data)
+        self.targets = torch.stack(self.targets)
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __len__(self):
+        # return len(self.image_paths)
+        return len(self.data)
+        
+    def __getitem__(self, idx):
+        # x = Image.open(self.image_paths[idx])
+        # x = Image.open(self.data[idx])
+        x = transforms.functional.to_pil_image(self.data[idx])
         y = self.targets[idx]
         if self.transform is not None:
             x = self.transform(x)
@@ -184,7 +241,10 @@ class customTensorDataset(torch.utils.data.Dataset):
         img = self.data[index]
         target = int(self.target[index])
         # doing this so that it is consistent with all other datasets to return a PIL Image
-        img = Image.fromarray(img.numpy(), mode='L')
+        if img.shape[-1]==1:
+            img = Image.fromarray(img.numpy(), mode='L')
+        elif img.shape[-1]==3:
+            img = Image.fromarray(img.numpy(), mode='RGB')
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:

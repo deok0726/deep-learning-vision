@@ -1,5 +1,6 @@
 import os
 import torch
+import cv2
 from torch.utils import tensorboard
 import time, datetime
 import matplotlib.pyplot as plt
@@ -62,6 +63,9 @@ class Tester:
                 self.test_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
+        if self.args.save_result_images:
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, 'input')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, 'output')
         if self.batch_idx == (len(self.dataloader.test_data_loader)-1):
             if "ROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['ROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
@@ -72,6 +76,7 @@ class Tester:
     def _set_testing_constants(self):
         self.CHECKPOINT_SAVE_DIR = os.path.join(os.path.join(self.args.checkpoint_dir, self.args.model_name), self.args.exp_name)
         self.TENSORBOARD_LOG_SAVE_DIR = os.path.join(os.path.join(self.args.tensorboard_dir, self.args.model_name), self.args.exp_name)
+        self.TEST_RESULTS_SAVE_DIR = os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'test_results')
         self.TIMEZONE = datetime.timezone(datetime.timedelta(hours=9))
         self.TEST_LOG_INTERVAL = ceil(len(self.dataloader.test_data_loader) / 10)
         if self.args.channel_num == 1:
@@ -163,3 +168,21 @@ class Tester:
         print("metrics")
         for metric_name, metric_value_per_epoch in self.test_metrics_per_epoch.items():
             print(metric_name, ": ", metric_value_per_epoch.avg)
+    
+    def save_result_images(self, save_path, result_images, result_label, result_type=None):
+        for img_idx in range(result_label.shape[0]):
+            image_path = os.path.join(save_path, str(self.batch_idx)+ '_' +str(img_idx))
+            image_path = image_path + '_label_' + str(result_label[img_idx].item()) + '_' + result_type
+            for loss_name, loss_value in self.losses_per_batch.items():
+                image_path = image_path + '_' + loss_name + '_' + str(loss_value.mean().item())
+            for metric_name, metric_value in self.metrics_per_batch.items():
+                image_path = image_path + '_' + metric_name + '_' + str(metric_value.mean().item())
+            # result_image_path = image_path +'_' + result_type + '.png'
+            image_path += '.png'
+            if self.args.normalize:
+                result_img = result_images[img_idx].detach().mul(0.5).add(0.5)
+            else:
+                result_img = result_images[img_idx].detach()
+            result_img = np.clip(result_img.cpu().numpy().transpose(1, 2, 0), 0, 1)
+            result_img = (result_img*255).astype('uint8')
+            cv2.imwrite(image_path, result_img)

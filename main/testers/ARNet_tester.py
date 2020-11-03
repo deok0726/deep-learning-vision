@@ -104,55 +104,10 @@ class ARNetTester(Tester):
         for i in range(t):
             transform_indexes[i] = list(range(i, b*t, t))
             transform_avg_diff[i] = batch_diff_per_batch[transform_indexes[i]].mean() # b*t, c, h, w
-        
-        # save transformed images
-        # for t_idx, indexes in enumerate(transform_indexes):
-        #     for i in range(b):
-        #         save_image(original_batch_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3) + "_gt_"+str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
-        #         save_image(transformed_batch_data_all[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_transformed_"+str(all_types_products[t_idx])+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
-        #         save_image(output_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_output_"+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
-        
         if self.transform_avg_diff is None:
             self.transform_avg_diff = transform_avg_diff
         else:
             self.transform_avg_diff += transform_avg_diff
-
-    # def _get_expectation_error_step(self, input_batch_data):
-    #     original_batch_data = []
-    #     transformed_batch_data = []
-    #     #TBD: speed up
-    #     # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
-    #     for angle in self.angles:
-    #         original_batch_data.append(input_batch_data)
-    #         transformed_batch_data.append(self.rotate_funtions[str(angle)](input_batch_data, -2, -1))
-    #     original_batch_data = torch.stack(original_batch_data, dim=0) # num of angles, B, C, H, W
-    #     transformed_batch_data = torch.stack(transformed_batch_data, dim=0) # num of angles, B, C, H, W
-    #     original_batch_data = torch.transpose(original_batch_data, 0, 1) # num of angles, B
-    #     transformed_batch_data = torch.transpose(transformed_batch_data, 0, 1) # B, num of angles, C, H, W
-    #     if not original_batch_data.is_contiguous():
-    #         original_batch_data = original_batch_data.contiguous()
-    #     if not transformed_batch_data.is_contiguous():
-    #         transformed_batch_data = transformed_batch_data.contiguous()
-    #     # Graying: This operation averages each pixel value along the channel dimension of images.
-    #     if transformed_batch_data.shape[2] == 3:
-    #         transformed_batch_data = torch.mean(transformed_batch_data, dim=2, keepdim=True) # channel dim 2
-    #     b, t, c, h, w = transformed_batch_data.shape
-    #     original_batch_data = original_batch_data.flatten(0, 1)
-    #     transformed_batch_data = transformed_batch_data.flatten(0, 1)
-    #     original_batch_data = original_batch_data.to(self.device)
-    #     transformed_batch_data = transformed_batch_data.to(self.device)
-    #     with torch.no_grad():
-    #         output_data = self.model(transformed_batch_data)
-    #     batch_diff_per_batch = self.anomaly_criterion(original_batch_data, output_data)
-    #     transform_indexes = [0]*t
-    #     transform_avg_diff = torch.zeros(t)
-    #     for i in range(t):
-    #         transform_indexes[i] = list(range(i, b*t, t))
-    #         transform_avg_diff[i] = batch_diff_per_batch[transform_indexes[i]].mean() # b*t, c, h, w
-    #     if self.transform_avg_diff is None:
-    #         self.transform_avg_diff = transform_avg_diff
-    #     else:
-    #         self.transform_avg_diff += transform_avg_diff
 
     def _test_step(self, input_batch_data, input_batch_label):
         self.data_time.update(time.time() - self.end_time)
@@ -184,19 +139,12 @@ class ARNetTester(Tester):
                     transformed_batch_data_all.append(transformed_batch_data)
                     original_batch_data.append(input_batch_data)
                     original_batch_label.append(input_batch_label)
-        # for angle in self.angles:
-        #     transformed_batch_data_all.append(self.rotate_funtions[str(angle)](input_batch_data, -2, -1))
-        #     original_batch_data.append(input_batch_data)
-        #     original_batch_label.append(input_batch_label)
         transformed_batch_data_all = torch.stack(transformed_batch_data_all, dim=0) # num of angles, B, C, H, W
         original_batch_data = torch.stack(original_batch_data, dim=0) # num of angles, B, C, H, W
         original_batch_label = torch.stack(original_batch_label, dim=0) # num of angles, B
         transformed_batch_data_all = transformed_batch_data_all.transpose(0, 1)
         original_batch_data = original_batch_data.transpose(0, 1)
         original_batch_label = original_batch_label.transpose(0, 1)
-        # Graying: This operation averages each pixel value along the channel dimension of images.
-        # if transformed_batch_data_all.shape[2] == 3:
-        #     transformed_batch_data_all = torch.mean(transformed_batch_data_all, dim=2, keepdim=True) # channel dim 2
         if not original_batch_data.is_contiguous():
             original_batch_data = original_batch_data.contiguous()
         if not transformed_batch_data_all.is_contiguous():
@@ -210,8 +158,6 @@ class ARNetTester(Tester):
         original_batch_data = original_batch_data.to(self.device)
         transformed_batch_data_all = transformed_batch_data_all.to(self.device)
         original_batch_label = original_batch_label.to(self.device)
-        # with torch.no_grad():
-        #     output_data = self.model(transformed_batch_data_all)
         output_data = []
         with torch.no_grad():
             for chunk_idx in range(b*t):
@@ -239,23 +185,8 @@ class ARNetTester(Tester):
         for i in range(t):
             transform_indexes[i] = list(range(i, b*t, t))
             batch_diff_per_batch[transform_indexes[i]] = batch_diff_per_batch[transform_indexes[i]] / self.transform_avg_diff[i]
-            # batch_diff_per_batch[transform_indexes[i]] = batch_diff_per_batch[transform_indexes[i]] * self.transform_avg_diff[i] # 분모가 1보다 작을 때
         for i in range(b):
             batch_diff_per_batch_avg[i] = batch_diff_per_batch[t*i:t*(i+1)].mean()
-        
-        # save transformed images
-        # for t_idx, indexes in enumerate(transform_indexes):
-        #     for i in range(b):
-        #         save_image(original_batch_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3) + "_gt_"+str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
-        #         save_image(transformed_batch_data_all[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_transformed_"+str(all_types_products[t_idx])+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
-        #         save_image(output_data[indexes[i]].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(indexes[i]).zfill(3)+ "_output_"+ str(batch_diff_per_batch[indexes[i]].double().mean().item())+".png", "PNG")
-        
-        # for i in range(len(batch_diff_per_batch_avg)):
-        #     for j in range(t):
-        #         # if original_batch_label[t*i+j].item() == 0:
-        #         save_image(original_batch_data[t*i+j].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(i)+'_'+str(j)+ "_gt_" + str(original_batch_label[t*i+j].item()) +'_' + str(batch_diff_per_batch[t*i+j].double().mean().item())+".png", "PNG")
-        #         save_image(output_data[t*i+j].double().mul_(0.5).add_(0.5), "/root/anomaly_detection/temp/" + str(i)+'_'+str(j) + "_output_" +str(original_batch_label[t*i+j].item()) + '_' + str(batch_diff_per_batch[t*i+j].double().mean().item())+".png", "PNG")
-        
         self.diffs_per_data.extend(batch_diff_per_batch_avg.cpu().detach().numpy())
         self.labels_per_data.extend(input_batch_label.cpu().detach().numpy())
         for metric_func_name, metric_func in self.metric_funcs.items():
@@ -267,12 +198,15 @@ class ARNetTester(Tester):
                 self.test_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
+        if self.args.save_result_images:
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, transformed_batch_data_all, original_batch_label, 'input')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, original_batch_label, 'output')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, original_batch_data, original_batch_label, 'gt')
         if self.batch_idx == len(self.dataloader.test_data_loader)-1:
             if "ROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['ROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
                 self.metrics_per_batch['ROC'] = metric_value
                 self.test_metrics_per_epoch['ROC'].update(metric_value)
-            # self._log_tensorboard(original_batch_data, original_batch_label, output_data, self.losses_per_batch, self.metrics_per_batch, True)
             self._log_tensorboard(original_batch_data, original_batch_label, transformed_batch_data_all, output_data, self.losses_per_batch, self.metrics_per_batch)
 
     def _set_testing_variables(self):
