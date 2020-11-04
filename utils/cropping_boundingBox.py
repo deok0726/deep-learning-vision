@@ -38,19 +38,30 @@ def save_bbox_img(image_root_path, save_root_path, image_filename, image_info):
     image = cv2.imread(os.path.join(image_root_path, image_filename), cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_COLOR)
     image_filename = image_filename.split('.')[0]
     for idx, obj in enumerate(image_info['obj']):
+        path = os.path.join(image_root_path, obj['text'])
+        if not os.path.exists(path):
+            os.makedirs(path)
         bbox = obj['bbox']
         cropped_img = image[bbox['ymin']: bbox['ymax'], bbox['xmin']: bbox['xmax']]
-        cropped_img_filename = image_filename + '_' + str(idx)
-        cv2.imwrite(os.path.join(image_root_path, cropped_img_filename)+'.png', cropped_img)
+        cropped_img_filename = image_filename + '_' + str(idx) + '_' + obj['text']
+        cv2.imwrite(os.path.join(image_root_path, obj['text'], cropped_img_filename)+'.png', cropped_img)
 
 if __name__ == "__main__":
     # img_root = "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole/good"
     # xml_root = "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole/good"
     # save_root = "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole/good"
     roots = [
-        "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole",
-        "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole/good",
-        "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole/defective"
+        "/hd/anomaly_detection/GMS/normal/1",
+        "/hd/anomaly_detection/GMS/normal/2",
+        "/hd/anomaly_detection/GMS/normal/3",
+        "/hd/anomaly_detection/GMS/normal/4",
+        "/hd/anomaly_detection/GMS/normal/5",
+        "/hd/anomaly_detection/GMS/normal/6",
+        "/hd/anomaly_detection/GMS/normal/7",
+        "/hd/anomaly_detection/GMS/ng/ng",
+        # "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole",
+        # "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole/good",
+        # "/hd/anomaly_detection/GMSHightech_anomaly_detection_hole/defective"
     ]
     for root in roots:
         xml_filenames = os.listdir(root)

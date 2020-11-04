@@ -12,22 +12,24 @@ from itertools import combinations, product
 class ARNetTester(Tester):
     def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
         super().__init__(args, dataloader, model, optimizer, loss_funcs, metric_funcs, device)
-        self.transformation_functions = dict(
-            rotate = dict(
+        self.transformation_functions = {}
+        if args.rotation:
+            self.transformation_functions['rotate'] = dict(
                 rotate_0 = lambda x: x,
                 rotate_90 = lambda x: x.transpose(-2, -1).flip(-2),
                 rotate_180 = lambda x: x.flip(-2).flip(-1),
                 rotate_270 = lambda x: x.transpose(-2, -1).flip(-1),
-            ),
-            hflips = dict(
+            )
+        if args.hflip:
+            self.transformation_functions['hflips'] = dict(
                 no_hflip = lambda x: x,
                 hflip = torchvision.transforms.functional.hflip
-            ),
-            vflips = dict(
+            )
+        if args.vflip:
+            self.transformation_functions['vflips'] = dict(
                 no_vflip = lambda x: x,
                 vflip = torchvision.transforms.functional.vflip
             )
-        )
         self.anomaly_criterion = torch.nn.L1Loss(reduction='none')
         self.transform_avg_diff = None
     
@@ -55,77 +57,66 @@ class ARNetTester(Tester):
         all_types_products = []
         #TBD: speed up
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if input_batch_data.shape[1] == 3:
+        if input_batch_data.shape[1] == 3 and self.args.graying:
             grayed_batch_data = torch.mean(input_batch_data, dim=1, keepdim=True) # channel dim 2
+        else:
+            grayed_batch_data = input_batch_data
         
+        # only gray
         # original_batch_data = input_batch_data
         # transformed_batch_data_all = grayed_batch_data
         # b, c, h, w = transformed_batch_data_all.shape
         # t = 1
-        
-        # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
-        # hflip
-        # vflip
-        for k in range(len(self.transformation_functions.keys())):
-            transformation_combinations = list(combinations(self.transformation_functions.keys(), k+1)) 
-            for transformation_combination in transformation_combinations: # ex) ['rotate', 'hflips']
-                all_types = []
-                for transformation_function in transformation_combination:
-                    all_types.append(list(self.transformation_functions[transformation_function].keys()))
-                types_products = list(product(*all_types))
-                for types_product in types_products:
-                    all_types_products.append(types_product)
-                    for idx, transformation_function in enumerate(transformation_combination):
-                        if idx == 0:
-                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](grayed_batch_data)
-                        else:
-                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](transformed_batch_data)
-                    transformed_batch_data_all.append(transformed_batch_data)
-                    original_batch_data.append(input_batch_data)
-        original_batch_data = torch.stack(original_batch_data, dim=0) # num of transformations, B, C, H, W
-        transformed_batch_data_all = torch.stack(transformed_batch_data_all, dim=0) # num of transformations, B, C, H, W
-        original_batch_data = torch.transpose(original_batch_data, 0, 1) # num of transformations, B
-        transformed_batch_data_all = torch.transpose(transformed_batch_data_all, 0, 1) # B, num of transformations, C, H, W
-        if not original_batch_data.is_contiguous():
-            original_batch_data = original_batch_data.contiguous()
-        if not transformed_batch_data_all.is_contiguous():
-            transformed_batch_data_all = transformed_batch_data_all.contiguous()
-        b, t, c, h, w = transformed_batch_data_all.shape
-        original_batch_data = original_batch_data.flatten(0, 1)
-        transformed_batch_data_all = transformed_batch_data_all.flatten(0, 1)
+
+        if self.transformation_functions == {}:
+            original_batch_data = input_batch_data
+            transformed_batch_data_all = grayed_batch_data
+            b, c, h, w = transformed_batch_data_all.shape
+            t = 1
+        else:
+            for k in range(len(self.transformation_functions.keys())):
+                transformation_combinations = list(combinations(self.transformation_functions.keys(), k+1)) 
+                for transformation_combination in transformation_combinations: # ex) ['rotate', 'hflips']
+                    all_types = []
+                    for transformation_function in transformation_combination:
+                        all_types.append(list(self.transformation_functions[transformation_function].keys()))
+                    types_products = list(product(*all_types))
+                    for types_product in types_products:
+                        all_types_products.append(types_product)
+                        for idx, transformation_function in enumerate(transformation_combination):
+                            if idx == 0:
+                                transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](grayed_batch_data)
+                            else:
+                                transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](transformed_batch_data)
+                        transformed_batch_data_all.append(transformed_batch_data)
+                        original_batch_data.append(input_batch_data)
+            original_batch_data = torch.stack(original_batch_data, dim=0) # num of transformations, B, C, H, W
+            transformed_batch_data_all = torch.stack(transformed_batch_data_all, dim=0) # num of transformations, B, C, H, W
+            original_batch_data = torch.transpose(original_batch_data, 0, 1) # num of transformations, B
+            transformed_batch_data_all = torch.transpose(transformed_batch_data_all, 0, 1) # B, num of transformations, C, H, W
+            if not original_batch_data.is_contiguous():
+                original_batch_data = original_batch_data.contiguous()
+            if not transformed_batch_data_all.is_contiguous():
+                transformed_batch_data_all = transformed_batch_data_all.contiguous()
+            b, t, c, h, w = transformed_batch_data_all.shape
+            original_batch_data = original_batch_data.flatten(0, 1)
+            transformed_batch_data_all = transformed_batch_data_all.flatten(0, 1)
 
         original_batch_data = original_batch_data.to(self.device)
         transformed_batch_data_all = transformed_batch_data_all.to(self.device)
-        # output_data = []
         output_data_all = []
         with torch.no_grad():
             for chunk_idx in range(b*t):
                 # sliding window
-                # original_batch_data_patch, transformed_batch_data_all_patch, output_data_patch, labels_patch = self._generate_patches(
-                #     original_batch_data[chunk_idx],
-                #     transformed_batch_data_all[chunk_idx],
-                #     original_batch_label[chunk_idx],
-                #     30,
-                #     self.args.crop_size)
-                output_data = self._generate_patches_and_merge(transformed_batch_data_all[chunk_idx], 100, self.args.crop_size, self.args.channel_num)
-                # original_batch_data_patches.append(original_batch_data_patch)
-                # transformed_batch_data_all_patches.append(transformed_batch_data_all_patch)
+                if self.args.random_crop:
+                    output_data = self._generate_patches_and_merge(transformed_batch_data_all[chunk_idx], 100, self.args.crop_size, self.args.channel_num)
+                else:
+                    output_data = self.model(transformed_batch_data_all[chunk_idx].unsqueeze(0))
                 output_data_all.append(output_data)
-                # original_batch_label_patches.append(labels_patch)
-                
-                # output_data.append(self.model(transformed_batch_data_all[chunk_idx].unsqueeze(0)))
-        
-        # original_batch_data = torch.stack(original_batch_data_patches, dim=0)
-        # transformed_batch_data_all = torch.stack(transformed_batch_data_all_patches, dim=0)
-        # output_data = torch.stack(output_data_patches, dim=0)
-        # original_batch_label = torch.stack(original_batch_label_patches, dim=0)
-
         output_data = torch.stack(output_data_all, dim=0)
+        output_data = output_data.squeeze(1)
         output_data = output_data.to(self.device)
-        # with torch.no_grad():
-        #     for chunk_idx in range(b*t):
-        #         output_data.append(self.model(transformed_batch_data_all[chunk_idx].unsqueeze(0)))
-        # output_data = torch.stack(output_data, dim=0).squeeze()
+        
         batch_diff_per_batch = self.anomaly_criterion(original_batch_data, output_data)
         transform_indexes = [0]*t
         transform_avg_diff = torch.zeros(t)
@@ -145,83 +136,68 @@ class ARNetTester(Tester):
         all_types_products = []
         #TBD: speed up
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if input_batch_data.shape[1] == 3:
+        if input_batch_data.shape[1] == 3 and self.args.graying:
             grayed_batch_data = torch.mean(input_batch_data, dim=1, keepdim=True) # channel dim 2
-        
-        # original_batch_data = input_batch_data
-        # transformed_batch_data_all = grayed_batch_data
-        # original_batch_label = input_batch_label
-        # b, c, h, w = transformed_batch_data_all.shape
-        # t = 1
+        else:
+            grayed_batch_data = input_batch_data
 
-        # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
-        # hflip
-        # vflip
-        for k in range(len(self.transformation_functions.keys())):
-            transformation_combinations = list(combinations(self.transformation_functions.keys(), k+1)) 
-            for transformation_combination in transformation_combinations: # ex) ['rotate', 'hflips']
-                all_types = []
-                for transformation_function in transformation_combination:
-                    all_types.append(list(self.transformation_functions[transformation_function].keys()))
-                types_products = list(product(*all_types))
-                for types_product in types_products:
-                    all_types_products.append(types_product)
-                    for idx, transformation_function in enumerate(transformation_combination):
-                        if idx == 0:
-                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](grayed_batch_data)
-                        else:
-                            transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](transformed_batch_data)
-                    transformed_batch_data_all.append(transformed_batch_data)
-                    original_batch_data.append(input_batch_data)
-                    original_batch_label.append(input_batch_label)
-        transformed_batch_data_all = torch.stack(transformed_batch_data_all, dim=0) # num of angles, B, C, H, W
-        original_batch_data = torch.stack(original_batch_data, dim=0) # num of angles, B, C, H, W
-        original_batch_label = torch.stack(original_batch_label, dim=0) # num of angles, B
-        transformed_batch_data_all = transformed_batch_data_all.transpose(0, 1)
-        original_batch_data = original_batch_data.transpose(0, 1)
-        original_batch_label = original_batch_label.transpose(0, 1)
-        if not original_batch_data.is_contiguous():
-            original_batch_data = original_batch_data.contiguous()
-        if not transformed_batch_data_all.is_contiguous():
-            transformed_batch_data_all = transformed_batch_data_all.contiguous()
-        if not original_batch_label.is_contiguous():
-            original_batch_label = original_batch_label.contiguous()
-        b, t, c, h, w = transformed_batch_data_all.shape
-        transformed_batch_data_all = transformed_batch_data_all.flatten(0, 1)
-        original_batch_data = original_batch_data.flatten(0, 1)
-        original_batch_label = original_batch_label.flatten(0, 1)
+        if self.transformation_functions == {}:
+            original_batch_data = input_batch_data
+            transformed_batch_data_all = grayed_batch_data
+            original_batch_label = input_batch_label
+            b, c, h, w = transformed_batch_data_all.shape
+            t = 1
+        else:
+            # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
+            # hflip
+            # vflip
+            for k in range(len(self.transformation_functions.keys())):
+                transformation_combinations = list(combinations(self.transformation_functions.keys(), k+1)) 
+                for transformation_combination in transformation_combinations: # ex) ['rotate', 'hflips']
+                    all_types = []
+                    for transformation_function in transformation_combination:
+                        all_types.append(list(self.transformation_functions[transformation_function].keys()))
+                    types_products = list(product(*all_types))
+                    for types_product in types_products:
+                        all_types_products.append(types_product)
+                        for idx, transformation_function in enumerate(transformation_combination):
+                            if idx == 0:
+                                transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](grayed_batch_data)
+                            else:
+                                transformed_batch_data = self.transformation_functions[transformation_function][types_product[idx]](transformed_batch_data)
+                        transformed_batch_data_all.append(transformed_batch_data)
+                        original_batch_data.append(input_batch_data)
+                        original_batch_label.append(input_batch_label)
+            transformed_batch_data_all = torch.stack(transformed_batch_data_all, dim=0) # num of angles, B, C, H, W
+            original_batch_data = torch.stack(original_batch_data, dim=0) # num of angles, B, C, H, W
+            original_batch_label = torch.stack(original_batch_label, dim=0) # num of angles, B
+            transformed_batch_data_all = transformed_batch_data_all.transpose(0, 1)
+            original_batch_data = original_batch_data.transpose(0, 1)
+            original_batch_label = original_batch_label.transpose(0, 1)
+            if not original_batch_data.is_contiguous():
+                original_batch_data = original_batch_data.contiguous()
+            if not transformed_batch_data_all.is_contiguous():
+                transformed_batch_data_all = transformed_batch_data_all.contiguous()
+            if not original_batch_label.is_contiguous():
+                original_batch_label = original_batch_label.contiguous()
+            b, t, c, h, w = transformed_batch_data_all.shape
+            transformed_batch_data_all = transformed_batch_data_all.flatten(0, 1)
+            original_batch_data = original_batch_data.flatten(0, 1)
+            original_batch_label = original_batch_label.flatten(0, 1)
         
         original_batch_data = original_batch_data.to(self.device)
         transformed_batch_data_all = transformed_batch_data_all.to(self.device)
         original_batch_label = original_batch_label.to(self.device)
-        # original_batch_data_patches = []
-        # transformed_batch_data_all_patches = []
-        # original_batch_label_patches = []
-        # output_data_patches = []
         output_data_all = []
         with torch.no_grad():
             for chunk_idx in range(b*t):
                 # sliding window
-                # original_batch_data_patch, transformed_batch_data_all_patch, output_data_patch, labels_patch = self._generate_patches(
-                #     original_batch_data[chunk_idx],
-                #     transformed_batch_data_all[chunk_idx],
-                #     original_batch_label[chunk_idx],
-                #     30,
-                #     self.args.crop_size)
-                output_data = self._generate_patches_and_merge(transformed_batch_data_all[chunk_idx], 100, self.args.crop_size, self.args.channel_num)
-                # original_batch_data_patches.append(original_batch_data_patch)
-                # transformed_batch_data_all_patches.append(transformed_batch_data_all_patch)
+                if self.args.random_crop:
+                    output_data = self._generate_patches_and_merge(transformed_batch_data_all[chunk_idx], 100, self.args.crop_size, self.args.channel_num)
+                else:
+                    output_data = self.model(transformed_batch_data_all[chunk_idx].unsqueeze(0))
                 output_data_all.append(output_data)
-                # original_batch_label_patches.append(labels_patch)
-                
-                # output_data.append(self.model(transformed_batch_data_all[chunk_idx].unsqueeze(0)))
-        
-        # original_batch_data = torch.stack(original_batch_data_patches, dim=0)
-        # transformed_batch_data_all = torch.stack(transformed_batch_data_all_patches, dim=0)
-        # output_data = torch.stack(output_data_patches, dim=0)
-        # original_batch_label = torch.stack(original_batch_label_patches, dim=0)
-
-        output_data = torch.stack(output_data_all, dim=0)
+        output_data = torch.stack(output_data_all, dim=0).squeeze(1)
         output_data = output_data.to(self.device)
         for loss_func_name, loss_func in self.loss_funcs.items():
             loss_values = loss_func(original_batch_data, output_data)
@@ -280,29 +256,6 @@ class ARNetTester(Tester):
                     output_data_patch = self.model(transformed_data_patch.unsqueeze(0))
                     output_data[:, y:y+windowSize, x:x+windowSize] = output_data_patch
         return output_data
-
-    # def _generate_patches(self, input_data, transformed_data, label, stride, windowSize):
-    #     input_data_patches = []
-    #     transformed_data_patches = []
-    #     output_data_patches = []
-    #     labels = []
-    #     for y in range(0, input_data.shape[1], stride):
-    #         for x in range(0, input_data.shape[2], stride):
-    #             if (y+windowSize > input_data.shape[1]) or (x+windowSize > input_data.shape[2]):
-    #                 pass
-    #             else:
-    #                 input_data_patch = input_data[:, y:y+windowSize, x:x+windowSize]
-    #                 input_data_patches.append(input_data_patch)
-    #                 transformed_data_patch = transformed_data[:, y:y+windowSize, x:x+windowSize]
-    #                 transformed_data_patches.append(transformed_data_patch)
-    #                 output_data_patch = self.model(transformed_data_patch.unsqueeze(0))
-    #                 output_data_patches.append(output_data_patch)
-    #                 labels.append(label)
-    #     input_data_patches = torch.stack(input_data_patches, dim=0)
-    #     transformed_data_patches = torch.stack(transformed_data_patches, dim=0)
-    #     output_data_patches = torch.stack(output_data_patches, dim=0).squeeze(1)
-    #     labels = torch.stack(labels, dim=0)
-    #     return input_data_patches, transformed_data_patches, output_data_patches, labels
 
     def _set_testing_variables(self):
         super()._set_testing_variables()

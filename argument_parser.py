@@ -47,6 +47,11 @@ parser.add_argument('--tensorboard_dir', type=str, default='/hd/tensorboard_logs
 
 # model args
 parser.add_argument('--entropy_loss_coef', type=float, default=0.0002, help="entropy loss weight for memae model")
+parser.add_argument('--graying', action='store_true', default=False, help="graying augmentation for ARNet")
+parser.add_argument('--rotation', action='store_true', default=False, help="rotation flip augmentation for ARNet")
+parser.add_argument('--hflip', action='store_true', default=False, help="horizontal flip augmentation for ARNet")
+parser.add_argument('--vflip', action='store_true', default=False, help="vertical flip augmentation for ARNet")
+
 
 def get_args():
     args = parser.parse_args()

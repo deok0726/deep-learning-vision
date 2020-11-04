@@ -23,8 +23,11 @@ def load_loss(losses_name):
 def load_model(args):
     if args.model_name=='ARNet':
         from models.CAE_ARNet import Model
-        if args.dataset_name=='MvTec' or 'GMS':
-            model = Model(in_channels=1, out_channels=3, bilinear=False).to(DEVICE, dtype=torch.float)
+        if args.dataset_name=='MvTec' or args.dataset_name=='GMS':
+            if args.graying:
+                model = Model(in_channels=1, out_channels=3, bilinear=False).to(DEVICE, dtype=torch.float)
+            else:
+                model = Model(in_channels=3, out_channels=3, bilinear=False).to(DEVICE, dtype=torch.float)
         else:
             model = Model(in_channels=1, out_channels=1, bilinear=False).to(DEVICE, dtype=torch.float)
         # x = torch.rand(1,1,300,300).to(DEVICE, dtype=torch.float)

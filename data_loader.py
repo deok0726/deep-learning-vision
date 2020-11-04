@@ -27,7 +27,6 @@ class DataLoader:
         if args.dataset_name == 'MNIST':
             train_dataset = MNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
             test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
-            # test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'FMNIST':
             train_dataset = FashionMNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
@@ -44,9 +43,12 @@ class DataLoader:
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
         elif args.dataset_name == 'GMS':
             train_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform, args=args)
-            test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform, args=args)
+            # test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform, args=args)
             # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
-            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
+            test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=False, transform=transforms.Compose([
+                transforms.Resize(args.resize_size),
+                transforms.ToTensor(), 
+                transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform, args=args)
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         else:
             raise Exception('Wrong dataset name')
@@ -95,16 +97,16 @@ class DataLoader:
         #               set of normal data and the data of abnormal data                #
         # ============================================================================= #
         current_ratio = anomaly_data.shape[0] / (test_length + anomaly_data.shape[0])
-        if current_ratio < args.anomaly_ratio:
+        if args.anomaly_ratio == -1:
+            pass
+        elif current_ratio < args.anomaly_ratio:
             normal_count = int(len(anomaly_data) / args.anomaly_ratio - len(anomaly_data))
             test_data = test_data[:normal_count]
             test_targets = test_targets[:normal_count]
         elif current_ratio > args.anomaly_ratio:
-            anomaly_count = int((test_length + anomaly_data.shape[0]) * args.anomaly_ratio / (1 - args.anomaly_ratio))
+            anomaly_count = int(test_length * args.anomaly_ratio / (1 - args.anomaly_ratio))
             anomaly_data = anomaly_data[:anomaly_count]
             anomaly_targets = anomaly_targets[:anomaly_count]
-        elif args.anomaly_ratio == -1:
-            pass
         else:
             pass
         # ================================================================== #
@@ -235,6 +237,8 @@ class customTensorDataset(torch.utils.data.Dataset):
             img = Image.fromarray(img.numpy(), mode='L')
         elif img.shape[-1]==3:
             img = Image.fromarray(img.numpy(), mode='RGB')
+        else:
+            img = Image.fromarray(img.numpy(), mode='L')
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
