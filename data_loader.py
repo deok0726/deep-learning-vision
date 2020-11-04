@@ -36,9 +36,9 @@ class DataLoader:
             train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'MvTec':
             train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
-            test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
             # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
-            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
+            test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
             train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
             valid_length = len(train_dataset) - train_length
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
@@ -148,7 +148,6 @@ class DataLoader:
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, root, train=True, transform=None, target_transform=None):
-        # self.image_paths = []
         self.data = []
         self.targets = []
         if(train):
@@ -158,23 +157,19 @@ class ImageDataset(torch.utils.data.Dataset):
         for folder in os.listdir(root_dir):
             folder_path = os.path.join(root_dir, folder)
             images_in_folder = sorted(os.listdir(folder_path))
-            # self.image_paths.extend([os.path.join(folder_path, image) for image in images_in_folder])
             self.data.extend([os.path.join(folder_path, image) for image in images_in_folder])
             if folder == 'good':
                 self.targets.extend([0]*len(images_in_folder))
             else:
                 self.targets.extend([1]*len(images_in_folder))
-        # assert len(self.image_paths) == len(self.targets), 'images and label number mismatch'
         assert len(self.data) == len(self.targets), 'images and label number mismatch'
         self.transform = transform
         self.target_transform = target_transform
 
     def __len__(self):
-        # return len(self.image_paths)
         return len(self.data)
         
     def __getitem__(self, idx):
-        # x = Image.open(self.image_paths[idx])
         x = Image.open(self.data[idx])
         y = self.targets[idx]
         if self.transform is not None:
@@ -185,7 +180,6 @@ class ImageDataset(torch.utils.data.Dataset):
 
 class ImageDatasetPreLoadImages(torch.utils.data.Dataset):
     def __init__(self, root, train=True, transform=None, target_transform=None, args=None):
-        # self.image_paths = []
         self.data = []
         self.targets = []
         if(train):
@@ -207,7 +201,6 @@ class ImageDatasetPreLoadImages(torch.utils.data.Dataset):
                 self.targets.extend(torch.tensor([0]*len(images_in_folder)))
             else:
                 self.targets.extend(torch.tensor([1]*len(images_in_folder)))
-        # assert len(self.image_paths) == len(self.targets), 'images and label number mismatch'
         assert len(self.data) == len(self.targets), 'images and label number mismatch'
         self.data = torch.stack(self.data)
         self.targets = torch.stack(self.targets)
@@ -215,12 +208,9 @@ class ImageDatasetPreLoadImages(torch.utils.data.Dataset):
         self.target_transform = target_transform
 
     def __len__(self):
-        # return len(self.image_paths)
         return len(self.data)
         
     def __getitem__(self, idx):
-        # x = Image.open(self.image_paths[idx])
-        # x = Image.open(self.data[idx])
         x = transforms.functional.to_pil_image(self.data[idx])
         y = self.targets[idx]
         if self.transform is not None:

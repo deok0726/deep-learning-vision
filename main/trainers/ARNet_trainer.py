@@ -23,14 +23,14 @@ class ARNetTrainer(Trainer):
     def _train_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)    
         self.optimizer.zero_grad()
+        # Graying: This operation averages each pixel value along the channel dimension of images.
+        if batch_data.shape[1] == 3:
+            transformed_batch_data = torch.mean(batch_data, dim=1, keepdim=True) # channel dim 1
         # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
         angle = self.angles[randint(0, 4)]
-        transformed_batch_data = self.rotate_funtions[str(angle)](batch_data, -2, -1)
+        transformed_batch_data = self.rotate_funtions[str(angle)](transformed_batch_data, -2, -1)
         if not transformed_batch_data.is_contiguous():
             transformed_batch_data = transformed_batch_data.contiguous()
-        # Graying: This operation averages each pixel value along the channel dimension of images.
-        if transformed_batch_data.shape[1] == 3:
-            transformed_batch_data = torch.mean(transformed_batch_data, dim=1, keepdim=True) # channel dim 1
         # Horizontally flip
         if torch.rand(1) < 0.5:
             transformed_batch_data = torchvision.transforms.functional.hflip(transformed_batch_data)
@@ -39,9 +39,9 @@ class ARNetTrainer(Trainer):
             transformed_batch_data = torchvision.transforms.functional.vflip(transformed_batch_data)
         # TBD: Shifting(upgrade needed to latest pytorch version)
         # if torch.rand(1) < 0.5:
-            # transformed_batch_data = torchvision.transforms.functional.affine(img=transformed_batch_data, angle=0, translate=(0.5, 0.5), scale=1, shear=0)
-            # transformed_batch_data = torchvision.transforms.RandomAffine(degrees=0, translate=(0.5, 0.5)).forward(transformed_batch_data)
-            # transformed_batch_data = self.translate_function.forward(transformed_batch_data)
+        #     transformed_batch_data = torchvision.transforms.functional.affine(img=transformed_batch_data, angle=0, translate=(0.5, 0.5), scale=1, shear=0)
+        #     transformed_batch_data = torchvision.transforms.RandomAffine(degrees=0, translate=(0.5, 0.5)).forward(transformed_batch_data)
+        #     transformed_batch_data = self.translate_function.forward(transformed_batch_data)
         batch_data = batch_data.to(self.device)
         transformed_batch_data = transformed_batch_data.to(self.device)
         batch_label = batch_label.to(self.device)
@@ -75,14 +75,14 @@ class ARNetTrainer(Trainer):
 
     def _val_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)
+        # Graying: This operation averages each pixel value along the channel dimension of images.
+        if batch_data.shape[1] == 3:
+            transformed_batch_data = torch.mean(batch_data, dim=1, keepdim=True) # channel dim 1
         # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
         angle = self.angles[randint(0, 4)]
-        transformed_batch_data = self.rotate_funtions[str(angle)](batch_data, -2, -1)
+        transformed_batch_data = self.rotate_funtions[str(angle)](transformed_batch_data, -2, -1)
         if not transformed_batch_data.is_contiguous():
             transformed_batch_data = transformed_batch_data.contiguous()
-        # Graying: This operation averages each pixel value along the channel dimension of images.
-        if transformed_batch_data.shape[1] == 3:
-            transformed_batch_data = torch.mean(transformed_batch_data, dim=1, keepdim=True) # channel dim 1
         # Horizontally flip
         if torch.rand(1) < 0.5:
             transformed_batch_data = torchvision.transforms.functional.hflip(transformed_batch_data)
@@ -91,8 +91,8 @@ class ARNetTrainer(Trainer):
             transformed_batch_data = torchvision.transforms.functional.vflip(transformed_batch_data)
         # TBD: Shifting
         # if torch.rand(1) < 0.5:
-            # transformed_batch_data = torchvision.transforms.functional.affine(img=transformed_batch_data, angle=0, translate=(0.5, 0.5), scale=1, shear=0)
-            # transformed_batch_data = self.translate_function.forward(transformed_batch_data)
+        #     transformed_batch_data = torchvision.transforms.functional.affine(img=transformed_batch_data, angle=0, translate=(0.5, 0.5), scale=1, shear=0)
+        #     transformed_batch_data = self.translate_function.forward(transformed_batch_data)
         batch_data = batch_data.to(self.device)
         transformed_batch_data = transformed_batch_data.to(self.device)
         batch_label = batch_label.to(self.device)
