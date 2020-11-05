@@ -15,6 +15,7 @@ class MemAETester(Tester):
         with torch.no_grad():
             output_data = self.model(batch_data)
             mem_weight = getattr(output_data, 'mem_weight')
+            embedding = getattr(output_data, 'embedding')
             output_data = getattr(output_data ,'output')
         for loss_func_name, loss_func in self.loss_funcs.items():
             loss_values = loss_func(batch_data, output_data)
@@ -39,6 +40,8 @@ class MemAETester(Tester):
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         self.diffs_per_data.extend(batch_diff_per_batch.cpu().detach().numpy())
         self.labels_per_data.extend(batch_label.cpu().detach().numpy())
+        self.embedding_per_data.extend(embedding.view(output_data.shape[0], -1).cpu().detach())
+        self.output_per_data.extend(output_data.cpu().detach())
         for metric_func_name, metric_func in self.metric_funcs.items():
             if metric_func_name == 'ROC':
                 pass
@@ -53,7 +56,10 @@ class MemAETester(Tester):
                 metric_value = self.metric_funcs['ROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
                 self.metrics_per_batch['ROC'] = metric_value
                 self.test_metrics_per_epoch['ROC'].update(metric_value)
+            if self.args.save_embedding:
+                self.tensorboard_writer_test.add_embedding(torch.stack(self.embedding_per_data), self.labels_per_data, torch.stack(self.output_per_data), int(self.epoch_idx), 'embedding_vector')
             self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch)
+        
         if self.args.save_result_images:
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, 'input')
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, 'output')
@@ -62,3 +68,5 @@ class MemAETester(Tester):
         super()._set_testing_variables()
         for loss_name in self.model.get_losses_name():
             self.test_losses_per_epoch[loss_name] = AverageMeter()
+        self.embedding_per_data = []
+        self.output_per_data = []

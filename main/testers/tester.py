@@ -150,6 +150,7 @@ class Tester:
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
             # print('tester metric metric_value_per_epoch.avg: ', metric_value_per_epoch.avg)
             # print('tester metric self.epoch_idx: ', self.epoch_idx)
+        self.tensorboard_writer_test.add_pr_curve('test_pr_curve', np.asarray(self.labels_per_data), np.asarray(self.diffs_per_data), self.epoch_idx)
         self.tensorboard_writer_test.flush()
 
     def _log_progress(self):

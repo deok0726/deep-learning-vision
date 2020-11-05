@@ -22,6 +22,7 @@ parser.add_argument('--target_label', type=int, default=0, help="target label")
 parser.add_argument('--unique_anomaly', action='store_true', default=False, help="Unique anomaly class")
 parser.add_argument('--reproducibility', action='store_true', default=False, help="Reproducibility On")
 parser.add_argument('--save_result_images', action='store_true', default=False, help="saving result images")
+parser.add_argument('--save_embedding', action='store_true', default=False, help="saving embedding")
 
 # data loader
 parser.add_argument('--dataset_name', type=str, default='MNIST', help="dataset name")

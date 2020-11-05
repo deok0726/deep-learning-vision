@@ -18,15 +18,17 @@ class Model(nn.Module):
         self.memory_module = MemoryModule(mem_dim=mem_dim, fea_dim=self.conv_channel_num*4, input_h=self.input_h, input_w=self.input_w)
         # self.memory_module = MemoryModule(mem_dim=mem_dim, fea_dim=self.conv_channel_num*4, input_h=self.input_h, input_w=self.input_w)
         self.rec_criterion = nn.MSELoss(reduction='none')
-        self.return_values = namedtuple("return_values", 'output mem_weight')
+        self.return_values = namedtuple("return_values", 'output mem_weight embedding')
 
     def forward(self, x):
         z = self.encoder(x)
         f = self.memory_module(z)        
         mem_weight = f['mem_weight']
+        embedding = f['output'].view(-1, self.conv_channel_num*4, self.input_h, self.input_w)
         # output = self.decoder(z)
-        output = self.decoder(f['output'].view(-1, self.conv_channel_num*4, self.input_h, self.input_w))
-        return self.return_values(output, mem_weight)
+        # output = self.decoder(f['output'].view(-1, self.conv_channel_num*4, self.input_h, self.input_w))
+        output = self.decoder(embedding)
+        return self.return_values(output, mem_weight, embedding)
         # return output
     
     def get_losses_name(self):
