@@ -54,6 +54,9 @@ class MemAETester(Tester):
                 self.metrics_per_batch['ROC'] = metric_value
                 self.test_metrics_per_epoch['ROC'].update(metric_value)
             self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch)
+        if self.args.save_result_images:
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, 'input')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, 'output')
 
     def _set_testing_variables(self):
         super()._set_testing_variables()

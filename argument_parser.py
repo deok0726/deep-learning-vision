@@ -26,6 +26,8 @@ parser.add_argument('--save_result_images', action='store_true', default=False, 
 # data loader
 parser.add_argument('--dataset_name', type=str, default='MNIST', help="dataset name")
 parser.add_argument('--dataset_root', type=str, default='/hd/', help="dataset name")
+parser.add_argument('--input_width', type=int, default=100, help="input width")
+parser.add_argument('--input_height', type=int, default=100, help="input height")
 parser.add_argument('--channel_num', type=int, default=3, help="dataset name")
 parser.add_argument('--num_workers', type=int, default=0, help="number of data loader workers")
 parser.add_argument('--shuffle', action='store_true', default=False, help="shuffle or not")

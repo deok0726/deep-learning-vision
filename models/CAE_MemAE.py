@@ -7,16 +7,16 @@ from collections import namedtuple
 
 # Refer to https://github.com/h19920918/memae/blob/master/model.py
 class Model(nn.Module):
-    def __init__(self, n_channels, mem_dim=100):
+    def __init__(self, n_channels, input_height, input_width, mem_dim=100):
         super(Model, self).__init__()
         self.conv_channel_num = 16
-        self.input_h = 4
-        self.input_w = 4
-        # self.input_h = 88
-        # self.input_w = 88
         self.encoder = Encoder(n_channels, self.conv_channel_num)
         self.decoder = Decoder(n_channels, self.conv_channel_num)
+        temp_encoder_output = self.encoder.forward(torch.rand(1, n_channels, input_height, input_width))
+        self.input_h = temp_encoder_output.shape[-2]
+        self.input_w = temp_encoder_output.shape[-1]
         self.memory_module = MemoryModule(mem_dim=mem_dim, fea_dim=self.conv_channel_num*4, input_h=self.input_h, input_w=self.input_w)
+        # self.memory_module = MemoryModule(mem_dim=mem_dim, fea_dim=self.conv_channel_num*4, input_h=self.input_h, input_w=self.input_w)
         self.rec_criterion = nn.MSELoss(reduction='none')
         self.return_values = namedtuple("return_values", 'output mem_weight')
 

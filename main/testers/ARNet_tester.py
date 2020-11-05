@@ -61,13 +61,6 @@ class ARNetTester(Tester):
             grayed_batch_data = torch.mean(input_batch_data, dim=1, keepdim=True) # channel dim 2
         else:
             grayed_batch_data = input_batch_data
-        
-        # only gray
-        # original_batch_data = input_batch_data
-        # transformed_batch_data_all = grayed_batch_data
-        # b, c, h, w = transformed_batch_data_all.shape
-        # t = 1
-
         if self.transformation_functions == {}:
             original_batch_data = input_batch_data
             transformed_batch_data_all = grayed_batch_data

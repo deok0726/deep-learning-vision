@@ -44,12 +44,16 @@ def load_model(args):
         # print('test')
     elif args.model_name=='MemAE':
         from models.CAE_MemAE import Model
-        model = Model(n_channels=args.channel_num, mem_dim = 100).to(DEVICE, dtype=torch.float)
+        model = Model(args.channel_num, args.input_height, args.input_width).to(DEVICE, dtype=torch.float)
+        # model = Model(n_channels=args.channel_num, mem_dim = 100).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MvTec':
         from models.CAE_MvTec import Model
         model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
     elif args.model_name=='RaPP':
         from models.AE_RaPP import Model
+        model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
+    elif args.model_name=='CAE':
+        from models.CAE_basic_2 import Model
         model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
     else:
         raise NotImplementedError
@@ -74,7 +78,7 @@ def load_optimizer_with_lr_scheduler(args):
     elif args.model_name=='RaPP':
         optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
     else:
-        raise NotImplementedError
+        optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
     return optimizer, lr_scheduler
 
 def load_trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE):

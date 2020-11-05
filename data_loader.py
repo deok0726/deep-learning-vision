@@ -15,6 +15,7 @@ class DataLoader:
         target_transform_list = self._get_transform(args, is_target=True)
         train_dataset, valid_dataset, test_dataset = self._get_datasets(args, source_transform=source_transform_list, target_transform=target_transform_list)
         sample_train_data = train_dataset.__getitem__(np.random.randint(train_dataset.__len__()))[0]
+        _, args.input_height, args.input_width = sample_train_data.shape
         self.sample_train_data = sample_train_data.unsqueeze(0)
         self.train_data_loader = self._get_data_loader(args, train_dataset, args.train_batch_size)
         self.valid_data_loader = self._get_data_loader(args, valid_dataset, args.train_batch_size)
@@ -99,6 +100,8 @@ class DataLoader:
         current_ratio = anomaly_data.shape[0] / (test_length + anomaly_data.shape[0])
         if args.anomaly_ratio == -1:
             pass
+        elif args.anomaly_ratio < 0 and args.anomaly_ratio > 1:
+            raise Exception('anomaly_ratio should be greater than or equal to 0 and less than or equal to 1')
         elif current_ratio < args.anomaly_ratio:
             normal_count = int(len(anomaly_data) / args.anomaly_ratio - len(anomaly_data))
             test_data = test_data[:normal_count]
@@ -131,8 +134,10 @@ class DataLoader:
         if not is_target:
             if args.random_crop:
                 transforms_list.append(transforms.RandomCrop(args.crop_size))
+                args.input_height, args.input_width = args.crop_size, args.crop_size
             if args.resize:
                 transforms_list.append(transforms.Resize(args.resize_size))
+                args.input_height, args.input_width = args.resize_size, args.resize_size
             if args.grayscale:
                 transforms_list.append(transforms.Grayscale())
                 args.channel_num = 1
