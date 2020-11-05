@@ -166,7 +166,7 @@ class EncoderHier(nn.Module):
 
     def load(self, name):
         fpath = self.fpath_from_name(name)
-        self.load_state_dict(torch.load(fpath))
+        self.load_state_dict(torch.load(fpath, map_location='cuda:0'))
 
     @staticmethod
     def fpath_from_name(name):

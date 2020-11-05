@@ -1,3 +1,4 @@
+import os
 import argparse
 import torch
 from codes import mvtecad
@@ -53,6 +54,7 @@ def train():
 
     print('Start training')
     for i_epoch in range(args.epochs):
+        print(i_epoch+1, "/", args.epochs)
         if i_epoch != 0:
             for module in modules:
                 module.train()
@@ -93,4 +95,8 @@ def log_result(obj, aurocs):
 
 
 if __name__ == '__main__':
+    # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    torch.cuda.set_device(1)
+    print('GPU Number is :', torch.cuda.current_device())
     train()
