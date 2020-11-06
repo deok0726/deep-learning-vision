@@ -55,7 +55,7 @@ class Tester:
         self.diffs_per_data.extend(batch_diff_per_batch.cpu().detach().numpy())
         self.labels_per_data.extend(batch_label.cpu().detach().numpy())
         for metric_func_name, metric_func in self.metric_funcs.items():
-            if metric_func_name == 'AUROC':
+            if metric_func_name in ['AUROC', 'F1']:
                 pass
             else:
                 metric_value = metric_func(batch_data, output_data)
@@ -71,6 +71,10 @@ class Tester:
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
                 self.metrics_per_batch['AUROC'] = metric_value
                 self.test_metrics_per_epoch['AUROC'].update(metric_value)
+            if "F1" in self.metric_funcs.keys():
+                metric_value = self.metric_funcs['F1'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold)
+                self.metrics_per_batch['F1'] = metric_value
+                self.test_metrics_per_epoch['F1'].update(metric_value)
             self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch)
 
     def _set_testing_constants(self):
@@ -126,12 +130,14 @@ class Tester:
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
                 losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
-                if metric_per_batch_name == 'AUROC':
+                if metric_per_batch_name in ['AUROC', 'F1']:
                     pass
                 else:
                     metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
             if 'AUROC' in metric_per_epoch.keys():
                 metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_epoch['AUROC'].avg, 10)))))
+            if 'F1' in metric_per_epoch.keys():
+                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_epoch['F1'].avg, 10)))))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_batch = fig.add_subplot(2, self.args.test_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)

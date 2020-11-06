@@ -43,7 +43,7 @@ class MemAETester(Tester):
         self.embedding_per_data.extend(embedding.view(output_data.shape[0], -1).cpu().detach())
         self.output_per_data.extend(output_data.cpu().detach())
         for metric_func_name, metric_func in self.metric_funcs.items():
-            if metric_func_name == 'AUROC':
+            if metric_func_name in ['AUROC', 'F1']:
                 pass
             else:
                 metric_value = metric_func(batch_data, output_data)
@@ -56,6 +56,10 @@ class MemAETester(Tester):
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
                 self.metrics_per_batch['AUROC'] = metric_value
                 self.test_metrics_per_epoch['AUROC'].update(metric_value)
+            if "F1" in self.metric_funcs.keys():
+                metric_value = self.metric_funcs['F1'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold)
+                self.metrics_per_batch['F1'] = metric_value
+                self.test_metrics_per_epoch['F1'].update(metric_value)
             if self.args.save_embedding:
                 self.tensorboard_writer_test.add_embedding(torch.stack(self.embedding_per_data), self.labels_per_data, torch.stack(self.output_per_data), int(self.epoch_idx), 'embedding_vector')
             self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch)

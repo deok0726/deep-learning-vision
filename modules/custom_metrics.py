@@ -28,15 +28,18 @@ class AUROC(Metrics):
         except Exception as e:
             print(e)
 
-# class F1(Metrics):
-#     def __init__(self, target_label, unique_anomaly):
-#         super().__init__(target_label, unique_anomaly)
+class F1(Metrics):
+    def __init__(self, target_label, unique_anomaly):
+        super().__init__(target_label, unique_anomaly)
 
-#     def __call__(self, score, test_label, threshold):
-#         super().__call__(test_label)
-#         try:
-#             pred = score > threshold
-#             fprs, tprs, _ = metrics.f1_score(test_label, pred, -1)
-#             return metrics.auc(fprs, tprs)
-#         except Exception as e:
-#             print(e)
+    def __call__(self, score, test_label, threshold):
+        super().__call__(test_label)
+        try:
+            pred = score > threshold
+            pred = pred.astype(int)
+            pred[pred==1] = -1
+            pred[pred==0] = 1
+            f1_score = metrics.f1_score(test_label, pred, -1)
+            return f1_score
+        except Exception as e:
+            print(e)

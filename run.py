@@ -168,5 +168,6 @@ if __name__ == '__main__':
     # TBD: add tensorboard projector to test data(https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html)
     if args.test:
         metrics_dict['AUROC'] = custom_metrics.AUROC(args.target_label, args.unique_anomaly)
+        metrics_dict['F1'] = custom_metrics.F1(args.target_label, args.unique_anomaly)
         tester = load_tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
         tester.test()
