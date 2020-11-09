@@ -23,7 +23,7 @@ parser.add_argument('--unique_anomaly', action='store_true', default=False, help
 parser.add_argument('--reproducibility', action='store_true', default=False, help="Reproducibility On")
 parser.add_argument('--save_result_images', action='store_true', default=False, help="saving result images")
 parser.add_argument('--save_embedding', action='store_true', default=False, help="saving embedding")
-parser.add_argument('--anomaly_threshold', type=float, default=0.08661, help="anomaly threshold")
+parser.add_argument('--anomaly_threshold', type=float, default=0.3, help="anomaly threshold")
 
 # data loader
 parser.add_argument('--dataset_name', type=str, default='MNIST', help="dataset name")

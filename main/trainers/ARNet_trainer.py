@@ -164,7 +164,10 @@ class ARNetTrainer(Trainer):
             matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_batch.set_title("Ground Truth")
             ax_transfomred_batch = fig.add_subplot(3, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
-            matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=True, normalized=self.args.normalize, mean=0.5, std=0.5)
+            if self.args.graying:
+                matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=True, normalized=self.args.normalize, mean=0.5, std=0.5)
+            else:
+                matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_transfomred_batch.set_title("Transformed Batch Data")
         plt.tight_layout()
         if is_valid:

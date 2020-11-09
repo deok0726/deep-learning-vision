@@ -31,8 +31,8 @@ class Trainer:
         self.epoch_idx = 0
         self._restore_checkpoint()
         self.global_step = self.epoch_idx*len(self.dataloader.train_data_loader)
-        # self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
-        # self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
         for epoch_idx in tqdm(range(self.args.num_epoch), desc='Train'):
             # ================================================================== #
             #                         training                                   #
@@ -214,7 +214,6 @@ class Trainer:
                 losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
                 metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
-            # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_batch = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             # if training_state == "train":

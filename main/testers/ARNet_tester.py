@@ -1,5 +1,6 @@
 from modules.utils import AverageMeter, matplotlib_imshow
 from main.testers.tester import Tester
+from modules.custom_metrics import classification_report
 import time
 import torch
 import matplotlib.pyplot as plt
@@ -219,7 +220,7 @@ class ARNetTester(Tester):
         self.diffs_per_data.extend(batch_diff_per_batch_avg.cpu().detach().numpy())
         self.labels_per_data.extend(input_batch_label.cpu().detach().numpy())
         for metric_func_name, metric_func in self.metric_funcs.items():
-            if metric_func_name == 'AUROC':
+            if metric_func_name in ['AUROC', 'AUPRC', 'F1']:
                 pass
             else:
                 metric_value = metric_func(original_batch_data, output_data)
@@ -227,16 +228,32 @@ class ARNetTester(Tester):
                 self.test_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
+        if self.args.save_result_images:
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, transformed_batch_data_all, original_batch_label, 'input')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, original_batch_label, 'output')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, original_batch_data, original_batch_label, 'gt')
         if self.batch_idx == len(self.dataloader.test_data_loader)-1:
             if "AUROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
                 self.metrics_per_batch['AUROC'] = metric_value
                 self.test_metrics_per_epoch['AUROC'].update(metric_value)
+            if "AUPRC" in self.metric_funcs.keys():
+                metric_value = self.metric_funcs['AUPRC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
+                self.metrics_per_batch['AUPRC'] = metric_value
+                self.test_metrics_per_epoch['AUPRC'].update(metric_value)
+            if self.args.anomaly_threshold:
+                print(classification_report(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold), self.args.target_label, self.args.unique_anomaly)
+                if "F1" in self.metric_funcs.keys():
+                    metric_value = self.metric_funcs['F1'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold)
+                    self.metrics_per_batch['F1'] = metric_value
+                    self.test_metrics_per_epoch['F1'].update(metric_value)
+            if self.args.save_embedding:
+                self.tensorboard_writer_test.add_embedding(torch.stack(self.embedding_per_data), self.labels_per_data, torch.stack(self.output_per_data), int(self.epoch_idx), 'embedding_vector')
+            # if "AUROC" in self.metric_funcs.keys():
+            #     metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
+            #     self.metrics_per_batch['AUROC'] = metric_value
+            #     self.test_metrics_per_epoch['AUROC'].update(metric_value)
             self._log_tensorboard(original_batch_data, original_batch_label, transformed_batch_data_all, output_data, self.losses_per_batch, self.metrics_per_batch)
-        if self.args.save_result_images:
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, transformed_batch_data_all, original_batch_label, 'input')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, original_batch_label, 'output')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, original_batch_data, original_batch_label, 'gt')
 
     def _generate_patches_and_merge(self, transformed_data, stride, windowSize, output_color_channel):
         output_data = torch.empty((output_color_channel, transformed_data.shape[1], transformed_data.shape[2]))
@@ -268,12 +285,16 @@ class ARNetTester(Tester):
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
                 losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
-                if metric_per_batch_name == 'AUROC':
+                if metric_per_batch_name in ['AUROC', 'AUPRC', 'F1']:
                     pass
                 else:
                     metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
             if 'AUROC' in metric_per_epoch.keys():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_epoch['AUROC'].avg, 10)))))
+                metrics.append(':'.join(('AUROC', str(round(metric_per_epoch['AUROC'].avg, 10)))))
+            if 'AUPRC' in metric_per_epoch.keys():
+                metrics.append(':'.join(('AUPRC', str(round(metric_per_epoch['AUPRC'].avg, 10)))))
+            if 'F1' in metric_per_epoch.keys():
+                metrics.append(':'.join(('F1', str(round(metric_per_epoch['F1'].avg, 10)))))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_batch = fig.add_subplot(3, self.args.test_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
@@ -291,4 +312,5 @@ class ARNetTester(Tester):
         for metric_name, metric_value_per_epoch in metric_per_epoch.items():
             scalar_tag = [metric_name, '/metric']
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
+        self.log_pr_curve(np.asarray(self.labels_per_data), np.asarray(self.diffs_per_data), self.epoch_idx)
         self.tensorboard_writer_test.flush()

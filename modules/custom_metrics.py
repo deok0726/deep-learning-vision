@@ -1,11 +1,12 @@
 from sklearn import metrics
+from torchvision.transforms.functional import normalize
 
 class Metrics(object):
     def __init__(self, target_label, unique_anomaly):
         self.target_label = target_label
         self.unique_anomaly = unique_anomaly
 
-    def __call__(self, test_label):
+    def __call__(self, score, test_label):
         try:
             if(self.unique_anomaly):
                 test_label[test_label == self.target_label] = -1
@@ -13,6 +14,8 @@ class Metrics(object):
             else:
                 test_label[test_label != self.target_label] = -1
                 test_label[test_label != -1] = 1
+            score = ((score - score.min(axis=0))/(score.max(axis=0) - score.min(axis=0)))
+            return score, test_label
         except Exception as e:
             print(e)
 
@@ -21,7 +24,7 @@ class AUROC(Metrics):
         super().__init__(target_label, unique_anomaly)
 
     def __call__(self, score, test_label):
-        super().__call__(test_label)
+        score, test_label = super().__call__(score, test_label)
         try:
             fprs, tprs, _ = metrics.roc_curve(test_label, score, pos_label=-1)
             return metrics.auc(fprs, tprs)
@@ -33,7 +36,7 @@ class AUPRC(Metrics):
         super().__init__(target_label, unique_anomaly)
 
     def __call__(self, score, test_label):
-        super().__call__(test_label)
+        score, test_label = super().__call__(score, test_label)
         try:
             precision, recall, _ = metrics.precision_recall_curve(test_label, score, pos_label=-1)
             return metrics.auc(recall, precision)
@@ -45,14 +48,12 @@ class F1(Metrics):
         super().__init__(target_label, unique_anomaly)
 
     def __call__(self, score, test_label, threshold):
-        super().__call__(test_label)
+        score, test_label = super().__call__(score, test_label)
         try:
             pred = score > threshold
             pred = pred.astype(int)
             pred[pred==1] = -1
             pred[pred==0] = 1
-            # print('confusion matrix1:\n', metrics.confusion_matrix(test_label, pred, [-1, 1]))
-            # print('confusion matrix2:\n', metrics.confusion_matrix(test_label, pred, [1, -1]))
             f1_score = metrics.f1_score(test_label, pred, pos_label=-1)
             return f1_score
         except Exception as e:
@@ -70,8 +71,6 @@ def classification_report(score, test_label, threshold, target_label=0, unique_a
         pred = pred.astype(int)
         pred[pred==1] = -1
         pred[pred==0] = 1
-        # print(metrics.classification_report(test_label, pred, [1, -1], ['Normal', 'Anomaly']))
-        # print(metrics.classification_report(test_label, pred, [1, -1], ['Anomaly', 'Normal']))
         return metrics.classification_report(test_label, pred, [1, -1], ['Normal', 'Anomaly'])
     except Exception as e:
         print(e)

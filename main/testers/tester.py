@@ -142,11 +142,11 @@ class Tester:
                 else:
                     metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
             if 'AUROC' in metric_per_epoch.keys():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_epoch['AUROC'].avg, 10)))))
+                metrics.append(':'.join(('AUROC', str(round(metric_per_epoch['AUROC'].avg, 10)))))
             if 'AUPRC' in metric_per_epoch.keys():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_epoch['AUPRC'].avg, 10)))))
+                metrics.append(':'.join(('AUPRC', str(round(metric_per_epoch['AUPRC'].avg, 10)))))
             if 'F1' in metric_per_epoch.keys():
-                metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_epoch['F1'].avg, 10)))))
+                metrics.append(':'.join(('F1', str(round(metric_per_epoch['F1'].avg, 10)))))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_batch = fig.add_subplot(2, self.args.test_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
@@ -155,18 +155,25 @@ class Tester:
         self.tensorboard_writer_test.add_figure("test", fig, global_step=self.epoch_idx)
         for loss_name, loss_value_per_epoch in losses_per_epoch.items():
             scalar_tag = [loss_name, '/loss']
-            # print('tester loss scalar_tag: ', scalar_tag)
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), loss_value_per_epoch.avg, self.epoch_idx)
-            # print('tester loss loss_value_per_epoch.avg: ', loss_value_per_epoch.avg)
-            # print('tester loss self.epoch_idx: ', self.epoch_idx)
         for metric_name, metric_value_per_epoch in metric_per_epoch.items():
             scalar_tag = [metric_name, '/metric']
-            # print('tester metric scalar_tag: ', scalar_tag)
             self.tensorboard_writer_test.add_scalar(''.join(scalar_tag), metric_value_per_epoch.avg, self.epoch_idx)
-            # print('tester metric metric_value_per_epoch.avg: ', metric_value_per_epoch.avg)
-            # print('tester metric self.epoch_idx: ', self.epoch_idx)
-        self.tensorboard_writer_test.add_pr_curve('test_pr_curve', np.asarray(self.labels_per_data), np.asarray(self.diffs_per_data), self.epoch_idx)
+        # self.tensorboard_writer_test.add_pr_curve('test_pr_curve', np.asarray(self.labels_per_data), np.asarray(self.diffs_per_data), self.epoch_idx)
+        self.log_pr_curve(np.asarray(self.labels_per_data), np.asarray(self.diffs_per_data), self.epoch_idx)
         self.tensorboard_writer_test.flush()
+    
+    def log_pr_curve(self, labels, scores, step):
+        if(self.args.unique_anomaly):
+            labels[labels == self.args.target_label] = -1
+            labels[labels != -1] = 1
+        else:
+            labels[labels != self.args.target_label] = -1
+            labels[labels != -1] = 1
+        labels[labels==1] = 0
+        labels[labels==-1] = 1
+        scores = (scores - scores.min(axis=0)) / (scores.max(axis=0) - scores.min(axis=0))
+        self.tensorboard_writer_test.add_pr_curve('test_pr_curve', labels, scores, step)
 
     def _log_progress(self):
         self.data_time.update(time.time() - self.end_time)
@@ -193,7 +200,6 @@ class Tester:
                 image_path = image_path + '_' + loss_name + '_' + str(loss_value.mean().item())
             for metric_name, metric_value in self.metrics_per_batch.items():
                 image_path = image_path + '_' + metric_name + '_' + str(metric_value.mean().item())
-            # result_image_path = image_path +'_' + result_type + '.png'
             image_path += '.png'
             if self.args.normalize:
                 result_img = result_images[img_idx].detach().mul(0.5).add(0.5)
