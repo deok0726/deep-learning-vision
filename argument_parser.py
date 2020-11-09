@@ -18,7 +18,7 @@ parser.add_argument('--test', action='store_true', default=False, help="start te
 parser.add_argument('--exp_name', type=str, default='temp', help="experiment name")
 parser.add_argument('--train_tensorboard_shown_image_num', type=int, default=4, help="The number of the train and valid images shown in tensorboard")
 parser.add_argument('--test_tensorboard_shown_image_num', type=int, default=1, help="The number of the test images shown in tensorboard")
-parser.add_argument('--target_label', type=int, default=0, help="target label")
+parser.add_argument('--target_label', type=int, default=0, help="target label") # unique_anomaly False: normal class, unique_anomaly True: anomaly class
 parser.add_argument('--unique_anomaly', action='store_true', default=False, help="Unique anomaly class")
 parser.add_argument('--reproducibility', action='store_true', default=False, help="Reproducibility On")
 parser.add_argument('--save_result_images', action='store_true', default=False, help="saving result images")

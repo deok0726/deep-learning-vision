@@ -9,6 +9,16 @@ class MemAETester(Tester):
     def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
         super().__init__(args, dataloader, model, optimizer, loss_funcs, metric_funcs, device)
     
+    def _get_valid_residuals(self, batch_data):
+        batch_data = batch_data.to(self.device)
+        with torch.no_grad():
+            output_data = self.model(batch_data)
+            output_data = getattr(output_data ,'output')
+        batch_diff_per_batch = (batch_data - output_data) ** 2
+        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
+        if max(batch_diff_per_batch) > self.max_residual:
+            self.max_residual = max(batch_diff_per_batch)
+
     def _test_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)
         batch_data = batch_data.to(self.device)

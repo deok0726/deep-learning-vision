@@ -28,6 +28,10 @@ class Tester:
         self.model.eval()
         self.end_time = time.time()
         print(len(self.dataloader.test_data_loader))
+        for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.valid_data_loader), total=len(self.dataloader.valid_data_loader), desc='Valid'):
+            self._get_valid_residuals(batch_data)
+        if self.max_residual != 0:
+            self.args.anomaly_threshold = self.max_residual.item()
         for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_data_loader), total=len(self.dataloader.test_data_loader), desc='Test'):
             self.batch_idx = batch_idx
             self._test_step(batch_data, batch_label)
@@ -84,6 +88,9 @@ class Tester:
                     self.test_metrics_per_epoch['F1'].update(metric_value)
             self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch)
 
+    def _get_valid_residuals(self, batch_data):
+        raise NotImplementedError
+
     def _set_testing_constants(self):
         self.CHECKPOINT_SAVE_DIR = os.path.join(os.path.join(self.args.checkpoint_dir, self.args.model_name), self.args.exp_name)
         self.TENSORBOARD_LOG_SAVE_DIR = os.path.join(os.path.join(self.args.tensorboard_dir, self.args.model_name), self.args.exp_name)
@@ -110,6 +117,8 @@ class Tester:
             self.test_metrics_per_epoch[metric_name] = AverageMeter()
         self.diffs_per_data = []
         self.labels_per_data = []
+        # self.valid_residuals = []
+        self.max_residual = 0
         self.tensorboard_writer_test = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'test'), max_queue=100)
 
     def _restore_checkpoint(self):

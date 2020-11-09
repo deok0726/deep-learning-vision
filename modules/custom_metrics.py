@@ -6,7 +6,7 @@ class Metrics(object):
         self.target_label = target_label
         self.unique_anomaly = unique_anomaly
 
-    def __call__(self, score, test_label):
+    def __call__(self, test_label):
         try:
             if(self.unique_anomaly):
                 test_label[test_label == self.target_label] = -1
@@ -14,8 +14,7 @@ class Metrics(object):
             else:
                 test_label[test_label != self.target_label] = -1
                 test_label[test_label != -1] = 1
-            score = ((score - score.min(axis=0))/(score.max(axis=0) - score.min(axis=0)))
-            return score, test_label
+            return test_label
         except Exception as e:
             print(e)
 
@@ -24,7 +23,8 @@ class AUROC(Metrics):
         super().__init__(target_label, unique_anomaly)
 
     def __call__(self, score, test_label):
-        score, test_label = super().__call__(score, test_label)
+        test_label = super().__call__(test_label)
+        score = ((score - score.min(axis=0))/(score.max(axis=0) - score.min(axis=0)))
         try:
             fprs, tprs, _ = metrics.roc_curve(test_label, score, pos_label=-1)
             return metrics.auc(fprs, tprs)
@@ -36,7 +36,8 @@ class AUPRC(Metrics):
         super().__init__(target_label, unique_anomaly)
 
     def __call__(self, score, test_label):
-        score, test_label = super().__call__(score, test_label)
+        test_label = super().__call__(test_label)
+        score = ((score - score.min(axis=0))/(score.max(axis=0) - score.min(axis=0)))
         try:
             precision, recall, _ = metrics.precision_recall_curve(test_label, score, pos_label=-1)
             return metrics.auc(recall, precision)
@@ -48,7 +49,7 @@ class F1(Metrics):
         super().__init__(target_label, unique_anomaly)
 
     def __call__(self, score, test_label, threshold):
-        score, test_label = super().__call__(score, test_label)
+        test_label = super().__call__(test_label)
         try:
             pred = score > threshold
             pred = pred.astype(int)
@@ -71,6 +72,7 @@ def classification_report(score, test_label, threshold, target_label=0, unique_a
         pred = pred.astype(int)
         pred[pred==1] = -1
         pred[pred==0] = 1
-        return metrics.classification_report(test_label, pred, [1, -1], ['Normal', 'Anomaly'])
+        print(metrics.confusion_matrix(test_label, pred, [-1, 1]))
+        return metrics.classification_report(test_label, pred, [-1, 1], ['Anomaly', 'Normal'])
     except Exception as e:
         print(e)
