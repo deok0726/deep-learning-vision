@@ -8,7 +8,7 @@ import argument_parser as parser
 from main.trainers.trainer import Trainer
 from main.testers.tester import Tester
 from data_loader import DataLoader
-from modules import custom_metrics
+from modules import custom_metrics, custom_losses
 from modules.utils import AverageMeter
 
 
@@ -18,6 +18,8 @@ def load_loss(losses_name):
         losses_dict['MSE'] = torch.nn.MSELoss(reduction='none') # l2 loss
     if 'L1' in losses_name:
         losses_dict['L1'] = torch.nn.L1Loss(reduction='none') # l1 loss
+    if 'SSIM' in losses_name:
+        losses_dict['SSIM'] = custom_losses.SSIM(args.normalize, args.channel_num) # l1 loss
     return losses_dict
 
 def load_model(args):
@@ -147,6 +149,7 @@ if __name__ == '__main__':
 
     # losses
     losses_dict = load_loss([
+        'SSIM'
         # 'MSE', 
         # 'L1'
         ])
@@ -154,7 +157,8 @@ if __name__ == '__main__':
     # metrics
     metrics_dict = dict(
         MSE = torch.nn.MSELoss(reduction='none'),
-        L1 = torch.nn.L1Loss(reduction='none')
+        L1 = torch.nn.L1Loss(reduction='none'),
+        SSIM = custom_losses.SSIM(args.normalize, args.channel_num) # l1 loss
     )
     
     # optimizer
