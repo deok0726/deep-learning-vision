@@ -13,27 +13,30 @@ class DataLoader:
     def __init__(self, args):
         source_transform_list = self._get_transform(args, is_target=False)
         target_transform_list = self._get_transform(args, is_target=True)
-        train_dataset, valid_dataset, test_dataset = self._get_datasets(args, source_transform=source_transform_list, target_transform=target_transform_list)
+        train_dataset, valid_dataset, test_dataset, test_threshold_dataset = self._get_datasets(args, source_transform=source_transform_list, target_transform=target_transform_list)
         sample_train_data = train_dataset.__getitem__(np.random.randint(train_dataset.__len__()))[0]
         _, args.input_height, args.input_width = sample_train_data.shape
         self.sample_train_data = sample_train_data.unsqueeze(0)
         self.train_data_loader = self._get_data_loader(args, train_dataset, args.train_batch_size)
         self.valid_data_loader = self._get_data_loader(args, valid_dataset, args.train_batch_size)
         self.test_data_loader = self._get_data_loader(args, test_dataset, args.test_batch_size)
+        self.test_threshold_data_loader = self._get_data_loader(args, test_threshold_dataset, args.test_batch_size)
         print("train data size: ", len(self.train_data_loader)*args.train_batch_size)
         print("valid data size: ", len(self.valid_data_loader)*args.train_batch_size)
         print("test data size: ", len(self.test_data_loader)*args.test_batch_size)
+        print("test threshold data size: ", len(self.test_threshold_data_loader)*args.test_batch_size)
 
     def _get_datasets(self, args, source_transform, target_transform):
+        test_threshold_dataset = None
         if args.dataset_name == 'MNIST':
             train_dataset = MNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
             test_dataset = MNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
-            train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
+            train_dataset, valid_dataset, test_dataset, test_threshold_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'FMNIST':
             train_dataset = FashionMNIST(root=args.dataset_root, train=True, download=True, transform=source_transform, target_transform=target_transform)
             test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=source_transform, target_transform=target_transform)
             # test_dataset = FashionMNIST(root=args.dataset_root, train=False, download=True, transform=transforms.ToTensor(), target_transform=target_transform)
-            train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
+            train_dataset, valid_dataset, test_dataset, test_threshold_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         elif args.dataset_name == 'MvTec':
             train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
             # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
@@ -48,6 +51,9 @@ class DataLoader:
             train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
             valid_length = len(train_dataset) - train_length
             train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
+            test_threshold_length = int(len(test_dataset) * args.test_threshold_ratio)
+            test_except_threshold_length = len(test_dataset) - test_threshold_length
+            test_dataset, test_threshold_dataset= torch.utils.data.random_split(test_dataset, [test_except_threshold_length, test_threshold_length])
         elif args.dataset_name == 'GMS':
             train_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform, args=args)
             # test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform, args=args)
@@ -55,10 +61,13 @@ class DataLoader:
                 transforms.Resize(args.resize_size),
                 transforms.ToTensor(), 
                 transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform, args=args)
-            train_dataset, valid_dataset, test_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
+            train_dataset, valid_dataset, test_dataset, test_threshold_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         else:
             raise Exception('Wrong dataset name')
-        return train_dataset, valid_dataset, test_dataset
+        if test_threshold_dataset is not None:
+            return train_dataset, valid_dataset, test_dataset, test_threshold_dataset
+        else:
+            return train_dataset, valid_dataset, test_dataset
     
     def _preprocess_to_anomaly_detection_dataset(self, args, original_train_dataset, original_test_dataset):
         # Divide normal data according to the ratio of training set: validation set: test set
@@ -68,7 +77,7 @@ class DataLoader:
         total_ratio = args.train_ratio + args.valid_ratio + args.test_ratio
         train_ratio = args.train_ratio / total_ratio
         valid_ratio = args.valid_ratio / total_ratio
-        test_ratio = args.test_ratio / total_ratio
+        # test_ratio = args.test_ratio / total_ratio
         data = torch.cat((original_train_dataset.data, original_test_dataset.data))
         targets = torch.cat((original_train_dataset.targets, original_test_dataset.targets))
         # ============================================================================= #
@@ -123,12 +132,24 @@ class DataLoader:
         test_data = torch.cat((test_data, anomaly_data), 0)
         test_targets = torch.cat((test_targets, anomaly_targets), 0)
         # ================================================================== #
-        #                           5. make dataset                          #
+        #    5. split test data to threshold test dataset and test dataset   #
+        # ================================================================== #
+        if args.shuffle:
+            test_idx = np.random.permutation(test_data.shape[0])
+            test_data = test_data[test_idx]
+            test_targets = test_targets[test_idx]
+        test_threshold_length = int(len(test_data) * args.test_threshold_ratio)
+        test_except_threshold_length = test_data.shape[0] - test_threshold_length
+        test_threshold_data, test_data = torch.split(test_data, [test_threshold_length, test_except_threshold_length])
+        test_threshold_targets, test_targets = torch.split(test_targets, [test_threshold_length, test_except_threshold_length])
+        # ================================================================== #
+        #                           6. make dataset                          #
         # ================================================================== #
         train_dataset = customTensorDataset(train_data, train_targets, original_train_dataset.transform, original_train_dataset.target_transform)
         valid_dataset = customTensorDataset(valid_data, valid_targets, original_test_dataset.transform, original_test_dataset.target_transform)
         test_dataset = customTensorDataset(test_data, test_targets, original_test_dataset.transform, original_test_dataset.target_transform)
-        return train_dataset, valid_dataset, test_dataset
+        test_threshold_dataset = customTensorDataset(test_threshold_data, test_threshold_targets, original_test_dataset.transform, original_test_dataset.target_transform)
+        return train_dataset, valid_dataset, test_dataset, test_threshold_dataset
 
     def _get_data_loader(self, args, dataset, batch_size):
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=args.shuffle, num_workers=args.num_workers, drop_last=True)
@@ -203,11 +224,11 @@ class ImageDatasetPreLoadImages(torch.utils.data.Dataset):
             images_in_folder = sorted(os.listdir(folder_path))
             if args.resize:
                 self.data.extend([
-                    torch.tensor(np.asarray(Image.open(os.path.join(folder_path, image)).resize((args.resize_size, args.resize_size))))
+                    torch.from_numpy(np.array(Image.open(os.path.join(folder_path, image)).resize((args.resize_size, args.resize_size))))
                     for image in images_in_folder])
             else:
                 self.data.extend([
-                    torch.tensor(np.asarray(Image.open(os.path.join(folder_path, image))))
+                    torch.from_numpy(np.array(Image.open(os.path.join(folder_path, image))))
                     for image in images_in_folder])
             if folder == 'good':
                 self.targets.extend(torch.tensor([0]*len(images_in_folder)))

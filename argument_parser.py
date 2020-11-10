@@ -23,7 +23,7 @@ parser.add_argument('--unique_anomaly', action='store_true', default=False, help
 parser.add_argument('--reproducibility', action='store_true', default=False, help="Reproducibility On")
 parser.add_argument('--save_result_images', action='store_true', default=False, help="saving result images")
 parser.add_argument('--save_embedding', action='store_true', default=False, help="saving embedding")
-parser.add_argument('--anomaly_threshold', type=float, default=0.3, help="anomaly threshold")
+parser.add_argument('--anomaly_threshold', type=float, default=0.01, help="anomaly threshold")
 
 # data loader
 parser.add_argument('--dataset_name', type=str, default='MNIST', help="dataset name")
@@ -43,6 +43,7 @@ parser.add_argument('--resize_size', type=int, default=300, help="Cropped image 
 parser.add_argument('--train_ratio', type=float, default=0.6, help="training dataset ratio")
 parser.add_argument('--valid_ratio', type=float, default=0.3, help="validation dataset ratio")
 parser.add_argument('--test_ratio', type=float, default=0.1, help="test dataset ratio")
+parser.add_argument('--test_threshold_ratio', type=float, default=0.2, help="test dataset ratio to determine anomaly threshold")
 parser.add_argument('--anomaly_ratio', type=float, default=0.3, help="anomaly data ratio")
 
 # save

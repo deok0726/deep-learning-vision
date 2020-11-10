@@ -170,5 +170,6 @@ if __name__ == '__main__':
         metrics_dict['AUROC'] = custom_metrics.AUROC(args.target_label, args.unique_anomaly)
         metrics_dict['AUPRC'] = custom_metrics.AUPRC(args.target_label, args.unique_anomaly)
         metrics_dict['F1'] = custom_metrics.F1(args.target_label, args.unique_anomaly)
+        metrics_dict['Recall'] = custom_metrics.Recall(args.target_label, args.unique_anomaly)
         tester = load_tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
         tester.test()
