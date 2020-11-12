@@ -1,20 +1,29 @@
 import os
 import argparse
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--obj', default='screw')
+parser.add_argument('--mvtec', default="True", type=str2bool)
 args = parser.parse_args()
 
+print(args)
 
-def do_evaluate_encoder_multiK(obj):
+def do_evaluate_encoder_multiK(obj, mvtec):
     from codes.inspection import eval_encoder_NN_multiK
     from codes.networks import EncoderHier
 
     enc = EncoderHier(K=64, D=64).cuda()
     enc.load(obj)
     enc.eval()
-    results = eval_encoder_NN_multiK(enc, obj)
+    results = eval_encoder_NN_multiK(enc, obj, mvtec)
 
     det_64 = results['det_64']
     seg_64 = results['seg_64']
@@ -36,7 +45,7 @@ def do_evaluate_encoder_multiK(obj):
 
 
 def main():
-    do_evaluate_encoder_multiK(args.obj)
+    do_evaluate_encoder_multiK(args.obj, args.mvtec)
 
 
 if __name__ == '__main__':

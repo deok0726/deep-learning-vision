@@ -5,18 +5,16 @@ from glob import glob
 from sklearn.metrics import roc_auc_score
 import os
 import sys
+import random
+from pathlib import Path
 
-
-DATASET_PATH = '/hd/mvtec/'
-
+DATASET_PATH = '/hd/gms/'
 
 __all__ = ['objs', 'set_root_path',
            'get_x', 'get_x_standardized',
            'detection_auroc', 'segmentation_auroc']
 
-objs = ['bottle', 'cable', 'capsule', 'carpet', 'grid', 'hazelnut',
-        'leather', 'metal_nut', 'pill', 'screw', 'tile', 'toothbrush',
-        'transistor', 'wood', 'zipper']
+objs = ['circle_hole', 'rect_hole']
 
 
 def resize(image, shape=(256, 256)):
@@ -60,14 +58,22 @@ def get_x(obj, mode='train'):
         images = np.concatenate([images1, images2])
 
     else:
+        # random.shuffle(fpaths)
+        # test_files = fpaths[:int(len(fpaths)*0.1)]
+        # print('Num of good test_files :', len(test_files))
+        # for f in test_files:
+        #     Path(f).rename(os.path.join(f'/hd/gms/{obj}/test/good/', os.path.basename(f)))
+        # train_files = fpaths[int(len(fpaths)*0.1):]
+        # print('Num of train_files :', len(train_files))
+        # sys.exit()
         images = np.asarray(list(map(imread, fpaths)))
 
-    if images.shape[-1] != 3:
-        images = gray2rgb(images)
+    # if images.shape[-1] != 3:
+    #     print(images.shape)
+    #     print('Change gray to rgb')
+    #     images = gray2rgb(images)
     images = list(map(resize, images))
     images = np.asarray(images)
-    print(images.shape)
-    sys.exit()
     return images
 
 

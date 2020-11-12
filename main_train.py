@@ -1,13 +1,24 @@
 import os
+import sys
 import argparse
 import torch
 from codes import mvtecad
+from codes import gms
 from functools import reduce
 from torch.utils.data import DataLoader
 from codes.datasets import *
 from codes.networks import *
 from codes.inspection import eval_encoder_NN_multiK
 from codes.utils import *
+from tensorboardX import SummaryWriter
+
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
 
@@ -18,14 +29,18 @@ parser.add_argument('--D', default=64, type=int)
 parser.add_argument('--epochs', default=300, type=int)
 parser.add_argument('--lr', default=1e-4, type=float)
 
-args = parser.parse_args()
+parser.add_argument('--mvtec', default="True", type=str2bool)
 
+args = parser.parse_args()
+writer = SummaryWriter('runs/path_svdd_experiment_2')
 
 def train():
     obj = args.obj
     D = args.D
     lr = args.lr
-        
+    mvtec = args.mvtec
+    print(args)
+    
     with task('Networks'):
         enc = EncoderHier(64, D).cuda()
         cls_64 = PositionClassifier(64, D).cuda()
@@ -38,8 +53,13 @@ def train():
         opt = torch.optim.Adam(params=params, lr=lr)
 
     with task('Datasets'):
-        train_x = mvtecad.get_x_standardized(obj, mode='train')
-        train_x = NHWC2NCHW(train_x)
+        if mvtec:
+            train_x = mvtecad.get_x_standardized(obj, mode='train')
+            train_x = NHWC2NCHW(train_x)
+        
+        else:
+            train_x = gms.get_x_standardized(obj, mode='train')
+            train_x = NHWC2NCHW(train_x)
 
         rep = 100
         datasets = dict()
@@ -53,6 +73,7 @@ def train():
         loader = DataLoader(dataset, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
 
     print('Start training')
+    loss = 0
     for i_epoch in range(args.epochs):
         print(i_epoch+1, "/", args.epochs)
         if i_epoch != 0:
@@ -72,8 +93,12 @@ def train():
 
                 loss.backward()
                 opt.step()
+            
+            # for vd in valid_loader:
+                
 
-        aurocs = eval_encoder_NN_multiK(enc, obj)
+        writer.add_scalar('training_loss', loss, i_epoch)
+        aurocs = eval_encoder_NN_multiK(enc, obj, mvtec)
         log_result(obj, aurocs)
         enc.save(obj)
 
