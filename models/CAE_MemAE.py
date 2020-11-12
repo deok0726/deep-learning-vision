@@ -56,24 +56,26 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.conv1 = nn.Conv2d(image_channel_num, conv_channel_num, kernel_size=1,stride=2, padding=1)
         self.bn1 = nn.BatchNorm2d(conv_channel_num)
-        self.relu = nn.ReLU()
+        self.relu1 = nn.ReLU()
         self.conv2 = nn.Conv2d(conv_channel_num, conv_channel_num*2, kernel_size=3,stride=2, padding=1)
         self.bn2 = nn.BatchNorm2d(conv_channel_num*2)
+        self.relu2 = nn.ReLU()
         self.conv3 = nn.Conv2d(conv_channel_num*2, conv_channel_num*4, kernel_size=3,stride=2, padding=1)
         self.bn3 = nn.BatchNorm2d(conv_channel_num*4)
+        self.relu3 = nn.ReLU()
     
     def forward(self, x):
         x = self.conv1(x)
         x = self.bn1(x)
-        x = self.relu(x)
+        x = self.relu1(x)
 
         x = self.conv2(x)
         x = self.bn2(x)
-        x = self.relu(x)
+        x = self.relu2(x)
 
         x = self.conv3(x)
         x = self.bn3(x)
-        x = self.relu(x)
+        x = self.relu3(x)
         return x
 
 class Decoder(nn.Module):

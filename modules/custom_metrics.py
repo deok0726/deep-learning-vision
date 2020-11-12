@@ -1,5 +1,6 @@
 from sklearn import metrics
 from torchvision.transforms.functional import normalize
+import torch
 
 class Metrics(object):
     def __init__(self, target_label, unique_anomaly):
@@ -92,7 +93,7 @@ def confusion_matrix(score, test_label, threshold, target_label=0, unique_anomal
     except Exception as e:
         print(e)
 
-def classification_report(score, test_label, threshold, target_label=0, unique_anomaly=False):
+def classification_report(score, test_label, threshold, target_label, unique_anomaly=False):
     try:
         if(unique_anomaly):
             test_label[test_label == target_label] = -1
@@ -108,3 +109,19 @@ def classification_report(score, test_label, threshold, target_label=0, unique_a
         return metrics.classification_report(test_label, pred, [-1, 1], ['Anomaly', 'Normal'])
     except Exception as e:
         print(e)
+
+def rapp_criterion(x, x_tilde, layers):
+    # TBD: model multiple name same activation or sequential
+    diffs = []
+    output_diff = (x_tilde - x)**2
+    output_diff = output_diff.mean((1,2,3))
+    diffs.append(output_diff)
+    for layer in layers:
+        x = layer(x)
+        x_tilde = layer(x_tilde)
+        diff = (x_tilde-x)**2
+        diff = diff.mean((1,2,3))
+        diffs.append(diff)
+    diffs = torch.stack(diffs)
+    diffs = diffs.mean(0)
+    return diffs

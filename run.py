@@ -32,18 +32,6 @@ def load_model(args):
                 model = Model(in_channels=3, out_channels=3, bilinear=False).to(DEVICE, dtype=torch.float)
         else:
             model = Model(in_channels=1, out_channels=1, bilinear=False).to(DEVICE, dtype=torch.float)
-        # x = torch.rand(1,1,300,300).to(DEVICE, dtype=torch.float)
-        # _children = model.children()
-        # for layer in _children:
-        #     print(layer)
-        #     x = layer(x)
-        #     print(x.shape)
-        # _modules = model.modules()
-        # for layer in _modules:
-        #     print(layer)
-        #     x = layer(x)
-        #     print(x.shape)
-        # print('test')
     elif args.model_name=='MemAE':
         from models.CAE_MemAE import Model
         model = Model(args.channel_num, args.input_height, args.input_width).to(DEVICE, dtype=torch.float)
@@ -145,11 +133,21 @@ if __name__ == '__main__':
 
     # Load Model
     model = load_model(args)
-    
+
+    # TBD: model multiple name same activation or sequential
+    # x = torch.rand(1,args.channel_num,28,28).to(DEVICE, dtype=torch.float)
+    # x_tilde = model(x)
+    # x_tilde = getattr(x_tilde ,'output')
+    # _children = model.encoder.children()
+    # print(len(_children))
+    # for layer in _children:
+    #     x = layer(x)
+    #     x_tilde = layer(x_tilde)
+    #     print((x_tilde-x).mean())
 
     # losses
     losses_dict = load_loss([
-        'SSIM'
+        # 'SSIM'
         # 'MSE', 
         # 'L1'
         ])

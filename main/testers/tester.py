@@ -126,6 +126,7 @@ class Tester:
         self.TEST_RESULTS_SAVE_DIR = os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'test_results')
         self.TIMEZONE = datetime.timezone(datetime.timedelta(hours=9))
         self.TEST_LOG_INTERVAL = ceil(len(self.dataloader.test_data_loader) / 10)
+        self.ANOMALY_CRITERION = torch.nn.L1Loss(reduction='none')
         if self.args.channel_num == 1:
             self.one_channel = True
         else:

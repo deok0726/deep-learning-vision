@@ -31,7 +31,7 @@ class ARNetTester(Tester):
                 no_vflip = lambda x: x,
                 vflip = torchvision.transforms.functional.vflip
             )
-        self.anomaly_criterion = torch.nn.L1Loss(reduction='none')
+        self.ANOMALY_CRITERION = torch.nn.L1Loss(reduction='none')
         self.transform_avg_diff = None
     
     def test(self):
@@ -114,7 +114,7 @@ class ARNetTester(Tester):
         output_data = output_data.squeeze(1)
         output_data = output_data.to(self.device)
         
-        batch_diff_per_batch = self.anomaly_criterion(original_batch_data, output_data)
+        batch_diff_per_batch = self.ANOMALY_CRITERION(original_batch_data, output_data)
         transform_indexes = [0]*t
         transform_avg_diff = torch.zeros(t)
         for i in range(t):
@@ -129,7 +129,7 @@ class ARNetTester(Tester):
         # batch_data = batch_data.to(self.device)
         # with torch.no_grad():
         #     output_data = self.model(batch_data)
-        # batch_diff_per_batch = self.anomaly_criterion(batch_data, output_data)
+        # batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data)
         # batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
 
         original_batch_data = []
@@ -201,7 +201,7 @@ class ARNetTester(Tester):
                 output_data_all.append(output_data)
         output_data = torch.stack(output_data_all, dim=0).squeeze(1)
         output_data = output_data.to(self.device)
-        batch_diff_per_batch = self.anomaly_criterion(original_batch_data, output_data) # l1
+        batch_diff_per_batch = self.ANOMALY_CRITERION(original_batch_data, output_data) # l1
         batch_diff_per_batch_avg = torch.zeros(b)
         transform_indexes = [0]*t
         for i in range(t):
@@ -300,7 +300,7 @@ class ARNetTester(Tester):
         for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
             total_loss_per_batch += loss_per_batch.mean()
         self.test_losses_per_epoch['total_loss'].update(total_loss_per_batch.item())
-        batch_diff_per_batch = self.anomaly_criterion(original_batch_data, output_data) # l1
+        batch_diff_per_batch = self.ANOMALY_CRITERION(original_batch_data, output_data) # l1
         batch_diff_per_batch_avg = torch.zeros(b)
         transform_indexes = [0]*t
         for i in range(t):
@@ -334,7 +334,7 @@ class ARNetTester(Tester):
                 self.test_metrics_per_epoch['AUPRC'].update(metric_value)
             if self.args.anomaly_threshold:
                 print(confusion_matrix(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold, self.args.target_label, self.args.unique_anomaly))
-                print(classification_report(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold), self.args.target_label, self.args.unique_anomaly)
+                print(classification_report(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold, self.args.target_label, self.args.unique_anomaly))
                 if "F1" in self.metric_funcs.keys():
                     metric_value = self.metric_funcs['F1'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold)
                     self.metrics_per_batch['F1'] = metric_value

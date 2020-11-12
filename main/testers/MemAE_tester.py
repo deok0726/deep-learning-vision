@@ -1,5 +1,5 @@
 from modules.utils import AverageMeter
-from modules.custom_metrics import classification_report, confusion_matrix
+from modules.custom_metrics import classification_report, confusion_matrix, rapp_criterion
 from main.testers.tester import Tester
 import time
 import torch
@@ -8,14 +8,16 @@ import numpy as np
 class MemAETester(Tester):
     def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
         super().__init__(args, dataloader, model, optimizer, loss_funcs, metric_funcs, device)
+        self.ANOMALY_CRITERION = rapp_criterion
     
     def _get_valid_residuals(self, batch_data):
         batch_data = batch_data.to(self.device)
         with torch.no_grad():
             output_data = self.model(batch_data)
             output_data = getattr(output_data ,'output')
-        batch_diff_per_batch = (batch_data - output_data) ** 2
-        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
+        batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data, self.model.encoder.children())
+        # batch_diff_per_batch = (batch_data - output_data) ** 2
+        # batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         if max(batch_diff_per_batch) > self.max_residual:
             self.max_residual = max(batch_diff_per_batch)
     
@@ -24,8 +26,9 @@ class MemAETester(Tester):
         with torch.no_grad():
             output_data = self.model(batch_data)
             output_data = getattr(output_data ,'output')
-        batch_diff_per_batch = (batch_data - output_data) ** 2
-        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
+        batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data, self.model.encoder.children())
+        # batch_diff_per_batch = (batch_data - output_data) ** 2
+        # batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         self.diffs_per_data_threshold.extend(batch_diff_per_batch.cpu().detach().numpy())
         self.labels_per_data_threshold.extend(batch_label.cpu().detach().numpy())
 
@@ -73,8 +76,9 @@ class MemAETester(Tester):
         for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
             total_loss_per_batch += loss_per_batch.mean()
         self.test_losses_per_epoch['total_loss'].update(total_loss_per_batch.item())
-        batch_diff_per_batch = (batch_data - output_data) ** 2
-        batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
+        batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data, self.model.encoder.children())
+        # batch_diff_per_batch = (batch_data - output_data) ** 2
+        # batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         self.diffs_per_data.extend(batch_diff_per_batch.cpu().detach().numpy())
         self.labels_per_data.extend(batch_label.cpu().detach().numpy())
         self.embedding_per_data.extend(embedding.view(output_data.shape[0], -1).cpu().detach())
@@ -99,7 +103,7 @@ class MemAETester(Tester):
                 self.test_metrics_per_epoch['AUPRC'].update(metric_value)
             if self.args.anomaly_threshold:
                 print(confusion_matrix(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold, self.args.target_label, self.args.unique_anomaly))
-                print(classification_report(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold), self.args.target_label, self.args.unique_anomaly)
+                print(classification_report(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold, self.args.target_label, self.args.unique_anomaly))
                 if "F1" in self.metric_funcs.keys():
                     metric_value = self.metric_funcs['F1'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold)
                     self.metrics_per_batch['F1'] = metric_value

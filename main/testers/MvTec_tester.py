@@ -55,7 +55,7 @@ class MvTecTester(Tester):
                 self.test_metrics_per_epoch['AUPRC'].update(metric_value)
             if self.args.anomaly_threshold:
                 print(confusion_matrix(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold, self.args.target_label, self.args.unique_anomaly))
-                print(classification_report(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold), self.args.target_label, self.args.unique_anomaly)
+                print(classification_report(np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold, self.args.target_label, self.args.unique_anomaly))
                 if "F1" in self.metric_funcs.keys():
                     metric_value = self.metric_funcs['F1'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data), self.args.anomaly_threshold)
                     self.metrics_per_batch['F1'] = metric_value
