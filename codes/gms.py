@@ -58,6 +58,8 @@ def get_x(obj, mode='train'):
         images = np.concatenate([images1, images2])
 
     else:
+        # train : valid : test = 6 : 3 : 1
+
         # random.shuffle(fpaths)
         # test_files = fpaths[:int(len(fpaths)*0.1)]
         # print('Num of good test_files :', len(test_files))
@@ -66,6 +68,16 @@ def get_x(obj, mode='train'):
         # train_files = fpaths[int(len(fpaths)*0.1):]
         # print('Num of train_files :', len(train_files))
         # sys.exit()
+
+        # random.shuffle(fpaths)
+        # valid_files = fpaths[:672] 
+        # print('Num of valid_files :', len(valid_files))
+        # for f in valid_files:
+        #     Path(f).rename(os.path.join(f'/hd/gms/{obj}/valid/good/', os.path.basename(f)))
+        # train_files = fpaths[672:]
+        # print('Num of train_files :', len(train_files))
+        # sys.exit()
+        
         images = np.asarray(list(map(imread, fpaths)))
 
     # if images.shape[-1] != 3:

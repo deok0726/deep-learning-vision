@@ -32,7 +32,6 @@ parser.add_argument('--lr', default=1e-4, type=float)
 parser.add_argument('--mvtec', default="True", type=str2bool)
 
 args = parser.parse_args()
-writer = SummaryWriter('runs/path_svdd_experiment_2')
 
 def train():
     obj = args.obj
@@ -41,6 +40,11 @@ def train():
     mvtec = args.mvtec
     print(args)
     
+    if mvtec:
+        writer = SummaryWriter('runs/mvtec_experiment')
+    else:
+        writer = SummaryWriter('runs/gms_experiment')
+
     with task('Networks'):
         enc = EncoderHier(64, D).cuda()
         cls_64 = PositionClassifier(64, D).cuda()
@@ -56,51 +60,79 @@ def train():
         if mvtec:
             train_x = mvtecad.get_x_standardized(obj, mode='train')
             train_x = NHWC2NCHW(train_x)
+            # valid_x = mvtecad.get_x_standardized(obj, mode='valid')
+            # valid_x = NHWC2NCHW(train_x)
         
         else:
             train_x = gms.get_x_standardized(obj, mode='train')
             train_x = NHWC2NCHW(train_x)
+            valid_x = gms.get_x_standardized(obj, mode='valid')
+            valid_x = NHWC2NCHW(valid_x)
 
         rep = 100
         datasets = dict()
         datasets[f'pos_64'] = PositionDataset(train_x, K=64, repeat=rep)
         datasets[f'pos_32'] = PositionDataset(train_x, K=32, repeat=rep)
-        
         datasets[f'svdd_64'] = SVDD_Dataset(train_x, K=64, repeat=rep)
         datasets[f'svdd_32'] = SVDD_Dataset(train_x, K=32, repeat=rep)
 
+        datasets_val = dict()
+        datasets_val[f'pos_64'] = PositionDataset(valid_x, K=64, repeat=rep)
+        datasets_val[f'pos_32'] = PositionDataset(valid_x, K=32, repeat=rep)
+        datasets_val[f'svdd_64'] = SVDD_Dataset(valid_x, K=64, repeat=rep)
+        datasets_val[f'svdd_32'] = SVDD_Dataset(valid_x, K=32, repeat=rep)
+
         dataset = DictionaryConcatDataset(datasets)
+        dataset_val = DictionaryConcatDataset(datasets_val)
         loader = DataLoader(dataset, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
+        loader_val = DataLoader(dataset_val, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
 
     print('Start training')
     loss = 0
+    loss_val = 0
     for i_epoch in range(args.epochs):
         print(i_epoch+1, "/", args.epochs)
-        if i_epoch != 0:
-            for module in modules:
-                module.train()
+        for module in modules:
+            module.train()
 
-            for d in loader:
-                d = to_device(d, 'cuda', non_blocking=True)
-                opt.zero_grad()
+        for d in loader:
+            d = to_device(d, 'cuda', non_blocking=True)
+            opt.zero_grad()
 
-                loss_pos_64 = PositionClassifier.infer(cls_64, enc, d['pos_64'])
-                loss_pos_32 = PositionClassifier.infer(cls_32, enc.enc, d['pos_32'])
-                loss_svdd_64 = SVDD_Dataset.infer(enc, d['svdd_64'])
-                loss_svdd_32 = SVDD_Dataset.infer(enc.enc, d['svdd_32'])
+            loss_pos_64 = PositionClassifier.infer(cls_64, enc, d['pos_64'])
+            loss_pos_32 = PositionClassifier.infer(cls_32, enc.enc, d['pos_32'])
+            loss_svdd_64 = SVDD_Dataset.infer(enc, d['svdd_64'])
+            loss_svdd_32 = SVDD_Dataset.infer(enc.enc, d['svdd_32'])
 
-                loss = loss_pos_64 + loss_pos_32 + args.lambda_value * (loss_svdd_64 + loss_svdd_32)
+            loss = loss_pos_64 + loss_pos_32 + args.lambda_value * (loss_svdd_64 + loss_svdd_32)
 
-                loss.backward()
-                opt.step()
+            loss.backward()
+            opt.step()
             
-            # for vd in valid_loader:
-                
+        for module in modules:
+            module.eval()
+        
+        for vd in loader_val:
+            vd = to_device(vd, 'cuda', non_blocking=True)
+            
+            with torch.no_grad():
+                loss_pos_64 = PositionClassifier.infer(cls_64, enc, vd['pos_64'])
+                loss_pos_32 = PositionClassifier.infer(cls_32, enc.enc, vd['pos_32'])
+                loss_svdd_64 = SVDD_Dataset.infer(enc, vd['svdd_64'])
+                loss_svdd_32 = SVDD_Dataset.infer(enc.enc, vd['svdd_32'])
 
-        writer.add_scalar('training_loss', loss, i_epoch)
+            loss_val = loss_pos_64 + loss_pos_32 + args.lambda_value * (loss_svdd_64 + loss_svdd_32)
+    
+        if mvtec:
+            writer.add_scalar('training_loss', loss, i_epoch)
+        else:
+            writer.add_scalar('training_loss', loss, i_epoch)
+            writer.add_scalar('validation_loss', loss_val, i_epoch)
+
         aurocs = eval_encoder_NN_multiK(enc, obj, mvtec)
         log_result(obj, aurocs)
         enc.save(obj)
+    writer.close()
 
 
 def log_result(obj, aurocs):

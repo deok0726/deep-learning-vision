@@ -66,8 +66,7 @@ def get_x(obj, mode='train'):
         images = gray2rgb(images)
     images = list(map(resize, images))
     images = np.asarray(images)
-    print(images.shape)
-    sys.exit()
+    
     return images
 
 
