@@ -7,26 +7,28 @@ from collections import namedtuple
 
 # Refer to https://github.com/h19920918/memae/blob/master/model.py
 class Model(nn.Module):
-    def __init__(self, n_channels, mem_dim=100):
+    def __init__(self, n_channels, input_height, input_width, mem_dim=100):
         super(Model, self).__init__()
         self.conv_channel_num = 16
-        self.input_h = 4
-        self.input_w = 4
-        # self.input_h = 88
-        # self.input_w = 88
         self.encoder = Encoder(n_channels, self.conv_channel_num)
         self.decoder = Decoder(n_channels, self.conv_channel_num)
+        temp_encoder_output = self.encoder.forward(torch.rand(1, n_channels, input_height, input_width))
+        self.input_h = temp_encoder_output.shape[-2]
+        self.input_w = temp_encoder_output.shape[-1]
         self.memory_module = MemoryModule(mem_dim=mem_dim, fea_dim=self.conv_channel_num*4, input_h=self.input_h, input_w=self.input_w)
+        # self.memory_module = MemoryModule(mem_dim=mem_dim, fea_dim=self.conv_channel_num*4, input_h=self.input_h, input_w=self.input_w)
         self.rec_criterion = nn.MSELoss(reduction='none')
-        self.return_values = namedtuple("return_values", 'output mem_weight')
+        self.return_values = namedtuple("return_values", 'output mem_weight embedding')
 
     def forward(self, x):
         z = self.encoder(x)
         f = self.memory_module(z)        
         mem_weight = f['mem_weight']
+        embedding = f['output'].view(-1, self.conv_channel_num*4, self.input_h, self.input_w)
         # output = self.decoder(z)
-        output = self.decoder(f['output'].view(-1, self.conv_channel_num*4, self.input_h, self.input_w))
-        return self.return_values(output, mem_weight)
+        # output = self.decoder(f['output'].view(-1, self.conv_channel_num*4, self.input_h, self.input_w))
+        output = self.decoder(embedding)
+        return self.return_values(output, mem_weight, embedding)
         # return output
     
     def get_losses_name(self):
@@ -54,24 +56,26 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.conv1 = nn.Conv2d(image_channel_num, conv_channel_num, kernel_size=1,stride=2, padding=1)
         self.bn1 = nn.BatchNorm2d(conv_channel_num)
-        self.relu = nn.ReLU()
+        self.relu1 = nn.ReLU()
         self.conv2 = nn.Conv2d(conv_channel_num, conv_channel_num*2, kernel_size=3,stride=2, padding=1)
         self.bn2 = nn.BatchNorm2d(conv_channel_num*2)
+        self.relu2 = nn.ReLU()
         self.conv3 = nn.Conv2d(conv_channel_num*2, conv_channel_num*4, kernel_size=3,stride=2, padding=1)
         self.bn3 = nn.BatchNorm2d(conv_channel_num*4)
+        self.relu3 = nn.ReLU()
     
     def forward(self, x):
         x = self.conv1(x)
         x = self.bn1(x)
-        x = self.relu(x)
+        x = self.relu1(x)
 
         x = self.conv2(x)
         x = self.bn2(x)
-        x = self.relu(x)
+        x = self.relu2(x)
 
         x = self.conv3(x)
         x = self.bn3(x)
-        x = self.relu(x)
+        x = self.relu3(x)
         return x
 
 class Decoder(nn.Module):

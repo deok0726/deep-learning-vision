@@ -31,7 +31,7 @@ class AverageMeter(object):
 
 def matplotlib_imshow(img, one_channel=False, normalized=False, mean=0.5, std=0.5):
     if normalized:
-        img.mul_(std).add_(mean)
+        img = img.mul(std).add(mean)
     img = img.cpu()
     if one_channel:
         img = img.mean(dim=0)

@@ -31,8 +31,8 @@ class Trainer:
         self.epoch_idx = 0
         self._restore_checkpoint()
         self.global_step = self.epoch_idx*len(self.dataloader.train_data_loader)
-        # self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
-        # self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
         for epoch_idx in tqdm(range(self.args.num_epoch), desc='Train'):
             # ================================================================== #
             #                         training                                   #
@@ -70,7 +70,7 @@ class Trainer:
             self.epoch_idx += 1
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
-        self._log_hparams()
+        # self._log_hparams()
         self.tensorboard_writer_train.close()
         self.tensorboard_writer_valid.close()
 
@@ -110,7 +110,10 @@ class Trainer:
             loss_values = loss_func(batch_data, output_data)
             self.losses_per_batch[loss_func_name] = loss_values
             self.valid_losses_per_epoch[loss_func_name].update(loss_values.mean().item())
-        self.valid_losses_per_epoch['total_loss'].update(valid_losses_per_epoch.item())
+        total_loss_per_batch = 0
+        for idx, loss_per_batch in enumerate(self.losses_per_batch.values()):
+            total_loss_per_batch += loss_per_batch.mean()
+        self.valid_losses_per_epoch['total_loss'].update(total_loss_per_batch.item())
         for metric_func_name, metric_func in self.metric_funcs.items():
             metric_value = metric_func(batch_data, output_data)
             self.metrics_per_batch[metric_func_name] = metric_value
@@ -211,7 +214,6 @@ class Trainer:
                 losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
                 metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
-            # ax_output.set_title("Output\n" + "\n".join(losses) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_batch = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
             # if training_state == "train":
