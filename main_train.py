@@ -126,8 +126,7 @@ def train():
         if mvtec:
             writer.add_scalar('training_loss', loss, i_epoch)
         else:
-            writer.add_scalar('training_loss', loss, i_epoch)
-            writer.add_scalar('validation_loss', loss_val, i_epoch)
+            writer.add_scalars('training/validation_loss', {'training_loss' : loss, 'validation_loss' : loss_val}, i_epoch)
 
         aurocs = eval_encoder_NN_multiK(enc, obj, mvtec)
         log_result(obj, aurocs)
