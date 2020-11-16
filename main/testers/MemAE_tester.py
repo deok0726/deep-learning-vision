@@ -92,6 +92,9 @@ class MemAETester(Tester):
                 self.test_metrics_per_epoch[metric_func_name].update(metric_value.mean().item())
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
+        if self.args.save_result_images:
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, batch_diff_per_batch, 'input')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, batch_diff_per_batch, 'output')
         if self.batch_idx == len(self.dataloader.test_data_loader)-1:
             if "AUROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
@@ -115,9 +118,6 @@ class MemAETester(Tester):
             if self.args.save_embedding:
                 self.tensorboard_writer_test.add_embedding(torch.stack(self.embedding_per_data), self.labels_per_data, torch.stack(self.output_per_data), int(self.epoch_idx), 'embedding_vector')
             self._log_tensorboard(batch_data, batch_label, output_data, self.losses_per_batch, self.metrics_per_batch)
-        if self.args.save_result_images:
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, 'input')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, 'output')
 
     def _set_testing_variables(self):
         super()._set_testing_variables()

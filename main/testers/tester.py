@@ -28,15 +28,15 @@ class Tester:
         self.model.eval()
         self.end_time = time.time()
         print(len(self.dataloader.test_data_loader))
-        # # method 1 - using only validation dataset
-        # for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.valid_data_loader), total=len(self.dataloader.valid_data_loader), desc='Valid'):
-        #     self._get_valid_residuals(batch_data)
-        # if self.max_residual != 0:
-        #     self.args.anomaly_threshold = self.max_residual.item()
-        # method 2 - using small test dataset
-        for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_threshold_data_loader), total=len(self.dataloader.test_threshold_data_loader), desc='Test_Threshold'):
-            self._get_diffs_per_data_threshold(batch_data, batch_label)
-        self.args.anomaly_threshold = self._get_threshold(self.diffs_per_data_threshold, self.labels_per_data_threshold, self.thresholds_candidates, [self.metric_funcs['Recall'], self.metric_funcs['F1']])
+        # method 1 - using only validation dataset
+        for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.valid_data_loader), total=len(self.dataloader.valid_data_loader), desc='Valid'):
+            self._get_valid_residuals(batch_data)
+        if self.max_residual != 0:
+            self.args.anomaly_threshold = self.max_residual.item()
+        # # method 2 - using small test dataset
+        # for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_threshold_data_loader), total=len(self.dataloader.test_threshold_data_loader), desc='Test_Threshold'):
+        #     self._get_diffs_per_data_threshold(batch_data, batch_label)
+        # self.args.anomaly_threshold = self._get_threshold(self.diffs_per_data_threshold, self.labels_per_data_threshold, self.thresholds_candidates, [self.metric_funcs['Recall'], self.metric_funcs['F1']])
         for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_data_loader), total=len(self.dataloader.test_data_loader), desc='Test'):
             self.batch_idx = batch_idx
             self._test_step(batch_data, batch_label)
@@ -74,8 +74,8 @@ class Tester:
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
         if self.args.save_result_images:
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, 'input')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, 'output')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, batch_diff_per_batch, 'input')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, batch_diff_per_batch, 'output')
         if self.batch_idx == (len(self.dataloader.test_data_loader)-1):
             if "AUROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
@@ -236,14 +236,15 @@ class Tester:
         for metric_name, metric_value_per_epoch in self.test_metrics_per_epoch.items():
             print(metric_name, ": ", metric_value_per_epoch.avg)
     
-    def save_result_images(self, save_path, result_images, result_label, result_type=None):
+    def save_result_images(self, save_path, result_images, result_label, diff, result_type=None):
         for img_idx in range(result_label.shape[0]):
             image_path = os.path.join(save_path, str(self.batch_idx)+ '_' +str(img_idx))
             image_path = image_path + '_label_' + str(result_label[img_idx].item()) + '_' + result_type
             for loss_name, loss_value in self.losses_per_batch.items():
-                image_path = image_path + '_' + loss_name + '_' + str(loss_value.mean().item())
+                image_path = image_path + '_' + loss_name + '_' + str(loss_value[img_idx].mean().item())
             for metric_name, metric_value in self.metrics_per_batch.items():
-                image_path = image_path + '_' + metric_name + '_' + str(metric_value.mean().item())
+                image_path = image_path + '_' + metric_name + '_' + str(metric_value[img_idx].mean().item())
+            image_path = image_path + '_' + 'Anomaly_Criterion' + '_' + str(diff[img_idx].item())
             image_path += '.png'
             if self.args.normalize:
                 result_img = result_images[img_idx].detach().mul(0.5).add(0.5)
