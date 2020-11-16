@@ -34,7 +34,7 @@ def load_model(args):
             model = Model(in_channels=1, out_channels=1, bilinear=False).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MemAE':
         from models.CAE_MemAE import Model
-        model = Model(args.channel_num, args.input_height, args.input_width).to(DEVICE, dtype=torch.float)
+        model = Model(args.channel_num, args.input_height, args.input_width, args.memory_dimension).to(DEVICE, dtype=torch.float)
         # model = Model(n_channels=args.channel_num, mem_dim = 100).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MvTec':
         from models.CAE_MvTec import Model

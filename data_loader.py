@@ -56,11 +56,11 @@ class DataLoader:
             test_dataset, test_threshold_dataset= torch.utils.data.random_split(test_dataset, [test_except_threshold_length, test_threshold_length])
         elif args.dataset_name == 'GMS':
             train_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform, args=args)
-            test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform, args=args)
-            # test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=False, transform=transforms.Compose([
-            #     transforms.Resize(args.resize_size),
-            #     transforms.ToTensor(), 
-            #     transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform, args=args)
+            # test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform, args=args)
+            test_dataset = ImageDatasetPreLoadImages(root=args.dataset_root, train=False, transform=transforms.Compose([
+                transforms.Resize(args.resize_size),
+                transforms.ToTensor(), 
+                transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform, args=args)
             train_dataset, valid_dataset, test_dataset, test_threshold_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
         else:
             raise Exception('Wrong dataset name')
