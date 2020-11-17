@@ -58,23 +58,24 @@ def get_x(obj, mode='train'):
         images = np.concatenate([images1, images2])
 
     else:
+        # Use this code when split dataset into train, valid and test only once before training start
         # train : valid : test = 6 : 3 : 1
 
+        # num_test = int(len(fpaths)*0.1)
+        # num_valid = int(len(fpaths)*0.3)
         # random.shuffle(fpaths)
-        # test_files = fpaths[:int(len(fpaths)*0.1)]
-        # print('Num of good test_files :', len(test_files))
+
+        # test_files = fpaths[:num_test]
+        # print('Num of test_files :', len(test_files))
         # for f in test_files:
         #     Path(f).rename(os.path.join(f'/hd/gms/{obj}/test/good/', os.path.basename(f)))
-        # train_files = fpaths[int(len(fpaths)*0.1):]
-        # print('Num of train_files :', len(train_files))
-        # sys.exit()
-
-        # random.shuffle(fpaths)
-        # valid_files = fpaths[:672] 
+        
+        # valid_files = fpaths[num_test:num_test+num_valid] 
         # print('Num of valid_files :', len(valid_files))
         # for f in valid_files:
         #     Path(f).rename(os.path.join(f'/hd/gms/{obj}/valid/good/', os.path.basename(f)))
-        # train_files = fpaths[672:]
+
+        # train_files = fpaths[num_test+num_valid:]
         # print('Num of train_files :', len(train_files))
         # sys.exit()
         
