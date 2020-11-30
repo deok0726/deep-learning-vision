@@ -29,14 +29,15 @@ class Tester:
         self.end_time = time.time()
         print(len(self.dataloader.test_data_loader))
         # method 1 - using only validation dataset
-        for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.valid_data_loader), total=len(self.dataloader.valid_data_loader), desc='Valid'):
-            self._get_valid_residuals(batch_data)
-        if self.max_residual != 0:
-            self.args.anomaly_threshold = self.max_residual.item()
-        # # method 2 - using small test dataset
-        # for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_threshold_data_loader), total=len(self.dataloader.test_threshold_data_loader), desc='Test_Threshold'):
-        #     self._get_diffs_per_data_threshold(batch_data, batch_label)
-        # self.args.anomaly_threshold = self._get_threshold(self.diffs_per_data_threshold, self.labels_per_data_threshold, self.thresholds_candidates, [self.metric_funcs['Recall'], self.metric_funcs['F1']])
+        # for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.valid_data_loader), total=len(self.dataloader.valid_data_loader), desc='Valid'):
+        #     self._get_valid_residuals(batch_data)
+        # if self.max_residual != 0:
+        #     self.args.anomaly_threshold = self.max_residual.item()
+        # method 2 - using small test dataset
+        for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_threshold_data_loader), total=len(self.dataloader.test_threshold_data_loader), desc='Test_Threshold'):
+            self._get_diffs_per_data_threshold(batch_data, batch_label)
+        self.args.anomaly_threshold = self._get_threshold(self.diffs_per_data_threshold, self.labels_per_data_threshold, self.thresholds_candidates, [self.metric_funcs['Recall'], self.metric_funcs['F1']])
+        print("anomaly_threshold: ", self.args.anomaly_threshold)
         for batch_idx, (batch_data, batch_label) in tqdm(enumerate(self.dataloader.test_data_loader), total=len(self.dataloader.test_data_loader), desc='Test'):
             self.batch_idx = batch_idx
             self._test_step(batch_data, batch_label)
@@ -151,7 +152,7 @@ class Tester:
         self.labels_per_data_threshold = []
         # self.valid_residuals = []
         self.max_residual = 0
-        self.thresholds_candidates = np.arange(0.01, 1, 0.01)
+        self.thresholds_candidates = np.arange(0.01, 10, 0.01)
         self.tensorboard_writer_test = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'test'), max_queue=100)
 
     def _restore_checkpoint(self):
