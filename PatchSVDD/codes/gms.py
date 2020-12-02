@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 from imageio import imread
 from glob import glob
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, classification_report, confusion_matrix
 import os
 import sys
 import random
@@ -145,3 +145,16 @@ def segmentation_auroc(obj, anomaly_maps):
     auroc = roc_auc_score(gt.flatten(), anomaly_maps.flatten())
     return auroc
 
+def _classification_report(anomaly_scores, obj, threshold, target_label):
+    label = get_label(obj)
+    print('label: ', label)
+    try:
+        pred = anomaly_scores > threshold
+        print('pred: ', pred)
+        # pred = pred.astype(int)
+        # pred[pred==1] = -1
+        # pred[pred==0] = 1
+        print(confusion_matrix(label, pred, [1, 0]))
+        return classification_report(label, pred, [1, 0], ['Anomaly', 'Normal'])
+    except Exception as e:
+        print(e)

@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from .utils import PatchDataset_NCHW, NHWC2NCHW, distribute_scores
+import sys
 
 
 __all__ = ['eval_encoder_NN_multiK', 'eval_embeddings_NN_multiK']
@@ -36,6 +37,9 @@ def assess_anomaly_maps(obj, anomaly_maps, mvtec):
 
     else:
         anomaly_scores = anomaly_maps.max(axis=-1).max(axis=-1)
+        print(anomaly_scores)
+        result = gms._classification_report(anomaly_scores, obj, 3.3, target_label=1)
+        print(result)
         auroc_det = gms.detection_auroc(obj, anomaly_scores)
         return auroc_det
 
