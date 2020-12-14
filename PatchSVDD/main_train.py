@@ -4,6 +4,7 @@ import argparse
 import torch
 from codes import mvtecad
 from codes import gms
+from codes import daejoo
 from functools import reduce
 from torch.utils.data import DataLoader
 from codes.datasets import *
@@ -12,38 +13,38 @@ from codes.inspection import eval_encoder_NN_multiK
 from codes.utils import *
 from tensorboardX import SummaryWriter
 
-def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
+# def str2bool(v):
+#     if v.lower() in ('yes', 'true', 't', 'y', '1'):
+#         return True
+#     elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+#         return False
+#     else:
+#         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--obj', default='hazelnut', type=str)
 parser.add_argument('--lambda_value', default=1, type=float)
 parser.add_argument('--D', default=64, type=int)
-
 parser.add_argument('--epochs', default=300, type=int)
 parser.add_argument('--lr', default=1e-4, type=float)
-
-parser.add_argument('--mvtec', default="True", type=str2bool)
-
-args = parser.parse_args()
+parser.add_argument('--dataset', default='mvtec', type=str)
 
 def train():
+    args = parser.parse_args()
     obj = args.obj
     D = args.D
     lr = args.lr
-    mvtec = args.mvtec
+    dataset = args.dataset
+
     print(args)
-    
-    if mvtec:
+
+    if dataset == 'mvtec':
         writer = SummaryWriter('runs/mvtec_experiment')
-    else:
-        writer = SummaryWriter('runs/gms_experiment/loss')
+    elif dataset == 'gms':
+        writer = SummaryWriter('runs/gms_experiment/')
+    elif dataset == 'daejoo':
+        writer = SummaryWriter('runs/daejoo_experiment/')
 
     with task('Networks'):
         enc = EncoderHier(64, D).cuda()
@@ -57,16 +58,22 @@ def train():
         opt = torch.optim.Adam(params=params, lr=lr)
 
     with task('Datasets'):
-        if mvtec:
+        if dataset == 'mvtec':
             train_x = mvtecad.get_x_standardized(obj, mode='train')
             train_x = NHWC2NCHW(train_x)
             # valid_x = mvtecad.get_x_standardized(obj, mode='valid')
             # valid_x = NHWC2NCHW(train_x)
         
-        else:
+        elif dataset == 'gms':
             train_x = gms.get_x_standardized(obj, mode='train')
             train_x = NHWC2NCHW(train_x)
             valid_x = gms.get_x_standardized(obj, mode='valid')
+            valid_x = NHWC2NCHW(valid_x)
+        
+        elif dataset == 'daejoo':
+            train_x = daejoo.get_x_standardized(obj, mode='train')
+            train_x = NHWC2NCHW(train_x)
+            valid_x = daejoo.get_x_standardized(obj, mode='valid')
             valid_x = NHWC2NCHW(valid_x)
 
         rep = 100
@@ -82,9 +89,9 @@ def train():
         datasets_val[f'svdd_64'] = SVDD_Dataset(valid_x, K=64, repeat=rep)
         datasets_val[f'svdd_32'] = SVDD_Dataset(valid_x, K=32, repeat=rep)
 
-        dataset = DictionaryConcatDataset(datasets)
+        dataset_tr = DictionaryConcatDataset(datasets)
         dataset_val = DictionaryConcatDataset(datasets_val)
-        loader = DataLoader(dataset, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
+        loader = DataLoader(dataset_tr, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
         loader_val = DataLoader(dataset_val, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
 
     print('Start training')
@@ -123,12 +130,14 @@ def train():
 
             loss_val = loss_pos_64 + loss_pos_32 + args.lambda_value * (loss_svdd_64 + loss_svdd_32)
     
-        if mvtec:
+        if dataset == 'mvtec':
             writer.add_scalar('training_loss', loss, i_epoch)
-        else:
+        elif dataset == 'gms':
+            writer.add_scalars('training_validation', {'training_loss' : loss, 'validation_loss' : loss_val}, i_epoch)
+        elif dataset == 'daejoo':
             writer.add_scalars('training_validation', {'training_loss' : loss, 'validation_loss' : loss_val}, i_epoch)
 
-        aurocs = eval_encoder_NN_multiK(enc, obj, mvtec)
+        aurocs = eval_encoder_NN_multiK(enc, obj, dataset)
         log_result(obj, aurocs)
         enc.save(obj)
     writer.close()

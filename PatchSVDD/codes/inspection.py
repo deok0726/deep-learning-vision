@@ -1,5 +1,6 @@
 from codes import mvtecad
 from codes import gms
+from codes import daejoo
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -27,27 +28,38 @@ def infer(x, enc, K, S):
     return embs
 
 
-def assess_anomaly_maps(obj, anomaly_maps, mvtec):
-    if mvtec:
+def assess_anomaly_maps(obj, anomaly_maps, dataset):
+    if dataset == 'mvtec':
         auroc_seg = mvtecad.segmentation_auroc(obj, anomaly_maps)
 
         anomaly_scores = anomaly_maps.max(axis=-1).max(axis=-1)
         auroc_det = mvtecad.detection_auroc(obj, anomaly_scores)
         return auroc_det, auroc_seg
 
-    else:
+    elif dataset == 'gms':
         anomaly_scores = anomaly_maps.max(axis=-1).max(axis=-1)
         print(anomaly_scores)
         result = gms._classification_report(anomaly_scores, obj, 3.3, target_label=1)
         print(result)
         auroc_det = gms.detection_auroc(obj, anomaly_scores)
         return auroc_det
+    
+    elif dataset == 'daejoo':
+        anomaly_scores = anomaly_maps.max(axis=-1).max(axis=-1)
+        print(anomaly_scores)
+        result = daejoo._classification_report(anomaly_scores, obj, 3.3, target_label=1)
+        print(result)
+        auroc_det = daejoo.detection_auroc(obj, anomaly_scores)
+        if auroc_det == None:
+            return 0
+        else:
+            return auroc_det
 
 
 #########################
 
-def eval_encoder_NN_multiK(enc, obj, mvtec):
-    if mvtec:
+def eval_encoder_NN_multiK(enc, obj, dataset):
+    if dataset == 'mvtec':
         x_tr = mvtecad.get_x_standardized(obj, mode='train')
         x_te = mvtecad.get_x_standardized(obj, mode='test')
 
@@ -63,7 +75,7 @@ def eval_encoder_NN_multiK(enc, obj, mvtec):
         embs64 = embs64_tr, embs64_te
         embs32 = embs32_tr, embs32_te
     
-    else:
+    elif dataset == 'gms':
         x_tr = gms.get_x_standardized(obj, mode='train')
         x_te = gms.get_x_standardized(obj, mode='test')
 
@@ -78,41 +90,69 @@ def eval_encoder_NN_multiK(enc, obj, mvtec):
 
         embs64 = embs64_tr, embs64_te
         embs32 = embs32_tr, embs32_te
+    
+    elif dataset == 'daejoo':
+        x_tr = daejoo.get_x_standardized(obj, mode='train')
+        x_te = daejoo.get_x_standardized(obj, mode='test')
 
-    return eval_embeddings_NN_multiK(obj, embs64, embs32, mvtec)
+        embs64_tr = infer(x_tr, enc, K=64, S=16)
+        embs64_te = infer(x_te, enc, K=64, S=16)
+
+        x_tr = daejoo.get_x_standardized(obj, mode='train')
+        x_te = daejoo.get_x_standardized(obj, mode='test')
+
+        embs32_tr = infer(x_tr, enc.enc, K=32, S=4)
+        embs32_te = infer(x_te, enc.enc, K=32, S=4)
+
+        embs64 = embs64_tr, embs64_te
+        embs32 = embs32_tr, embs32_te
+
+    return eval_embeddings_NN_multiK(obj, embs64, embs32, dataset)
 
 
-def eval_embeddings_NN_multiK(obj, embs64, embs32, mvtec, NN=1):
+def eval_embeddings_NN_multiK(obj, embs64, embs32, dataset, NN=1):
     emb_tr, emb_te = embs64
     maps_64 = measure_emb_NN(emb_te, emb_tr, method='kdt', NN=NN)
     maps_64 = distribute_scores(maps_64, (256, 256), K=64, S=16)
-    if mvtec:
-        det_64, seg_64 = assess_anomaly_maps(obj, maps_64, mvtec)
-    else:
-        det_64 = assess_anomaly_maps(obj, maps_64, mvtec)
+    if dataset == 'mvtec':
+        det_64, seg_64 = assess_anomaly_maps(obj, maps_64, dataset)
+    elif dataset == 'gms':
+        det_64 = assess_anomaly_maps(obj, maps_64, dataset)
+        seg_64 = 0
+    elif dataset == 'daejoo':
+        det_64 = assess_anomaly_maps(obj, maps_64, dataset)
         seg_64 = 0
 
     emb_tr, emb_te = embs32
     maps_32 = measure_emb_NN(emb_te, emb_tr, method='ngt', NN=NN)
     maps_32 = distribute_scores(maps_32, (256, 256), K=32, S=4)
-    if mvtec:
-        det_32, seg_32 = assess_anomaly_maps(obj, maps_32, mvtec)
-    else:
-        det_32 = assess_anomaly_maps(obj, maps_32, mvtec)
+    if dataset == 'mvtec':
+        det_32, seg_32 = assess_anomaly_maps(obj, maps_32, dataset)
+    elif dataset == 'gms':
+        det_32 = assess_anomaly_maps(obj, maps_32, dataset)
+        seg_32 = 0
+    elif dataset == 'daejoo':
+        det_32 = assess_anomaly_maps(obj, maps_32, dataset)
         seg_32 = 0
 
     maps_sum = maps_64 + maps_32
-    if mvtec:
-        det_sum, seg_sum = assess_anomaly_maps(obj, maps_sum, mvtec)
-    else:
-        det_sum = assess_anomaly_maps(obj, maps_sum, mvtec)
+    if dataset == 'mvtec':
+        det_sum, seg_sum = assess_anomaly_maps(obj, maps_sum, dataset)
+    elif dataset == 'gms':
+        det_sum = assess_anomaly_maps(obj, maps_sum, dataset)
+        seg_sum = 0
+    elif dataset == 'daejoo':
+        det_sum = assess_anomaly_maps(obj, maps_sum, dataset)
         seg_sum = 0
 
     maps_mult = maps_64 * maps_32
-    if mvtec:
-        det_mult, seg_mult = assess_anomaly_maps(obj, maps_mult, mvtec)
-    else:
-        det_mult = assess_anomaly_maps(obj, maps_mult, mvtec)
+    if dataset == 'mvtec':
+        det_mult, seg_mult = assess_anomaly_maps(obj, maps_mult, dataset)
+    elif dataset == 'gms':
+        det_mult = assess_anomaly_maps(obj, maps_mult, dataset)
+        seg_mult = 0
+    elif dataset == 'daejoo':
+        det_mult = assess_anomaly_maps(obj, maps_mult, dataset)
         seg_mult = 0
 
     return {

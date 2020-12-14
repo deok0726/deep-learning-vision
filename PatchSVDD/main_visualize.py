@@ -5,25 +5,25 @@ from codes import mvtecad
 from tqdm import tqdm
 from codes.utils import resize, makedirpath
 
-def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
+# def str2bool(v):
+#     if v.lower() in ('yes', 'true', 't', 'y', '1'):
+#         return True
+#     elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+#         return False
+#     else:
+#         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--obj', default='wood')
-parser.add_argument('--mvtec', default="True", type=str2bool)
+parser.add_argument('--dataset', default="mvtec", type=str)
 
 args = parser.parse_args()
 
 
-def save_maps(obj, maps, mvtec):
+def save_maps(obj, maps, dataset):
     from skimage.segmentation import mark_boundaries
     N = maps.shape[0]
-    if mvtec:
+    if dataset == 'mvtec':
         images = mvtecad.get_x(obj, mode='test')
         masks = mvtecad.get_mask(obj)
 
@@ -60,10 +60,10 @@ def main():
     enc = EncoderHier(K=64, D=64).cuda()
     enc.load(args.obj)
     enc.eval()
-    results = eval_encoder_NN_multiK(enc, args.obj, args.mvtec)
+    results = eval_encoder_NN_multiK(enc, args.obj, args.dataset)
     maps = results['maps_mult']
 
-    save_maps(args.obj, maps, args.mvtec)
+    save_maps(args.obj, maps, args.dataset)
 
 
 if __name__ == '__main__':

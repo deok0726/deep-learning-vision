@@ -1,22 +1,25 @@
 import os
 import argparse
 
-def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
+# def str2bool(v):
+#     if v.lower() in ('yes', 'true', 't', 'y', '1'):
+#         return True
+#     elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+#         return False
+#     else:
+#         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--obj', default='screw')
-parser.add_argument('--mvtec', default="True", type=str2bool)
+parser.add_argument('--dataset', default='mvtec', type=str)
+
 args = parser.parse_args()
+obj = args.obj
+dataset = args.dataset
 
 print(args)
 
-def do_evaluate_encoder_multiK(obj, mvtec):
+def do_evaluate_encoder_multiK(obj, dataset):
     from codes.inspection import eval_encoder_NN_multiK
     from codes.networks import EncoderHier
 
@@ -24,7 +27,7 @@ def do_evaluate_encoder_multiK(obj, mvtec):
     enc.load(obj)
     enc.eval()
     try:
-        results = eval_encoder_NN_multiK(enc, obj, mvtec)
+        results = eval_encoder_NN_multiK(enc, obj, dataset)
 
         det_64 = results['det_64']
         seg_64 = results['seg_64']
@@ -47,7 +50,7 @@ def do_evaluate_encoder_multiK(obj, mvtec):
 
 
 def main():
-    do_evaluate_encoder_multiK(args.obj, args.mvtec)
+    do_evaluate_encoder_multiK(obj, dataset)
 
 
 if __name__ == '__main__':
