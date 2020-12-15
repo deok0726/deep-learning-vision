@@ -33,7 +33,12 @@ def load_model(args):
         else:
             model = Model(in_channels=1, out_channels=1, bilinear=False).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MemAE':
-        from models.CAE_MemAE import Model
+        # from models.CAE_MemAE import Model
+        # from models.CAE_MemAE_noMem import Model
+        from models.CAE_MemAE_noMem_small import Model
+        # from models.CAE_MemAE_biggest import Model
+        # from models.CAE_MemAE_biggest_noMem import Model
+        # from models.CAE_MemAE_subpixel import Model
         model = Model(args.channel_num, args.input_height, args.input_width, args.memory_dimension).to(DEVICE, dtype=torch.float)
         # model = Model(n_channels=args.channel_num, mem_dim = 100).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MvTec':
@@ -76,7 +81,8 @@ def load_trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict,
         from main.trainers.ARNet_trainer import ARNetTrainer
         trainer = ARNetTrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
     elif args.model_name=='MemAE':
-        from main.trainers.MemAE_trainer import MemAETrainer
+        # from main.trainers.MemAE_trainer import MemAETrainer
+        from main.trainers.MemAE_noMem_trainer import MemAETrainer
         trainer = MemAETrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
     elif args.model_name=='MvTec':
         from main.trainers.MvTec_trainer import MvTecTrainer
@@ -90,7 +96,8 @@ def load_tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, 
         from main.testers.ARNet_tester import ARNetTester
         tester = ARNetTester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
     elif args.model_name=='MemAE':
-        from main.testers.MemAE_tester import MemAETester
+        # from main.testers.MemAE_tester import MemAETester
+        from main.testers.MemAE_noMem_tester import MemAETester
         tester = MemAETester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
     elif args.model_name=='MvTec':
         from main.testers.MvTec_tester import MvTecTester
@@ -106,7 +113,7 @@ if __name__ == '__main__':
 
     # set cuda device
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     USE_CUDA = torch.cuda.is_available()
     
     # Reproducibility

@@ -8,8 +8,7 @@ import numpy as np
 from tqdm import tqdm
 from math import ceil
 from modules.utils import AverageMeter, matplotlib_imshow
-from sklearn.metrics import classification_report, confusion_matrix
-
+from modules.custom_metrics import classification_report, confusion_matrix
 
 class Tester:
     def __init__(self, args, dataloader, model, optimizer, loss_funcs: dict, metric_funcs: dict, device):
@@ -77,6 +76,7 @@ class Tester:
         if self.args.save_result_images:
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, batch_diff_per_batch, 'input')
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, batch_diff_per_batch, 'output')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, (batch_data-output_data)**2, batch_label, batch_diff_per_batch, 'residual')
         if self.batch_idx == (len(self.dataloader.test_data_loader)-1):
             if "AUROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
@@ -152,7 +152,7 @@ class Tester:
         self.labels_per_data_threshold = []
         # self.valid_residuals = []
         self.max_residual = 0
-        self.thresholds_candidates = np.arange(0.01, 10, 0.01)
+        self.thresholds_candidates = np.arange(0.0001, 1, 0.0002)
         self.tensorboard_writer_test = tensorboard.SummaryWriter(os.path.join(self.TENSORBOARD_LOG_SAVE_DIR, 'test'), max_queue=100)
 
     def _restore_checkpoint(self):
@@ -170,32 +170,36 @@ class Tester:
     def _log_tensorboard(self, batch_data, batch_label, output_data, losses_per_batch, metrics_per_batch):
         losses_per_epoch = self.test_losses_per_epoch
         metric_per_epoch = self.test_metrics_per_epoch
-        fig = plt.figure(figsize=(8, 8))
+        fig = plt.figure(figsize=(8, 12))
         for idx in range(self.args.test_tensorboard_shown_image_num):
             losses = []
             metrics = []
             random_sample_idx = np.random.randint(0, output_data.shape[0])
-            ax_output = fig.add_subplot(2, self.args.test_tensorboard_shown_image_num, idx+self.args.test_tensorboard_shown_image_num+1, xticks=[], yticks=[])
+            ax_batch = fig.add_subplot(3, self.args.test_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
+            matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
+            ax_batch.set_title("Ground Truth")
+            ax_output = fig.add_subplot(3, self.args.test_tensorboard_shown_image_num, idx+self.args.test_tensorboard_shown_image_num+1, xticks=[], yticks=[])
             matplotlib_imshow(output_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
-                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
+                losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 5)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
                 if metric_per_batch_name in ['AUROC', 'AUPRC', 'F1', 'Recall']:
                     pass
                 else:
-                    metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
+                    metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 5)))))
             if 'AUROC' in metric_per_epoch.keys():
-                metrics.append(':'.join(('AUROC', str(round(metric_per_epoch['AUROC'].avg, 10)))))
+                metrics.append(':'.join(('AUROC', str(round(metric_per_epoch['AUROC'].avg, 5)))))
             if 'AUPRC' in metric_per_epoch.keys():
-                metrics.append(':'.join(('AUPRC', str(round(metric_per_epoch['AUPRC'].avg, 10)))))
+                metrics.append(':'.join(('AUPRC', str(round(metric_per_epoch['AUPRC'].avg, 5)))))
             if 'F1' in metric_per_epoch.keys():
-                metrics.append(':'.join(('F1', str(round(metric_per_epoch['F1'].avg, 10)))))
+                metrics.append(':'.join(('F1', str(round(metric_per_epoch['F1'].avg, 5)))))
             if 'Recall' in metric_per_epoch.keys():
-                metrics.append(':'.join(('Recall', str(round(metric_per_epoch['Recall'].avg, 10)))))
+                metrics.append(':'.join(('Recall', str(round(metric_per_epoch['Recall'].avg, 5)))))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
-            ax_batch = fig.add_subplot(2, self.args.test_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
-            matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
-            ax_batch.set_title("Ground Truth")
+            ax_residual = fig.add_subplot(3, self.args.test_tensorboard_shown_image_num, idx+self.args.test_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
+            matplotlib_imshow((batch_data[random_sample_idx]-output_data[random_sample_idx])**2 , one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
+            ax_residual.set_title("Residual Map")
+            
         plt.tight_layout()
         self.tensorboard_writer_test.add_figure("test", fig, global_step=self.epoch_idx)
         for loss_name, loss_value_per_epoch in losses_per_epoch.items():
@@ -241,11 +245,11 @@ class Tester:
         for img_idx in range(result_label.shape[0]):
             image_path = os.path.join(save_path, str(self.batch_idx)+ '_' +str(img_idx))
             image_path = image_path + '_label_' + str(result_label[img_idx].item()) + '_' + result_type
+            image_path = image_path + '_' + 'Anomaly_Criterion' + '_' + str(round(diff[img_idx].item(), 5))
             for loss_name, loss_value in self.losses_per_batch.items():
-                image_path = image_path + '_' + loss_name + '_' + str(loss_value[img_idx].mean().item())
+                image_path = image_path + '_' + loss_name + '_' + str(round(loss_value[img_idx].mean().item(), 5))
             for metric_name, metric_value in self.metrics_per_batch.items():
-                image_path = image_path + '_' + metric_name + '_' + str(metric_value[img_idx].mean().item())
-            image_path = image_path + '_' + 'Anomaly_Criterion' + '_' + str(diff[img_idx].item())
+                image_path = image_path + '_' + metric_name + '_' + str(round(metric_value[img_idx].mean().item(), 5))
             image_path += '.png'
             if self.args.normalize:
                 result_img = result_images[img_idx].detach().mul(0.5).add(0.5)
@@ -253,4 +257,4 @@ class Tester:
                 result_img = result_images[img_idx].detach()
             result_img = np.clip(result_img.cpu().numpy().transpose(1, 2, 0), 0, 1)
             result_img = (result_img*255).astype('uint8')
-            cv2.imwrite(image_path, result_img)
+            cv2.imwrite(image_path, result_img[..., ::-1])

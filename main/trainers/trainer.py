@@ -31,8 +31,8 @@ class Trainer:
         self.epoch_idx = 0
         self._restore_checkpoint()
         self.global_step = self.epoch_idx*len(self.dataloader.train_data_loader)
-        self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
-        self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        # self.tensorboard_writer_train.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
+        # self.tensorboard_writer_valid.add_graph(self.model, self.dataloader.sample_train_data.to(self.device))
         for epoch_idx in tqdm(range(self.args.num_epoch), desc='Train'):
             # ================================================================== #
             #                         training                                   #
@@ -70,7 +70,7 @@ class Trainer:
             self.epoch_idx += 1
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
-        # self._log_hparams()
+        self._log_hparams()
         self.tensorboard_writer_train.close()
         self.tensorboard_writer_valid.close()
 
@@ -192,6 +192,8 @@ class Trainer:
             self.epoch_idx = states['epoch'] + 1
             self.model.load_state_dict(states['model_state_dict'])
             self.optimizer.load_state_dict(states['optimizer_state_dict'])
+            for g in self.optimizer.param_groups:
+                g['lr'] = self.args.learning_rate
         else:
             print('No checkpoints to restore')
 
@@ -203,24 +205,27 @@ class Trainer:
             training_state = "valid"
             losses_per_epoch = self.valid_losses_per_epoch
             metric_per_epoch = self.valid_metrics_per_epoch
-        fig = plt.figure(figsize=(8, 8))
+        fig = plt.figure(figsize=(8, 12))
         for idx in range(self.args.train_tensorboard_shown_image_num):
             losses = []
             metrics = []
             random_sample_idx = randint(0, output_data.shape[0])
-            ax_output = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num+1, xticks=[], yticks=[])
+            ax_batch = fig.add_subplot(3, self.args.train_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
+            # if training_state == "train":
+                # torchvision.utils.save_image(batch_data[random_sample_idx].double(), "/root/anomaly_detection/temp/batch_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
+                # torchvision.utils.save_image(output_data[random_sample_idx].double(), "/root/anomaly_detection/temp/output_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
+            matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
+            ax_batch.set_title("Ground Truth")
+            ax_output = fig.add_subplot(3, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num+1, xticks=[], yticks=[])
             matplotlib_imshow(output_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             for loss_per_batch_name, loss_per_batch_value in losses_per_batch.items():
                 losses.append(':'.join((loss_per_batch_name, str(round(loss_per_batch_value[random_sample_idx].mean().item(), 10)))))
             for metric_per_batch_name, metric_per_batch_value in metrics_per_batch.items():
                 metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
-            ax_batch = fig.add_subplot(2, self.args.train_tensorboard_shown_image_num, idx+1, xticks=[], yticks=[])
-            # if training_state == "train":
-                # torchvision.utils.save_image(batch_data[random_sample_idx].double(), "/root/anomaly_detection/temp/batch_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
-                # torchvision.utils.save_image(output_data[random_sample_idx].double(), "/root/anomaly_detection/temp/output_" + str(random_sample_idx) + "_" + str(random_sample_idx) + "_" + str(batch_label[random_sample_idx]) + ".png", "PNG")
-            matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
-            ax_batch.set_title("Ground Truth")
+            ax_residual = fig.add_subplot(3, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
+            matplotlib_imshow((batch_data[random_sample_idx]-output_data[random_sample_idx])**2 , one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
+            ax_residual.set_title("Residual Map")
         plt.tight_layout()
         if is_valid:
             self.tensorboard_writer_valid.add_figure(training_state, fig, global_step=self.epoch_idx)

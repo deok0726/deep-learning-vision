@@ -15,10 +15,9 @@ class MemAETester(Tester):
         batch_data = batch_data.to(self.device)
         with torch.no_grad():
             if self.args.random_crop:
-                output_data = self._generate_patches_and_merge(batch_data, self.window_size, self.args.crop_size, self.args.channel_num)[0]
+                output_data = self._generate_patches_and_merge(batch_data, self.window_size, self.args.crop_size, self.args.channel_num)
             else:
                 output_data = self.model(batch_data)
-                output_data = getattr(output_data ,'output')
         # batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data, self.model.encoder.children())
         batch_diff_per_batch = (batch_data - output_data) ** 2
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
@@ -29,11 +28,12 @@ class MemAETester(Tester):
         batch_data = batch_data.to(self.device)
         with torch.no_grad():
             if self.args.random_crop:
-                output_data = self._generate_patches_and_merge(batch_data, self.window_size, self.args.crop_size, self.args.channel_num)[0]
+                output_data = self._generate_patches_and_merge(batch_data, self.window_size, self.args.crop_size, self.args.channel_num)
             else:
                 output_data = self.model(batch_data)
-                output_data = getattr(output_data ,'output')
+                # output_data = getattr(output_data ,'output')
         # batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data, self.model.encoder.children())
+        # batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data)
         batch_diff_per_batch = (batch_data - output_data) ** 2
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         self.diffs_per_data_threshold.extend(batch_diff_per_batch.cpu().detach().numpy())
@@ -48,7 +48,6 @@ class MemAETester(Tester):
                 output_data = self._generate_patches_and_merge(batch_data, self.window_size, self.args.crop_size, self.args.channel_num)
             else:
                 output_data = self.model(batch_data)
-                output_data = getattr(output_data ,'output')
         batch_diff_per_batch = (batch_data - output_data) ** 2
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         self.diffs_per_data.extend(batch_diff_per_batch.cpu().detach().numpy())
@@ -107,5 +106,5 @@ class MemAETester(Tester):
                 else:
                     batch_data_patch = batch_data[:,:, y:y+windowSize, x:x+windowSize]
                     output_data_patch = self.model(batch_data_patch)
-                    output_data[:,:, y:y+windowSize, x:x+windowSize] = getattr(output_data_patch, 'output')[0]
+                    output_data[:,:, y:y+windowSize, x:x+windowSize] = output_data_patch
         return output_data.cuda()
