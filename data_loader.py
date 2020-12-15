@@ -62,6 +62,24 @@ class DataLoader:
                 transforms.ToTensor(), 
                 transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform, args=args)
             train_dataset, valid_dataset, test_dataset, test_threshold_dataset = self._preprocess_to_anomaly_detection_dataset(args, train_dataset, test_dataset)
+        elif args.dataset_name == 'Daejoo':
+            train_dataset = ImageDataset(root=args.dataset_root, train=True, transform=source_transform, target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=source_transform, target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.ToTensor(), target_transform=target_transform)
+            test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([
+                transforms.ToTensor(), 
+                transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
+            # test_dataset = ImageDataset(root=args.dataset_root, train=False, transform=transforms.Compose([
+            #     transforms.Resize(args.resize_size),
+            #     transforms.ToTensor(), 
+            #     transforms.Normalize((0.5,0.5,0.5,), (0.5,0.5,0.5,))]), target_transform=target_transform)
+            train_length = int(len(train_dataset) * (args.train_ratio / (args.train_ratio + args.valid_ratio)))
+            valid_length = len(train_dataset) - train_length
+            train_dataset, valid_dataset = torch.utils.data.random_split(train_dataset, [train_length, valid_length])
+            test_threshold_length = int(len(test_dataset) * args.test_threshold_ratio)
+            test_except_threshold_length = len(test_dataset) - test_threshold_length
+            test_dataset, test_threshold_dataset= torch.utils.data.random_split(test_dataset, [test_except_threshold_length, test_threshold_length])
+
         else:
             raise Exception('Wrong dataset name')
         if test_threshold_dataset is not None:
@@ -168,7 +186,8 @@ class DataLoader:
                 transforms_list.append(transforms.Grayscale())
                 args.channel_num = 1
             if args.random_rotation:
-                transforms_list.append(transforms.RandomRotation(360))
+                # transforms_list.append(transforms.RandomRotation(360))
+                transforms_list.append(MyRotationTransform(angles=[0, 90, 180, 270]))
             transforms_list.append(transforms.ToTensor())
             if args.normalize:
                 if args.channel_num == 3:
@@ -278,6 +297,16 @@ class customTensorDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return self.data.shape[0]
+
+class MyRotationTransform:
+    """Rotate by one of the given angles."""
+
+    def __init__(self, angles):
+        self.angles = angles
+
+    def __call__(self, x):
+        angle = random.choice(self.angles)
+        return transforms.functional.rotate(x, angle)
 
 if __name__ == "__main__":
     from torchvision.utils import save_image
