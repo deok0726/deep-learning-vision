@@ -18,6 +18,11 @@ def load_loss(losses_name):
         losses_dict['MSE'] = torch.nn.MSELoss(reduction='none') # l2 loss
     if 'L1' in losses_name:
         losses_dict['L1'] = torch.nn.L1Loss(reduction='none') # l1 loss
+    if 'total_kld' in losses_name:
+        losses_dict['total_kld'] = torch.nn.MSELoss(reduction='none') # l1 loss
+    if 'discriminator' in losses_name:
+        # losses_dict['discriminator'] = torch.nn.BCELoss(reduction='none') # l1 loss
+        losses_dict['discriminator'] = torch.nn.MSELoss(reduction='none') # l1 loss
     if 'SSIM' in losses_name:
         losses_dict['SSIM'] = custom_losses.SSIM(args.normalize, args.channel_num) # l1 loss
     return losses_dict
@@ -45,6 +50,12 @@ def load_model(args):
     elif args.model_name=='MvTec':
         from models.CAE_MvTec import Model
         model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
+    elif args.model_name=='VAE':
+        from models.VAE import Model
+        model = Model(n_channels=1, latent_dim=10).to(DEVICE, dtype=torch.float)
+    elif args.model_name=='AAE':
+        from models.AAE import Model
+        model = Model(n_channels=1, latent_dim=10).to(DEVICE, dtype=torch.float)
     elif args.model_name=='RaPP':
         from models.AE_RaPP import Model
         model = Model(n_channels=args.channel_num).to(DEVICE, dtype=torch.float)
@@ -73,38 +84,54 @@ def load_optimizer_with_lr_scheduler(args):
             lr_scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer, lr_scheduler_function)
     elif args.model_name=='RaPP':
         optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
+    elif args.model_name=='VAE':
+        # optimizer = torch.optim.SGD(model.parameters(), lr = args.learning_rate)
+        optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
+    elif args.model_name=='AAE' :
+        # optimizer = torch.optim.SGD(model.parameters(), lr = args.learning_rate)
+        optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
     else:
         optimizer = torch.optim.Adam(model.parameters(), lr = args.learning_rate)
     return optimizer, lr_scheduler
 
 def load_trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE):
     if args.model_name=='ARNet':
-        from main.trainers.ARNet_trainer import ARNetTrainer
-        trainer = ARNetTrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
+        from main.trainers.ARNet_trainer import ARNetTrainer as Trainer
     elif args.model_name=='MemAE':
+        from main.trainers.MemAE_trainer import MemAETrainer as Trainer
         # from main.trainers.MemAE_trainer import MemAETrainer
         from main.trainers.MemAE_noMem_trainer import MemAETrainer
         trainer = MemAETrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
+    elif args.model_name=='VAE' :
+        from main.trainers.VAE_trainer import VAE_trainer as Trainer
+    elif args.model_name=='AAE' :
+        from main.trainers.AAE_trainer import AAE_trainer as Trainer
     elif args.model_name=='MvTec':
         from main.trainers.MvTec_trainer import MvTecTrainer
         trainer = MvTecTrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
     else:
         trainer = Trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
+    # trainer = Trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
     return trainer
 
 def load_tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE):
     if args.model_name=='ARNet':
-        from main.testers.ARNet_tester import ARNetTester
-        tester = ARNetTester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+        from main.testers.ARNet_tester import Tester
     elif args.model_name=='MemAE':
-        # from main.testers.MemAE_tester import MemAETester
+        #from main.testers.MemAE_tester import Tester
+        from main.testers.MemAE_tester import MemAETester
         from main.testers.MemAE_noMem_tester import MemAETester
         tester = MemAETester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+    elif args.model_name=='AAE':
+        from main.testers.AAE_tester import Tester
+    elif args.model_name=='VAE':
+        from main.testers.VAE_tester import Tester
     elif args.model_name=='MvTec':
         from main.testers.MvTec_tester import MvTecTester
         tester = MvTecTester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
     else:
         tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+    # tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
     return tester
 
 if __name__ == '__main__':
@@ -154,11 +181,17 @@ if __name__ == '__main__':
     #     print((x_tilde-x).mean())
 
     # losses
-    losses_dict = load_loss([
-        # 'SSIM'
-        # 'MSE', 
-        # 'L1'
+    losses_dict = load_additional_loss([
+        'MSE', 
+        'L1',
+        # 'total_kld',
+        # 'discriminator',
         ])
+    # losses_dict = load_loss([
+    #     # 'SSIM'
+    #     # 'MSE', 
+    #     # 'L1'
+    # ])
 
     # metrics
     metrics_dict = dict(
