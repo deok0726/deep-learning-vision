@@ -147,7 +147,8 @@ class Model(nn.Module):
 
         # bfarzin 참고
         # z_fake = torch.randn((x.))
-        z_fake = torch.randn(16, 512).view(-1, 512, 1, 1).cuda()
+        # z_fake = torch.randn(16, 512).view(-1, 512, 1, 1).cuda()
+        z_fake = torch.randn(4, 512).view(-1, 512, 1, 1).cuda()
         z_real = decoder_input
         discriminator_z_result = [0, 0]
         for index, discriminator_input in enumerate([z_fake, z_real]):
