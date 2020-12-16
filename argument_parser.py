@@ -45,6 +45,7 @@ parser.add_argument('--valid_ratio', type=float, default=0.3, help="validation d
 parser.add_argument('--test_ratio', type=float, default=0.1, help="test dataset ratio")
 parser.add_argument('--test_threshold_ratio', type=float, default=0.2, help="test dataset ratio to determine anomaly threshold")
 parser.add_argument('--anomaly_ratio', type=float, default=0.3, help="anomaly data ratio")
+parser.add_argument('--window_size', type=int, default=30, help="patch window size")
 
 # save
 parser.add_argument('--checkpoint_dir', type=str, default='/hd/checkpoints/', help="ckpt dir")
@@ -52,6 +53,7 @@ parser.add_argument('--tensorboard_dir', type=str, default='/hd/tensorboard_logs
 
 # model args
 parser.add_argument('--entropy_loss_coef', type=float, default=0.0002, help="entropy loss weight for memae model")
+parser.add_argument('--memory_dimension', type=int, default=100, help="dimension of memory module for memae model")
 parser.add_argument('--graying', action='store_true', default=False, help="graying augmentation for ARNet")
 parser.add_argument('--rotation', action='store_true', default=False, help="rotation flip augmentation for ARNet")
 parser.add_argument('--hflip', action='store_true', default=False, help="horizontal flip augmentation for ARNet")

@@ -320,9 +320,9 @@ class ARNetTester(Tester):
         self.batch_time.update(time.time() - self.end_time)
         self.end_time = time.time()
         if self.args.save_result_images:
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, transformed_batch_data_all, original_batch_label, 'input')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, original_batch_label, 'output')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, original_batch_data, original_batch_label, 'gt')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, transformed_batch_data_all, original_batch_label, batch_diff_per_batch_avg, 'input')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, original_batch_label, batch_diff_per_batch_avg, 'output')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, original_batch_data, original_batch_label, batch_diff_per_batch_avg, 'gt')
         if self.batch_idx == len(self.dataloader.test_data_loader)-1:
             if "AUROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
