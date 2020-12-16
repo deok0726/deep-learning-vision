@@ -3,6 +3,7 @@ from main.trainers.trainer import Trainer
 from numpy.random import randint
 import time
 import torch
+import torchvision
 import matplotlib.pyplot as plt
 plt.rcParams.update({'axes.titlesize': 'small'})
 
@@ -17,18 +18,36 @@ class ARNetTrainer(Trainer):
             '180': lambda x, d1, d2: x.flip(d1).flip(d2),
             '270': lambda x, d1, d2: x.transpose(d1, d2).flip(d2)
             }
+        # self.translate_function = torchvision.transforms.RandomAffine(degrees=0, translate=(0.5, 0.5))
 
     def _train_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)    
         self.optimizer.zero_grad()
-        # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
-        angle = self.angles[randint(0, 4)]
-        transformed_batch_data = self.rotate_funtions[str(angle)](batch_data, -2, -1)
-        if not transformed_batch_data.is_contiguous():
-            transformed_batch_data = transformed_batch_data.contiguous()
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if transformed_batch_data.shape[1] == 3:
-            transformed_batch_data = torch.mean(transformed_batch_data, dim=1, keepdim=True) # channel dim 1
+        if batch_data.shape[1] == 3 and self.args.graying:
+            transformed_batch_data = torch.mean(batch_data, dim=1, keepdim=True) # channel dim 1
+        else:
+            transformed_batch_data = batch_data
+        if self.args.rotation:
+            # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
+            angle = self.angles[randint(0, 4)]
+            transformed_batch_data = self.rotate_funtions[str(angle)](transformed_batch_data, -2, -1)
+            if not transformed_batch_data.is_contiguous():
+                transformed_batch_data = transformed_batch_data.contiguous()
+        if self.args.hflip:
+            # Horizontally flip
+            if torch.rand(1) < 0.5:
+                transformed_batch_data = torchvision.transforms.functional.hflip(transformed_batch_data)
+        if self.args.vflip:
+            # Vertically flip
+            if torch.rand(1) < 0.5:
+                transformed_batch_data = torchvision.transforms.functional.vflip(transformed_batch_data)
+        
+        # TBD: Shifting(upgrade needed to latest pytorch version)
+        # if torch.rand(1) < 0.5:
+        #     transformed_batch_data = torchvision.transforms.functional.affine(img=transformed_batch_data, angle=0, translate=(0.5, 0.5), scale=1, shear=0)
+        #     transformed_batch_data = torchvision.transforms.RandomAffine(degrees=0, translate=(0.5, 0.5)).forward(transformed_batch_data)
+        #     transformed_batch_data = self.translate_function.forward(transformed_batch_data)
         batch_data = batch_data.to(self.device)
         transformed_batch_data = transformed_batch_data.to(self.device)
         batch_label = batch_label.to(self.device)
@@ -62,14 +81,29 @@ class ARNetTrainer(Trainer):
 
     def _val_step(self, batch_data, batch_label):
         self.data_time.update(time.time() - self.end_time)
-        # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
-        angle = self.angles[randint(0, 4)]
-        transformed_batch_data = self.rotate_funtions[str(angle)](batch_data, -2, -1)
-        if not transformed_batch_data.is_contiguous():
-            transformed_batch_data = transformed_batch_data.contiguous()
         # Graying: This operation averages each pixel value along the channel dimension of images.
-        if transformed_batch_data.shape[1] == 3:
-            transformed_batch_data = torch.mean(transformed_batch_data, dim=1, keepdim=True) # channel dim 1
+        if batch_data.shape[1] == 3 and self.args.graying:
+            transformed_batch_data = torch.mean(batch_data, dim=1, keepdim=True) # channel dim 1
+        else:
+            transformed_batch_data = batch_data
+        if self.args.rotation:
+            # Random rotation: This operation rotates x anticlockwise by angle alpha around the center of each image channel. The rotation angle alpha is randomly selected from a set {0, 90, 180, 270}
+            angle = self.angles[randint(0, 4)]
+            transformed_batch_data = self.rotate_funtions[str(angle)](transformed_batch_data, -2, -1)
+            if not transformed_batch_data.is_contiguous():
+                transformed_batch_data = transformed_batch_data.contiguous()
+        if self.args.hflip:
+            # Horizontally flip
+            if torch.rand(1) < 0.5:
+                transformed_batch_data = torchvision.transforms.functional.hflip(transformed_batch_data)
+        if self.args.vflip:
+            # Vertically flip
+            if torch.rand(1) < 0.5:
+                transformed_batch_data = torchvision.transforms.functional.vflip(transformed_batch_data)
+        # TBD: Shifting
+        # if torch.rand(1) < 0.5:
+        #     transformed_batch_data = torchvision.transforms.functional.affine(img=transformed_batch_data, angle=0, translate=(0.5, 0.5), scale=1, shear=0)
+        #     transformed_batch_data = self.translate_function.forward(transformed_batch_data)
         batch_data = batch_data.to(self.device)
         transformed_batch_data = transformed_batch_data.to(self.device)
         batch_label = batch_label.to(self.device)
@@ -130,7 +164,10 @@ class ARNetTrainer(Trainer):
             matplotlib_imshow(batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_batch.set_title("Ground Truth")
             ax_transfomred_batch = fig.add_subplot(3, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
-            matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=True, normalized=self.args.normalize, mean=0.5, std=0.5)
+            if self.args.graying:
+                matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=True, normalized=self.args.normalize, mean=0.5, std=0.5)
+            else:
+                matplotlib_imshow(transformed_batch_data[random_sample_idx], one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_transfomred_batch.set_title("Transformed Batch Data")
         plt.tight_layout()
         if is_valid:

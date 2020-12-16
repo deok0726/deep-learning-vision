@@ -85,6 +85,7 @@ class Model(nn.Module):
         # seems that the structure in paper does not contain 'tanh'
         # self.out_conv = nn.Conv2d(64, out_channels, kernel_size=3, stride=1, padding=1, bias=False)# Unet use 1*1conv to be out_conv
         self.out_conv = nn.Conv2d(64, out_channels, kernel_size=3, stride=1, padding=1)# Unet use 1*1conv to be out_conv
+        self.tanh = torch.tanh
         self.rec_criterion = nn.MSELoss(reduction='none')
 
     def forward(self, x):
@@ -97,7 +98,8 @@ class Model(nn.Module):
         x = self.up2(x, x2_3)
         x = self.up3(x, x1_3)
         x = self.up4(x, x0_2)
-        out = torch.tanh(self.out_conv(x))
+        x = self.out_conv(x)
+        out = self.tanh(x)
         return out
     
     def get_losses_name(self):
