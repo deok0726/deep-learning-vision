@@ -35,7 +35,8 @@ def load_model(args):
     elif args.model_name=='MemAE':
         # from models.CAE_MemAE import Model
         # from models.CAE_MemAE_noMem import Model
-        from models.CAE_MemAE_noMem_small import Model
+        # from models.CAE_MemAE_noMem_small import Model
+        from models.CAE_MemAE_noMem_subpixel import Model
         # from models.CAE_MemAE_biggest import Model
         # from models.CAE_MemAE_biggest_noMem import Model
         # from models.CAE_MemAE_subpixel import Model
