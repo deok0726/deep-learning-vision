@@ -1,15 +1,10 @@
 import torch
-import torchvision
 import numpy as np
 import random
 import os
-import time, datetime
 import argument_parser as parser
-from main.trainers.trainer import Trainer
-from main.testers.tester import Tester
 from data_loader import DataLoader
 from modules import custom_metrics, custom_losses
-from modules.utils import AverageMeter
 
 
 def load_loss(losses_name):
@@ -99,39 +94,33 @@ def load_trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict,
         from main.trainers.ARNet_trainer import ARNetTrainer as Trainer
     elif args.model_name=='MemAE':
         from main.trainers.MemAE_trainer import MemAETrainer as Trainer
-        # from main.trainers.MemAE_trainer import MemAETrainer
-        from main.trainers.MemAE_noMem_trainer import MemAETrainer
-        trainer = MemAETrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
+        from main.trainers.MemAE_noMem_trainer import MemAETrainer as Trainer
     elif args.model_name=='VAE' :
         from main.trainers.VAE_trainer import VAE_trainer as Trainer
     elif args.model_name=='AAE' :
         from main.trainers.AAE_trainer import AAE_trainer as Trainer
     elif args.model_name=='MvTec':
-        from main.trainers.MvTec_trainer import MvTecTrainer
-        trainer = MvTecTrainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
+        from main.trainers.MvTec_trainer import MvTecTrainer as Trainer
     else:
-        trainer = Trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
-    # trainer = Trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
+        from main.trainers.trainer import Trainer
+    trainer = Trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
     return trainer
 
 def load_tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE):
     if args.model_name=='ARNet':
-        from main.testers.ARNet_tester import Tester
+        from main.testers.ARNet_tester import ARNetTester as Tester
     elif args.model_name=='MemAE':
-        #from main.testers.MemAE_tester import Tester
-        from main.testers.MemAE_tester import MemAETester
-        from main.testers.MemAE_noMem_tester import MemAETester
-        tester = MemAETester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+        # from main.testers.MemAE_tester import MemAETester as Tester
+        from main.testers.MemAE_noMem_tester import MemAETester as Tester
     elif args.model_name=='AAE':
         from main.testers.AAE_tester import Tester
     elif args.model_name=='VAE':
         from main.testers.VAE_tester import Tester
     elif args.model_name=='MvTec':
-        from main.testers.MvTec_tester import MvTecTester
-        tester = MvTecTester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+        from main.testers.MvTec_tester import MvTecTester as Tester
     else:
-        tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
-    # tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
+        from main.testers.tester import Tester
+    tester = Tester(args, data_loader, model, optimizer, losses_dict, metrics_dict, DEVICE)
     return tester
 
 if __name__ == '__main__':
@@ -169,29 +158,14 @@ if __name__ == '__main__':
     # Load Model
     model = load_model(args)
 
-    # TBD: model multiple name same activation or sequential
-    # x = torch.rand(1,args.channel_num,28,28).to(DEVICE, dtype=torch.float)
-    # x_tilde = model(x)
-    # x_tilde = getattr(x_tilde ,'output')
-    # _children = model.encoder.children()
-    # print(len(_children))
-    # for layer in _children:
-    #     x = layer(x)
-    #     x_tilde = layer(x_tilde)
-    #     print((x_tilde-x).mean())
-
     # losses
-    losses_dict = load_additional_loss([
-        'MSE', 
-        'L1',
+    losses_dict = load_loss([
+        # 'MSE', 
+        # 'L1',
+        # 'SSIM'
         # 'total_kld',
         # 'discriminator',
         ])
-    # losses_dict = load_loss([
-    #     # 'SSIM'
-    #     # 'MSE', 
-    #     # 'L1'
-    # ])
 
     # metrics
     metrics_dict = dict(
@@ -208,7 +182,6 @@ if __name__ == '__main__':
         trainer = load_trainer(args, data_loader, model, optimizer, lr_scheduler, losses_dict, metrics_dict, DEVICE)
         trainer.train()
 
-    # TBD: add tensorboard projector to test data(https://tutorials.pytorch.kr/intermediate/tensorboard_tutorial.html)
     if args.test:
         metrics_dict['AUROC'] = custom_metrics.AUROC(args.target_label, args.unique_anomaly)
         metrics_dict['AUPRC'] = custom_metrics.AUPRC(args.target_label, args.unique_anomaly)
