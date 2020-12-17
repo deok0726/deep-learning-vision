@@ -5,6 +5,7 @@ import torch
 from codes import mvtecad
 from codes import gms
 from codes import daejoo
+from codes import etc
 from functools import reduce
 from torch.utils.data import DataLoader
 from codes.datasets import *
@@ -28,7 +29,8 @@ parser.add_argument('--lambda_value', default=1, type=float)
 parser.add_argument('--D', default=64, type=int)
 parser.add_argument('--epochs', default=300, type=int)
 parser.add_argument('--lr', default=1e-4, type=float)
-parser.add_argument('--dataset', default='mvtec', type=str)
+parser.add_argument('--dataset', default='etc', type=str)
+parser.add_argument('--data_path', default='/hd/', type=str)
 
 def train():
     args = parser.parse_args()
@@ -36,6 +38,7 @@ def train():
     D = args.D
     lr = args.lr
     dataset = args.dataset
+    data_path = args.data_path
 
     print(args)
 
@@ -45,6 +48,8 @@ def train():
         writer = SummaryWriter('runs/gms_experiment/')
     elif dataset == 'daejoo':
         writer = SummaryWriter('runs/daejoo_experiment/')
+    elif dataset == 'etc':
+        writer = SummaryWriter('runs/etc_experiment/')
 
     with task('Networks'):
         enc = EncoderHier(64, D).cuda()
@@ -74,6 +79,13 @@ def train():
             train_x = daejoo.get_x_standardized(obj, mode='train')
             train_x = NHWC2NCHW(train_x)
             valid_x = daejoo.get_x_standardized(obj, mode='valid')
+            valid_x = NHWC2NCHW(valid_x)
+        
+        elif dataset == 'etc':
+            etc.set_root_path(data_path)
+            train_x = etc.get_x_standardized(obj, mode='train')
+            train_x = NHWC2NCHW(train_x)
+            valid_x = etc.get_x_standardized(obj, mode='valid')
             valid_x = NHWC2NCHW(valid_x)
 
         rep = 100
@@ -136,7 +148,9 @@ def train():
             writer.add_scalars('training_validation', {'training_loss' : loss, 'validation_loss' : loss_val}, i_epoch)
         elif dataset == 'daejoo':
             writer.add_scalars('training_validation', {'training_loss' : loss, 'validation_loss' : loss_val}, i_epoch)
-
+        elif dataset == 'etc':
+            writer.add_scalars('training_validation', {'training_loss' : loss, 'validation_loss' : loss_val}, i_epoch)
+        
         aurocs = eval_encoder_NN_multiK(enc, obj, dataset)
         log_result(obj, aurocs)
         enc.save(obj)

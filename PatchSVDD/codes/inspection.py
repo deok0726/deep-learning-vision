@@ -1,6 +1,7 @@
 from codes import mvtecad
 from codes import gms
 from codes import daejoo
+from codes import etc
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -55,6 +56,16 @@ def assess_anomaly_maps(obj, anomaly_maps, dataset):
         else:
             return auroc_det
 
+    elif dataset == 'etc':
+        anomaly_scores = anomaly_maps.max(axis=-1).max(axis=-1)
+        print(anomaly_scores)
+        result = etc._classification_report(anomaly_scores, obj, 3.3, target_label=1)
+        print(result)
+        auroc_det = etc.detection_auroc(obj, anomaly_scores)
+        if auroc_det == None:
+            return 0
+        else:
+            return auroc_det
 
 #########################
 
@@ -107,6 +118,22 @@ def eval_encoder_NN_multiK(enc, obj, dataset):
         embs64 = embs64_tr, embs64_te
         embs32 = embs32_tr, embs32_te
 
+    elif dataset == 'etc':
+        x_tr = etc.get_x_standardized(obj, mode='train')
+        x_te = etc.get_x_standardized(obj, mode='test')
+
+        embs64_tr = infer(x_tr, enc, K=64, S=16)
+        embs64_te = infer(x_te, enc, K=64, S=16)
+
+        x_tr = etc.get_x_standardized(obj, mode='train')
+        x_te = etc.get_x_standardized(obj, mode='test')
+
+        embs32_tr = infer(x_tr, enc.enc, K=32, S=4)
+        embs32_te = infer(x_te, enc.enc, K=32, S=4)
+
+        embs64 = embs64_tr, embs64_te
+        embs32 = embs32_tr, embs32_te
+
     return eval_embeddings_NN_multiK(obj, embs64, embs32, dataset)
 
 
@@ -122,6 +149,9 @@ def eval_embeddings_NN_multiK(obj, embs64, embs32, dataset, NN=1):
     elif dataset == 'daejoo':
         det_64 = assess_anomaly_maps(obj, maps_64, dataset)
         seg_64 = 0
+    elif dataset == 'etc':
+        det_64 = assess_anomaly_maps(obj, maps_64, dataset)
+        seg_64 = 0
 
     emb_tr, emb_te = embs32
     maps_32 = measure_emb_NN(emb_te, emb_tr, method='ngt', NN=NN)
@@ -134,6 +164,9 @@ def eval_embeddings_NN_multiK(obj, embs64, embs32, dataset, NN=1):
     elif dataset == 'daejoo':
         det_32 = assess_anomaly_maps(obj, maps_32, dataset)
         seg_32 = 0
+    elif dataset == 'etc':
+        det_32 = assess_anomaly_maps(obj, maps_32, dataset)
+        seg_32 = 0
 
     maps_sum = maps_64 + maps_32
     if dataset == 'mvtec':
@@ -144,6 +177,9 @@ def eval_embeddings_NN_multiK(obj, embs64, embs32, dataset, NN=1):
     elif dataset == 'daejoo':
         det_sum = assess_anomaly_maps(obj, maps_sum, dataset)
         seg_sum = 0
+    elif dataset == 'etc':
+        det_sum = assess_anomaly_maps(obj, maps_sum, dataset)
+        seg_sum = 0
 
     maps_mult = maps_64 * maps_32
     if dataset == 'mvtec':
@@ -152,6 +188,9 @@ def eval_embeddings_NN_multiK(obj, embs64, embs32, dataset, NN=1):
         det_mult = assess_anomaly_maps(obj, maps_mult, dataset)
         seg_mult = 0
     elif dataset == 'daejoo':
+        det_mult = assess_anomaly_maps(obj, maps_mult, dataset)
+        seg_mult = 0
+    elif dataset == 'etc':
         det_mult = assess_anomaly_maps(obj, maps_mult, dataset)
         seg_mult = 0
 

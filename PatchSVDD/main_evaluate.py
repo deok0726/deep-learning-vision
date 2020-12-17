@@ -11,7 +11,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--obj', default='screw')
-parser.add_argument('--dataset', default='mvtec', type=str)
+parser.add_argument('--dataset', default='etc', type=str)
 
 args = parser.parse_args()
 obj = args.obj
