@@ -9,6 +9,7 @@ from collections import namedtuple
 class Model(nn.Module):
     def __init__(self, n_channels, input_height, input_width, mem_dim=100):
         super(Model, self).__init__()
+        assert input_height == self.calDim(input_height), 'input dimension output dimension mismatch'
         self.conv_channel_num = 32
         self.encoder = Encoder(n_channels, self.conv_channel_num)
         self.decoder = Decoder(n_channels, self.conv_channel_num)
@@ -16,7 +17,6 @@ class Model(nn.Module):
         self.input_h = temp_encoder_output.shape[-2]
         self.input_w = temp_encoder_output.shape[-1]
         self.rec_criterion = nn.MSELoss(reduction='none')
-        self.return_values = namedtuple("return_values", 'output mem_weight embedding')
 
     def forward(self, x):
         z = self.encoder(x)
@@ -33,6 +33,18 @@ class Model(nn.Module):
     def _get_recon_loss(self, x, y):
         rec_loss = self.rec_criterion(y, x)
         return rec_loss
+    
+    def calDim(self, crop_size):
+        x1 = math.floor((crop_size+2-(3-1)-1)/2+1)
+        x2 = math.floor((x1+2-(3-1)-1)/2+1)
+        x3 = math.floor((x2+2-(3-1)-1)/2+1)
+        x4 = math.floor((x3+2-(3-1)-1)/2+1)
+        y1 = (x4-1)*2-2+(3-1)+1+1
+        y2 = (y1-1)*2-2+(3-1)+1+1
+        y3 = (y2-1)*2-2+(3-1)+1+1
+        y4 = (y3-1)*2-2+(3-1)+1+1
+        print(crop_size, x1, x2, x3, x4, y1, y2, y3, y4)
+        return y4
 
 class Encoder(nn.Module):
     def __init__(self, image_channel_num, conv_channel_num):

@@ -19,7 +19,8 @@ class MemAETester(Tester):
             else:
                 output_data = self.model(batch_data)
         # batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data, self.model.encoder.children())
-        batch_diff_per_batch = (batch_data - output_data) ** 2
+        # batch_diff_per_batch = (batch_data - output_data) ** 2
+        batch_diff_per_batch = torch.abs(batch_data - output_data)
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         if max(batch_diff_per_batch) > self.max_residual:
             self.max_residual = max(batch_diff_per_batch)
@@ -34,7 +35,8 @@ class MemAETester(Tester):
                 # output_data = getattr(output_data ,'output')
         # batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data, self.model.encoder.children())
         # batch_diff_per_batch = self.ANOMALY_CRITERION(batch_data, output_data)
-        batch_diff_per_batch = (batch_data - output_data) ** 2
+        # batch_diff_per_batch = (batch_data - output_data) ** 2
+        batch_diff_per_batch = torch.abs(batch_data - output_data)
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         self.diffs_per_data_threshold.extend(batch_diff_per_batch.cpu().detach().numpy())
         self.labels_per_data_threshold.extend(batch_label.cpu().detach().numpy())
@@ -48,7 +50,8 @@ class MemAETester(Tester):
                 output_data = self._generate_patches_and_merge(batch_data, self.window_size, self.args.crop_size, self.args.channel_num)
             else:
                 output_data = self.model(batch_data)
-        batch_diff_per_batch = (batch_data - output_data) ** 2
+        # batch_diff_per_batch = (batch_data - output_data) ** 2
+        batch_diff_per_batch = torch.abs(batch_data - output_data)
         batch_diff_per_batch = batch_diff_per_batch.mean((1, 2, 3))
         self.diffs_per_data.extend(batch_diff_per_batch.cpu().detach().numpy())
         self.labels_per_data.extend(batch_label.cpu().detach().numpy())
@@ -65,7 +68,7 @@ class MemAETester(Tester):
         if self.args.save_result_images:
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, batch_diff_per_batch, 'input')
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, batch_diff_per_batch, 'output')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, (batch_data-output_data)**2, batch_label, batch_diff_per_batch, 'residual')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, torch.abs(batch_data-output_data), batch_label, batch_diff_per_batch, 'residual')
         if self.batch_idx == len(self.dataloader.test_data_loader)-1:
             if "AUROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
@@ -98,7 +101,7 @@ class MemAETester(Tester):
         self.output_per_data = []
     
     def _generate_patches_and_merge(self, batch_data, stride, windowSize, output_color_channel):
-        output_data = torch.empty((output_color_channel, batch_data.shape[2], batch_data.shape[3])).unsqueeze(0)
+        output_data = torch.empty((batch_data.shape[0], output_color_channel, batch_data.shape[2], batch_data.shape[3]))
         for y in range(0, batch_data.shape[2], stride):
             for x in range(0, batch_data.shape[3], stride):
                 if (y+windowSize > batch_data.shape[2]) or (x+windowSize > batch_data.shape[3]):

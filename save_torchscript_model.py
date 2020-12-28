@@ -18,7 +18,8 @@ def load_model(args):
         else:
             model = Model(in_channels=1, out_channels=1, bilinear=False).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MemAE':
-        from models.CAE_MemAE import Model
+        # from models.CAE_MemAE import Model
+        from models.CAE_MemAE_noMem_subpixel import Model
         model = Model(args.channel_num, args.input_height, args.input_width, args.memory_dimension).to(DEVICE, dtype=torch.float)
         # model = Model(n_channels=args.channel_num, mem_dim = 100).to(DEVICE, dtype=torch.float)
     elif args.model_name=='MvTec':
@@ -78,7 +79,7 @@ def automkdir(path):
 
 if __name__ == "__main__":
     args = parser.get_args()
-    args.input_height, args.input_width = 28, 28
+    args.input_height, args.input_width = 392, 392
     CHECKPOINT_SAVE_DIR = os.path.join(os.path.join(args.checkpoint_dir, args.model_name), args.exp_name)
     # '/hd/checkpoints/MemAE/MNIST_Data_MemAE_Model_target_1/'
     # set cuda device
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     optimizer, lr_scheduler = load_optimizer_with_lr_scheduler(args)
     _restore_checkpoint(CHECKPOINT_SAVE_DIR, model, optimizer)
     model.eval()
-    x = torch.randn(1, 1, 28, 28, requires_grad=True).to(DEVICE)
+    x = torch.randn(1, 3, 392, 392, requires_grad=True).to(DEVICE)
     torch_out = model(x)
     traced_cell = torch.jit.trace(model, x)
     # print(traced_cell)

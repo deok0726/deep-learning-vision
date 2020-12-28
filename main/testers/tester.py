@@ -76,7 +76,7 @@ class Tester:
         if self.args.save_result_images:
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, batch_data, batch_label, batch_diff_per_batch, 'input')
             self.save_result_images(self.TEST_RESULTS_SAVE_DIR, output_data, batch_label, batch_diff_per_batch, 'output')
-            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, (batch_data-output_data)**2, batch_label, batch_diff_per_batch, 'residual')
+            self.save_result_images(self.TEST_RESULTS_SAVE_DIR, torch.abs(batch_data-output_data), batch_label, batch_diff_per_batch, 'residual')
         if self.batch_idx == (len(self.dataloader.test_data_loader)-1):
             if "AUROC" in self.metric_funcs.keys():
                 metric_value = self.metric_funcs['AUROC'](np.asarray(self.diffs_per_data), np.asarray(self.labels_per_data))
@@ -197,7 +197,7 @@ class Tester:
                 metrics.append(':'.join(('Recall', str(round(metric_per_epoch['Recall'].avg, 5)))))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_residual = fig.add_subplot(3, self.args.test_tensorboard_shown_image_num, idx+self.args.test_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
-            matplotlib_imshow((batch_data[random_sample_idx]-output_data[random_sample_idx])**2 , one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
+            matplotlib_imshow(torch.abs(batch_data[random_sample_idx]-output_data[random_sample_idx]) , one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_residual.set_title("Residual Map")
             
         plt.tight_layout()

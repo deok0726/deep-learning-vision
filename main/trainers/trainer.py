@@ -224,7 +224,7 @@ class Trainer:
                 metrics.append(':'.join((metric_per_batch_name, str(round(metric_per_batch_value[random_sample_idx].mean().item(), 10)))))
             ax_output.set_title("Output\n" + "losses\n" + "\n".join(losses) + "\n\nmetrics\n"+ "\n".join(metrics) + "\nlabel: " + str(batch_label[random_sample_idx].item()))
             ax_residual = fig.add_subplot(3, self.args.train_tensorboard_shown_image_num, idx+self.args.train_tensorboard_shown_image_num*2+1, xticks=[], yticks=[])
-            matplotlib_imshow((batch_data[random_sample_idx]-output_data[random_sample_idx])**2 , one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
+            matplotlib_imshow(torch.abs(batch_data[random_sample_idx]-output_data[random_sample_idx]) , one_channel=self.one_channel, normalized=self.args.normalize, mean=0.5, std=0.5)
             ax_residual.set_title("Residual Map")
         plt.tight_layout()
         if is_valid:
