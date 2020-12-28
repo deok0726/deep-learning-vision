@@ -11,6 +11,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         assert input_height == self.calDim(input_height), 'input dimension output dimension mismatch'
         self.conv_channel_num = 16
+        # self.conv_channel_num = 4
         self.encoder = Encoder(n_channels, self.conv_channel_num)
         self.decoder = Decoder(n_channels, self.conv_channel_num)
         temp_encoder_output = self.encoder.forward(torch.rand(1, n_channels, input_height, input_width))
@@ -78,23 +79,25 @@ class Decoder(nn.Module):
         self.conv1 = nn.Conv2d(conv_channel_num*4, conv_channel_num*2*(2**2), kernel_size=3, stride=1, padding=1)
         self.ps1 = nn.PixelShuffle(2)
         self.bn1 = nn.BatchNorm2d(conv_channel_num*2)
+        self.relu1 = nn.ReLU()
         self.conv2 = nn.Conv2d(conv_channel_num*2, conv_channel_num*(2**2), kernel_size=3,stride=1, padding=1)
         self.ps2 = nn.PixelShuffle(2)
         self.bn2 = nn.BatchNorm2d(conv_channel_num)
+        self.relu2 = nn.ReLU()
         self.conv3 = nn.Conv2d(conv_channel_num, image_channel_num*(2**2), kernel_size=3,stride=1, padding=1)
         self.ps3 = nn.PixelShuffle(2)
-        self.relu = nn.ReLU()
+        
     
     def forward(self, x):
         x = self.conv1(x)
         x = self.ps1(x)
         x = self.bn1(x)
-        x = self.relu(x)
+        x = self.relu1(x)
 
         x = self.conv2(x)
         x = self.ps2(x)
         x = self.bn2(x)
-        x = self.relu(x)
+        x = self.relu2(x)
 
         x = self.conv3(x)
         x = self.ps3(x)
