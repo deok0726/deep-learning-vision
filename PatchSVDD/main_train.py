@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import torch
+from os import path
 from codes import mvtecad
 from codes import gms
 from codes import daejoo
@@ -13,14 +14,6 @@ from codes.networks import *
 from codes.inspection import eval_encoder_NN_multiK
 from codes.utils import *
 from tensorboardX import SummaryWriter
-
-# def str2bool(v):
-#     if v.lower() in ('yes', 'true', 't', 'y', '1'):
-#         return True
-#     elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-#         return False
-#     else:
-#         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 parser = argparse.ArgumentParser()
 
@@ -41,7 +34,7 @@ def train():
     data_path = args.data_path
 
     print(args)
-
+    
     if dataset == 'mvtec':
         writer = SummaryWriter('runs/mvtec_experiment')
     elif dataset == 'gms':
@@ -95,22 +88,38 @@ def train():
         datasets[f'svdd_64'] = SVDD_Dataset(train_x, K=64, repeat=rep)
         datasets[f'svdd_32'] = SVDD_Dataset(train_x, K=32, repeat=rep)
 
-        datasets_val = dict()
-        datasets_val[f'pos_64'] = PositionDataset(valid_x, K=64, repeat=rep)
-        datasets_val[f'pos_32'] = PositionDataset(valid_x, K=32, repeat=rep)
-        datasets_val[f'svdd_64'] = SVDD_Dataset(valid_x, K=64, repeat=rep)
-        datasets_val[f'svdd_32'] = SVDD_Dataset(valid_x, K=32, repeat=rep)
+        if dataset != 'mvtec':
+            datasets_val = dict()
+            datasets_val[f'pos_64'] = PositionDataset(valid_x, K=64, repeat=rep)
+            datasets_val[f'pos_32'] = PositionDataset(valid_x, K=32, repeat=rep)
+            datasets_val[f'svdd_64'] = SVDD_Dataset(valid_x, K=64, repeat=rep)
+            datasets_val[f'svdd_32'] = SVDD_Dataset(valid_x, K=32, repeat=rep)
 
         dataset_tr = DictionaryConcatDataset(datasets)
-        dataset_val = DictionaryConcatDataset(datasets_val)
+        if dataset != 'mvtec':
+            dataset_val = DictionaryConcatDataset(datasets_val)
         loader = DataLoader(dataset_tr, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
-        loader_val = DataLoader(dataset_val, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
-
+        if dataset != 'mvtec':
+            loader_val = DataLoader(dataset_val, batch_size=64, shuffle=True, num_workers=2, pin_memory=True)
+    
     print('Start training')
     loss = 0
     loss_val = 0
-    for i_epoch in range(args.epochs):
-        print(i_epoch+1, "/", args.epochs)
+    epoch = 1
+
+    try:
+        checkpoint = torch.load(enc.fpath_from_name(obj))
+        enc.load_state_dict(checkpoint['model_state_dict'])
+        opt.load_state_dict(checkpoint['optimizer_state_dict'])
+        epoch = checkpoint['epoch']
+        epoch += 1
+        loss = checkpoint['loss']
+        print('Successfully loaded checkpoint')
+    except:
+        print('There is no checkpoint. Training starts from scratch')
+
+    for i_epoch in range(epoch, args.epochs+epoch):
+        print(i_epoch, "/", args.epochs+epoch-1)
         for module in modules:
             module.train()
 
@@ -130,17 +139,18 @@ def train():
             
         for module in modules:
             module.eval()
-        
-        for vd in loader_val:
-            vd = to_device(vd, 'cuda', non_blocking=True)
-            
-            with torch.no_grad():
-                loss_pos_64 = PositionClassifier.infer(cls_64, enc, vd['pos_64'])
-                loss_pos_32 = PositionClassifier.infer(cls_32, enc.enc, vd['pos_32'])
-                loss_svdd_64 = SVDD_Dataset.infer(enc, vd['svdd_64'])
-                loss_svdd_32 = SVDD_Dataset.infer(enc.enc, vd['svdd_32'])
 
-            loss_val = loss_pos_64 + loss_pos_32 + args.lambda_value * (loss_svdd_64 + loss_svdd_32)
+        if dataset != 'mvtec':
+            for vd in loader_val:
+                vd = to_device(vd, 'cuda', non_blocking=True)
+                
+                with torch.no_grad():
+                    loss_pos_64 = PositionClassifier.infer(cls_64, enc, vd['pos_64'])
+                    loss_pos_32 = PositionClassifier.infer(cls_32, enc.enc, vd['pos_32'])
+                    loss_svdd_64 = SVDD_Dataset.infer(enc, vd['svdd_64'])
+                    loss_svdd_32 = SVDD_Dataset.infer(enc.enc, vd['svdd_32'])
+
+                loss_val = loss_pos_64 + loss_pos_32 + args.lambda_value * (loss_svdd_64 + loss_svdd_32)
     
         if dataset == 'mvtec':
             writer.add_scalar('training_loss', loss, i_epoch)
@@ -153,7 +163,7 @@ def train():
         
         aurocs = eval_encoder_NN_multiK(enc, obj, dataset)
         log_result(obj, aurocs)
-        enc.save(obj)
+        enc.save(obj, i_epoch, opt, loss)
     writer.close()
 
 

@@ -48,7 +48,7 @@ def assess_anomaly_maps(obj, anomaly_maps, dataset):
     elif dataset == 'daejoo':
         anomaly_scores = anomaly_maps.max(axis=-1).max(axis=-1)
         print(anomaly_scores)
-        result = daejoo._classification_report(anomaly_scores, obj, 3.3, target_label=1)
+        result = daejoo._classification_report(anomaly_scores, obj, 1.5, target_label=1)
         print(result)
         auroc_det = daejoo.detection_auroc(obj, anomaly_scores)
         if auroc_det == None:
