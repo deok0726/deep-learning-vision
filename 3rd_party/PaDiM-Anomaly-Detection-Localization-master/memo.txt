@@ -1,0 +1,22 @@
+x.size(): torch.Size([364, 64, 56, 56])
+y.size(): torch.Size([364, 128, 28, 28])
+x.unfold size: torch.Size([364, 256, 784])
+x.view size: torch.Size([364, 64, 4, 28, 28])
+
+z.zeros size: torch.Size([364, 192, 4, 28, 28])
+z.size(): torch.Size([364, 192, 4, 28, 28])
+z.view size: torch.Size([364, 768, 784])
+z.fold size: torch.Size([364, 192, 56, 56])
+finished embedding concat: layer2
+
+
+x.size(): torch.Size([364, 192, 56, 56])
+y.size(): torch.Size([364, 256, 14, 14])
+x.unfold size: torch.Size([364, 3072, 196])
+x.view size: torch.Size([364, 192, 16, 14, 14])
+
+z.zeros size: torch.Size([364, 448, 16, 14, 14])
+z.size(): torch.Size([364, 448, 16, 14, 14])
+z.view size: torch.Size([364, 7168, 196])
+z.fold size: torch.Size([364, 448, 56, 56])
+finished embedding concat: layer3

@@ -21,25 +21,23 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision.models import wide_resnet50_2, resnet18
-import datasets.daejoo as daejoo
-import sys
+import datasets.mvtec as mvtec
+
 
 # device setup
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 use_cuda = torch.cuda.is_available()
 device = torch.device('cuda' if use_cuda else 'cpu')
-# print(device)
-# sys.exit()
+
 
 def parse_args():
     parser = argparse.ArgumentParser('PaDiM')
-    parser.add_argument("--data_path", type=str, default="/hd/daejoo/")
-    parser.add_argument("--save_path", type=str, default="/root/anomaly_detection/3rd_party/PaDiM-Anomaly-Detection-Localization-master/")
-    parser.add_argument("--arch", type=str, choices=['resnet18', 'wide_resnet50_2'], default='resnet18')
+    parser.add_argument("--data_path", type=str, default="D:/dataset/mvtec_anomaly_detection")
+    parser.add_argument("--save_path", type=str, default="./mvtec_result")
+    parser.add_argument("--arch", type=str, choices=['resnet18, wide_resnet50_2'], default='wide_resnet50_2')
     return parser.parse_args()
 
-def main_nomask():
+
+def main():
 
     args = parse_args()
 
@@ -47,12 +45,10 @@ def main_nomask():
     if args.arch == 'resnet18':
         model = resnet18(pretrained=True, progress=True)
         t_d = 448
-        d = 448
-        # d = 100
+        d = 100
     elif args.arch == 'wide_resnet50_2':
         model = wide_resnet50_2(pretrained=True, progress=True)
         t_d = 1792
-        # d = 100
         d = 550
     model.to(device)
     model.eval()
@@ -73,9 +69,7 @@ def main_nomask():
     model.layer2[-1].register_forward_hook(hook)
     model.layer3[-1].register_forward_hook(hook)
 
-    # os.mkdir(os.path.join(args.save_path, 'temp_%s' % args.arch))
-    new_path = os.path.join(args.save_path, 'temp_%s' % args.arch)
-    os.makedirs(new_path, exist_ok=True)
+    os.makedirs(os.path.join(args.save_path, 'temp_%s' % args.arch), exist_ok=True)
     fig, ax = plt.subplots(1, 2, figsize=(20, 10))
     fig_img_rocauc = ax[0]
     fig_pixel_rocauc = ax[1]
@@ -83,11 +77,11 @@ def main_nomask():
     total_roc_auc = []
     total_pixel_roc_auc = []
 
-    for class_name in daejoo.CLASS_NAMES:
+    for class_name in mvtec.CLASS_NAMES:
 
-        train_dataset = daejoo.MVTecDataset_nomask(args.data_path, class_name=class_name, is_train=True)
+        train_dataset = mvtec.MVTecDataset(args.data_path, class_name=class_name, is_train=True)
         train_dataloader = DataLoader(train_dataset, batch_size=32, pin_memory=True)
-        test_dataset = daejoo.MVTecDataset_nomask(args.data_path, class_name=class_name, is_train=False)
+        test_dataset = mvtec.MVTecDataset(args.data_path, class_name=class_name, is_train=False)
         test_dataloader = DataLoader(test_dataset, batch_size=32, pin_memory=True)
 
         train_outputs = OrderedDict([('layer1', []), ('layer2', []), ('layer3', [])])
@@ -96,13 +90,12 @@ def main_nomask():
         # extract train set features
         train_feature_filepath = os.path.join(args.save_path, 'temp_%s' % args.arch, 'train_%s.pkl' % class_name)
         if not os.path.exists(train_feature_filepath):
-            for (x, _) in tqdm(train_dataloader, '| feature extraction | train | %s |' % class_name):
+            for (x, _, _) in tqdm(train_dataloader, '| feature extraction | train | %s |' % class_name):
                 # model prediction
                 with torch.no_grad():
                     _ = model(x.to(device))
                 # get intermediate layer outputs
                 for k, v in zip(train_outputs.keys(), outputs):
-                    # print('outputs:', outputs)
                     train_outputs[k].append(v.cpu().detach())
                 # initialize hook outputs
                 outputs = []
@@ -113,10 +106,6 @@ def main_nomask():
             embedding_vectors = train_outputs['layer1']
             for layer_name in ['layer2', 'layer3']:
                 embedding_vectors = embedding_concat(embedding_vectors, train_outputs[layer_name])
-                print('finished embedding concat:', layer_name)
-            # for layer_name in ['layer3', 'layer2']:
-            #     embedding_vectors = embedding_concat(embedding_vectors, train_outputs[layer_name])
-            #     print('finished embedding concat:', layer_name)
 
             # randomly select d dimension
             embedding_vectors = torch.index_select(embedding_vectors, 1, idx)
@@ -139,14 +128,14 @@ def main_nomask():
                 train_outputs = pickle.load(f)
 
         gt_list = []
-        # gt_mask_list = []
+        gt_mask_list = []
         test_imgs = []
 
         # extract test set features
-        for (x, y) in tqdm(test_dataloader, '| feature extraction | test | %s |' % class_name):
+        for (x, y, mask) in tqdm(test_dataloader, '| feature extraction | test | %s |' % class_name):
             test_imgs.extend(x.cpu().detach().numpy())
             gt_list.extend(y.cpu().detach().numpy())
-            # gt_mask_list.extend(mask.cpu().detach().numpy())
+            gt_mask_list.extend(mask.cpu().detach().numpy())
             # model prediction
             with torch.no_grad():
                 _ = model(x.to(device))
@@ -157,14 +146,11 @@ def main_nomask():
             outputs = []
         for k, v in test_outputs.items():
             test_outputs[k] = torch.cat(v, 0)
-        # for k in test_outputs.keys():
-        #     print(len(test_outputs[k]))
-
+        
         # Embedding concat
         embedding_vectors = test_outputs['layer1']
         for layer_name in ['layer2', 'layer3']:
             embedding_vectors = embedding_concat(embedding_vectors, test_outputs[layer_name])
-            print('finished embedding concat:', layer_name)
 
         # randomly select d dimension
         embedding_vectors = torch.index_select(embedding_vectors, 1, idx)
@@ -204,27 +190,45 @@ def main_nomask():
         print('image ROCAUC: %.3f' % (img_roc_auc))
         fig_img_rocauc.plot(fpr, tpr, label='%s img_ROCAUC: %.3f' % (class_name, img_roc_auc))
         
-        
+        # get optimal threshold
+        gt_mask = np.asarray(gt_mask_list)
+        precision, recall, thresholds = precision_recall_curve(gt_mask.flatten(), scores.flatten())
+        a = 2 * precision * recall
+        b = precision + recall
+        f1 = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
+        threshold = thresholds[np.argmax(f1)]
+
+        # calculate per-pixel level ROCAUC
+        fpr, tpr, _ = roc_curve(gt_mask.flatten(), scores.flatten())
+        per_pixel_rocauc = roc_auc_score(gt_mask.flatten(), scores.flatten())
+        total_pixel_roc_auc.append(per_pixel_rocauc)
+        print('pixel ROCAUC: %.3f' % (per_pixel_rocauc))
+
+        fig_pixel_rocauc.plot(fpr, tpr, label='%s ROCAUC: %.3f' % (class_name, per_pixel_rocauc))
+        save_dir = args.save_path + '/' + f'pictures_{args.arch}'
+        os.makedirs(save_dir, exist_ok=True)
+        plot_fig(test_imgs, scores, gt_mask_list, threshold, save_dir, class_name)
+
     print('Average ROCAUC: %.3f' % np.mean(total_roc_auc))
     fig_img_rocauc.title.set_text('Average image ROCAUC: %.3f' % np.mean(total_roc_auc))
     fig_img_rocauc.legend(loc="lower right")
 
-    # print('Average pixel ROCUAC: %.3f' % np.mean(total_pixel_roc_auc))
-    # fig_pixel_rocauc.title.set_text('Average pixel ROCAUC: %.3f' % np.mean(total_pixel_roc_auc))
-    # fig_pixel_rocauc.legend(loc="lower right")
+    print('Average pixel ROCUAC: %.3f' % np.mean(total_pixel_roc_auc))
+    fig_pixel_rocauc.title.set_text('Average pixel ROCAUC: %.3f' % np.mean(total_pixel_roc_auc))
+    fig_pixel_rocauc.legend(loc="lower right")
 
     fig.tight_layout()
     fig.savefig(os.path.join(args.save_path, 'roc_curve.png'), dpi=100)
 
 
-def plot_fig_nomask(test_img, scores, threshold, save_dir, class_name):
+def plot_fig(test_img, scores, gts, threshold, save_dir, class_name):
     num = len(scores)
     vmax = scores.max() * 255.
     vmin = scores.min() * 255.
     for i in range(num):
         img = test_img[i]
         img = denormalization(img)
-        # gt = gts[i].transpose(1, 2, 0).squeeze()
+        gt = gts[i].transpose(1, 2, 0).squeeze()
         heat_map = scores[i] * 255
         mask = scores[i]
         mask[mask > threshold] = 1
@@ -241,8 +245,8 @@ def plot_fig_nomask(test_img, scores, threshold, save_dir, class_name):
             ax_i.axes.yaxis.set_visible(False)
         ax_img[0].imshow(img)
         ax_img[0].title.set_text('Image')
-        # ax_img[1].imshow(gt, cmap='gray')
-        # ax_img[1].title.set_text('GroundTruth')
+        ax_img[1].imshow(gt, cmap='gray')
+        ax_img[1].title.set_text('GroundTruth')
         ax = ax_img[2].imshow(heat_map, cmap='jet', norm=norm)
         ax_img[2].imshow(img, cmap='gray', interpolation='none')
         ax_img[2].imshow(heat_map, cmap='jet', alpha=0.5, interpolation='none')
@@ -271,7 +275,6 @@ def plot_fig_nomask(test_img, scores, threshold, save_dir, class_name):
         plt.close()
 
 
-
 def denormalization(x):
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
@@ -282,64 +285,18 @@ def denormalization(x):
 
 def embedding_concat(x, y):
     B, C1, H1, W1 = x.size()
-    print('x.size():', x.size())
-    print('x size:', x.element_size() * x.nelement())
-    # print('B, C1, H1, W1: ', B, C1, H1, W1)
-    
-    B2, C2, H2, W2 = y.size()
-    print('y.size():', y.size())
-    print('y size:', y.element_size() * y.nelement())
-    # print('B2, C2, H2, W2: ', B2, C2, H2, W2)
-
+    _, C2, H2, W2 = y.size()
     s = int(H1 / H2)
     x = F.unfold(x, kernel_size=s, dilation=1, stride=s)
-    # print('x.unfold size:', x.size())
     x = x.view(B, C1, -1, H2, W2)
-    # print('x.view size:', x.size())
     z = torch.zeros(B, C1 + C2, x.size(2), H2, W2)
-    print('z.zeros size:', z.size())
-    print('z size:', z.element_size() * z.nelement())
-
-    # print('x.size():', x.size())
-    # print('x.size(0): ', x.size(0))
-    # print('x.size(1): ', x.size(1))
-    # print('x.size(2): ', x.size(2))
-    # print('x.size(3): ', x.size(3))
-    # print('x.size(4): ', x.size(4))
-
     for i in range(x.size(2)):
-        # print(i)
         z[:, :, i, :, :] = torch.cat((x[:, :, i, :, :], y), 1)
-
-        # print('size:', sys.getsizeof(z.storage()))
-        # print('size:', z.element_size() * z.nelement())
-        # print('z size:', z.size())
-    # print('z.size():', z.size())
     z = z.view(B, -1, H2 * W2)
-    # print('z.view size:', z.size())
     z = F.fold(z, kernel_size=s, output_size=(H1, W1), stride=s)
-    # print('z.fold size:', z.size())
+
     return z
-
-# def embedding_concat(x, y, z):
-#     B, C1, H1, W1 = x.size()
-#     B2, C2, H2, W2 = y.size()
-#     B3, C3, H3, W3 = z.size()
-
-#     s = int(H1 / H2)
-#     x = F.unfold(x, kernel_size=s, dilation=1, stride=s)
-#     x = x.view(B, C1, -1, H2, W2)
-#     concat = torch.zeros(B, C1 + C2, x.size(2), H2, W2)
-
-#     for i in range(x.size(2)):
-#         concat[:, :, i, :, :] = torch.cat((x[:, :, i, :, :], y), 1)
-
-#     concat = z.view(B, -1, H2 * W2)
-#     concat = F.fold(z, kernel_size=s, output_size=(H1, W1), stride=s)
-
-#     return concat
 
 
 if __name__ == '__main__':
-    # main()
-    main_nomask()
+    main()
