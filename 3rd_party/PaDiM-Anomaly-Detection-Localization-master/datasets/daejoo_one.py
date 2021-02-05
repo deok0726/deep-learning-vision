@@ -1,6 +1,5 @@
 import os
 # import tarfile
-import numpy as np
 from PIL import Image, ImageFile
 from tqdm import tqdm
 # import urllib.request
@@ -16,15 +15,15 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 # CLASS_NAMES = ['bottle', 'cable', 'capsule', 'carpet', 'grid',
 #                'hazelnut', 'leather', 'metal_nut', 'pill', 'screw',
 #                'tile', 'toothbrush', 'transistor', 'wood', 'zipper']
-# CLASS_NAMES = ['orange', 'gray']
-CLASS_NAMES = ['orange']
+CLASS_NAMES = ['orange', 'gray']
+# CLASS_NAMES = ['gray']
 
 class MVTecDataset_nomask(Dataset):
-    def __init__(self, dataset_path='/hd/anomaly_detection/MVTec-AD', class_name='orange', is_train=True,
+    def __init__(self, data, class_name='orange', is_train=True,
                  resize=256, cropsize=224):
         # original cropsize=224
+        print('daejoo_one dataset called')
         assert class_name in CLASS_NAMES, 'class_name: {}, should be in {}'.format(class_name, CLASS_NAMES)
-        self.dataset_path = dataset_path
         self.class_name = class_name
         self.is_train = is_train
         self.resize = resize
@@ -35,7 +34,7 @@ class MVTecDataset_nomask(Dataset):
         # self.download()
 
         # load dataset
-        self.x, self.y = self.load_dataset_folder()
+        self.x = data
         # print(self.x)
         # print(self.y)
         # print(len(self.x))
@@ -63,13 +62,11 @@ class MVTecDataset_nomask(Dataset):
         #                                          std=[0.229, 0.224, 0.225])])
 
     def __getitem__(self, idx):
-        x, y = self.x[idx], self.y[idx]
+        print('x was called in __getitem__')
+        x = self.x[idx]
 
         x = Image.open(x).convert('RGB')
         x = self.transform_x(x)
-        # temp = np.array(x)
-        # print(x.shape)
-        # print(x[:, 100, 100:110])
 
         # if y == 0:
         #     mask = torch.zeros([1, self.cropsize, self.cropsize])
@@ -77,7 +74,7 @@ class MVTecDataset_nomask(Dataset):
         #     mask = Image.open(mask)
         #     mask = self.transform_mask(mask)
 
-        return x, y
+        return x
 
     def __len__(self):
         return len(self.x)
