@@ -1,0 +1,671 @@
+skip {'id': 57, 'image_id': 56, 'category_id': 15, 'segmentation': [], 'area': 54721.155, 'bbox': [180.85, 114, 295.95, 184.9], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 79, 'image_id': 77, 'category_id': 15, 'segmentation': [], 'area': 12163.974599999998, 'bbox': [280.92, 21.6, 168.78, 72.07], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 95, 'image_id': 92, 'category_id': 15, 'segmentation': [], 'area': 12845.914599999996, 'bbox': [240.63, 271.05, 117.82, 109.03], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 341, 'image_id': 337, 'category_id': 15, 'segmentation': [], 'area': 43587.308800000006, 'bbox': [71.28, 106.73, 184.88, 235.76], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 1634, 'image_id': 1617, 'category_id': 15, 'segmentation': [], 'area': 3776.023900000005, 'bbox': [250.88, 269.96, 133.57, 28.27], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 1635, 'image_id': 1617, 'category_id': 15, 'segmentation': [], 'area': 3993.5641999999975, 'bbox': [300.35, 229.68, 86.93, 45.94], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 1636, 'image_id': 1617, 'category_id': 15, 'segmentation': [], 'area': 12145.979400000004, 'bbox': [419.08, 183.04, 107.42, 113.07], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 1637, 'image_id': 1617, 'category_id': 15, 'segmentation': [], 'area': 2619.0055999999995, 'bbox': [386.57, 215.55, 32.51, 80.56], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12154, 'image_id': 12015, 'category_id': 15, 'segmentation': [], 'area': 198717.32300000003, 'bbox': [846.53, 240.37, 443.15, 448.42], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12174, 'image_id': 12033, 'category_id': 15, 'segmentation': [], 'area': 162340.17509999993, 'bbox': [436.77, 669.7, 724.83, 223.97], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12188, 'image_id': 12046, 'category_id': 15, 'segmentation': [], 'area': 59797.12200000002, 'bbox': [756.1, 345.7, 123.09, 485.8], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12195, 'image_id': 12051, 'category_id': 15, 'segmentation': [], 'area': 3785.499999999999, 'bbox': [601.3, 324.31, 50, 75.71], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12196, 'image_id': 12051, 'category_id': 15, 'segmentation': [], 'area': 9236.167199999998, 'bbox': [548.76, 236.38, 105.04, 87.93], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12382, 'image_id': 12223, 'category_id': 15, 'segmentation': [], 'area': 42606.20909999999, 'bbox': [674.76, 170.42, 199.29, 213.79], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12386, 'image_id': 12225, 'category_id': 15, 'segmentation': [], 'area': 25152.154, 'bbox': [386.42, 193.31, 109.4, 229.91], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12387, 'image_id': 12225, 'category_id': 15, 'segmentation': [], 'area': 12693.837599999995, 'bbox': [401.68, 424.07, 94.14, 134.84], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12391, 'image_id': 12228, 'category_id': 15, 'segmentation': [], 'area': 69327.70400000001, 'bbox': [678.15, 291.8, 261.2, 265.42], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12445, 'image_id': 12272, 'category_id': 15, 'segmentation': [], 'area': 16708.910699999997, 'bbox': [438.15, 369.79, 223.89, 74.63], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 12450, 'image_id': 12276, 'category_id': 15, 'segmentation': [], 'area': 2997.238500000003, 'bbox': [350.63, 176.95, 29.85, 100.41], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30030, 'image_id': 28365, 'category_id': 15, 'segmentation': [], 'area': 12744.9853, 'bbox': [121.55, 325.19, 366.13, 34.81], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30128, 'image_id': 28459, 'category_id': 15, 'segmentation': [], 'area': 17082.338, 'bbox': [500.21, 237.8, 139.79, 122.2], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30566, 'image_id': 28854, 'category_id': 15, 'segmentation': [], 'area': 18934.1572, 'bbox': [215.92, 177.04, 204.76, 92.47], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30594, 'image_id': 28879, 'category_id': 15, 'segmentation': [], 'area': 4549.411399999998, 'bbox': [211.3, 261.23, 68.33, 66.58], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30596, 'image_id': 28880, 'category_id': 15, 'segmentation': [], 'area': 3134.4911999999995, 'bbox': [144.6, 64.23, 59.91, 52.32], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30601, 'image_id': 28884, 'category_id': 15, 'segmentation': [], 'area': 8917.290000000003, 'bbox': [194.7, 111.1, 151.5, 58.86], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30607, 'image_id': 28889, 'category_id': 15, 'segmentation': [], 'area': 1425.7200000000014, 'bbox': [248.1, 244.07, 32.7, 43.6], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30678, 'image_id': 28957, 'category_id': 15, 'segmentation': [], 'area': 4874.088499999999, 'bbox': [178.08, 158.17, 67.09, 72.65], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30679, 'image_id': 28957, 'category_id': 15, 'segmentation': [], 'area': 6701.339999999998, 'bbox': [313.11, 130.8, 100.02, 67], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30794, 'image_id': 29065, 'category_id': 15, 'segmentation': [], 'area': 13866.877499999999, 'bbox': [413.04, 137.41, 72.75, 190.61], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30796, 'image_id': 29066, 'category_id': 15, 'segmentation': [], 'area': 20162.45, 'bbox': [259.32, 82.68, 96.25, 209.48], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30809, 'image_id': 29078, 'category_id': 15, 'segmentation': [], 'area': 25001.92, 'bbox': [122.5, 234.6, 339.7, 73.6], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30822, 'image_id': 29090, 'category_id': 15, 'segmentation': [], 'area': 34032.712999999996, 'bbox': [155.52, 108.15, 183.07, 185.9], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30833, 'image_id': 29100, 'category_id': 15, 'segmentation': [], 'area': 13388.649500000001, 'bbox': [474.81, 278.95, 165.19, 81.05], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 30915, 'image_id': 29178, 'category_id': 15, 'segmentation': [], 'area': 6523.207200000005, 'bbox': [207.42, 250.64, 104.74, 62.28], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31090, 'image_id': 29344, 'category_id': 15, 'segmentation': [], 'area': 5796.5480000000025, 'bbox': [178.17, 271.4, 87.76, 66.05], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31101, 'image_id': 29353, 'category_id': 15, 'segmentation': [], 'area': 9655.3264, 'bbox': [213.51, 155.57, 88.94, 108.56], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31106, 'image_id': 29356, 'category_id': 15, 'segmentation': [], 'area': 457.2017999999995, 'bbox': [414.6, 206.08, 28.38, 16.11], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31168, 'image_id': 29411, 'category_id': 15, 'segmentation': [], 'area': 6909.953699999997, 'bbox': [397.24, 182.28, 56.01, 123.37], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31225, 'image_id': 29467, 'category_id': 15, 'segmentation': [], 'area': 15765.119999999997, 'bbox': [91.36, 202.52, 214.2, 73.6], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31231, 'image_id': 29471, 'category_id': 15, 'segmentation': [], 'area': 9309.974699999997, 'bbox': [163.07, 190.25, 116.07, 80.21], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31237, 'image_id': 29476, 'category_id': 15, 'segmentation': [], 'area': 15690.716799999993, 'bbox': [551.84, 0, 88.16, 177.98], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31271, 'image_id': 29508, 'category_id': 15, 'segmentation': [], 'area': 14475.2964, 'bbox': [95.13, 253.47, 135.88, 106.53], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31274, 'image_id': 29510, 'category_id': 15, 'segmentation': [], 'area': 26098.902, 'bbox': [476.35, 66.63, 163.65, 159.48], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31282, 'image_id': 29517, 'category_id': 15, 'segmentation': [], 'area': 20445.638400000003, 'bbox': [270.99, 264.78, 214.72, 95.22], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31292, 'image_id': 29525, 'category_id': 15, 'segmentation': [], 'area': 50547.80959999999, 'bbox': [157.64, 155.68, 417.44, 121.09], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31295, 'image_id': 29528, 'category_id': 15, 'segmentation': [], 'area': 11973.561599999994, 'bbox': [45.12, 225.16, 469.92, 25.48], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31354, 'image_id': 29581, 'category_id': 15, 'segmentation': [], 'area': 2641.9888, 'bbox': [211.1, 192.14, 37.84, 69.82], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31459, 'image_id': 29679, 'category_id': 15, 'segmentation': [], 'area': 14396.325599999993, 'bbox': [523.44, 236.49, 116.56, 123.51], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31525, 'image_id': 29740, 'category_id': 15, 'segmentation': [], 'area': 26800.599000000002, 'bbox': [63.43, 275.74, 165.13, 162.3], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31541, 'image_id': 29756, 'category_id': 15, 'segmentation': [], 'area': 7619.7631999999985, 'bbox': [330.47, 421.06, 129.28, 58.94], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31559, 'image_id': 29773, 'category_id': 15, 'segmentation': [], 'area': 43300.95000000001, 'bbox': [37, 405.02, 577.5, 74.98], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31608, 'image_id': 29820, 'category_id': 15, 'segmentation': [], 'area': 74679.5315, 'bbox': [169.58, 20.4, 236.95, 315.17], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31654, 'image_id': 29863, 'category_id': 15, 'segmentation': [], 'area': 33785.9926, 'bbox': [0, 131.74, 204.59, 165.14], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31684, 'image_id': 29892, 'category_id': 15, 'segmentation': [], 'area': 15353.187899999994, 'bbox': [391.73, 433.23, 328.27, 46.77], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31694, 'image_id': 29901, 'category_id': 15, 'segmentation': [], 'area': 83983.20959999999, 'bbox': [296.41, 212.52, 328.47, 255.68], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31756, 'image_id': 29949, 'category_id': 15, 'segmentation': [], 'area': 12724.157899999998, 'bbox': [420.11, 360.67, 106.63, 119.33], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31835, 'image_id': 30024, 'category_id': 15, 'segmentation': [], 'area': 15373.528799999998, 'bbox': [60.12, 284.61, 203.92, 75.39], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31869, 'image_id': 30055, 'category_id': 15, 'segmentation': [], 'area': 12057.7002, 'bbox': [273.48, 306.31, 224.58, 53.69], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 31892, 'image_id': 30077, 'category_id': 15, 'segmentation': [], 'area': 13691.664000000002, 'bbox': [1.71, 211.95, 92.48, 148.05], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32057, 'image_id': 30228, 'category_id': 15, 'segmentation': [], 'area': 74600.58420000001, 'bbox': [93.53, 345.57, 554.94, 134.43], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32163, 'image_id': 30325, 'category_id': 15, 'segmentation': [], 'area': 28299.51279999999, 'bbox': [497.42, 159.28, 140.99, 200.72], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32270, 'image_id': 30422, 'category_id': 15, 'segmentation': [], 'area': 9089.467800000004, 'bbox': [317.47, 274.77, 133.14, 68.27], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32448, 'image_id': 30593, 'category_id': 15, 'segmentation': [], 'area': 36360.094800000006, 'bbox': [229.13, 261.96, 370.87, 98.04], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32473, 'image_id': 30618, 'category_id': 15, 'segmentation': [], 'area': 12996.938300000003, 'bbox': [236.85, 143.96, 83.63, 155.41], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32475, 'image_id': 30618, 'category_id': 15, 'segmentation': [], 'area': 5845.050900000002, 'bbox': [266.49, 84.67, 97.11, 60.19], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32533, 'image_id': 30674, 'category_id': 15, 'segmentation': [], 'area': 1670.1544000000026, 'bbox': [283.65, 170.91, 41.32, 40.42], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32537, 'image_id': 30678, 'category_id': 15, 'segmentation': [], 'area': 11779.198200000003, 'bbox': [389.56, 170.01, 80.94, 145.53], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32539, 'image_id': 30678, 'category_id': 15, 'segmentation': [], 'area': 15243.458999999997, 'bbox': [261.1, 240.98, 128.55, 118.58], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32553, 'image_id': 30690, 'category_id': 15, 'segmentation': [], 'area': 1853.6699999999998, 'bbox': [226.07, 279.61, 76.44, 24.25], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32555, 'image_id': 30691, 'category_id': 15, 'segmentation': [], 'area': 21327.7472, 'bbox': [235.14, 241.88, 180.56, 118.12], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32558, 'image_id': 30693, 'category_id': 15, 'segmentation': [], 'area': 9098.754000000003, 'bbox': [306.9, 263.4, 94.19, 96.6], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32559, 'image_id': 30693, 'category_id': 15, 'segmentation': [], 'area': 26010.70499999999, 'bbox': [397.48, 197.25, 159.82, 162.75], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32560, 'image_id': 30694, 'category_id': 15, 'segmentation': [], 'area': 15399.013499999997, 'bbox': [256.83, 259.93, 179.79, 85.65], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32568, 'image_id': 30700, 'category_id': 15, 'segmentation': [], 'area': 7653.7760000000035, 'bbox': [123.6, 219.28, 64.48, 118.7], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32569, 'image_id': 30700, 'category_id': 15, 'segmentation': [], 'area': 4705.6192, 'bbox': [180.03, 266.93, 50.56, 93.07], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32570, 'image_id': 30700, 'category_id': 15, 'segmentation': [], 'area': 7431.938800000001, 'bbox': [216.67, 301.37, 126.76, 58.63], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32572, 'image_id': 30701, 'category_id': 15, 'segmentation': [], 'area': 2645.338500000001, 'bbox': [152.01, 292.15, 39.69, 66.65], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32573, 'image_id': 30701, 'category_id': 15, 'segmentation': [], 'area': 5836.259499999999, 'bbox': [95.02, 243.3, 60.05, 97.19], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32588, 'image_id': 30715, 'category_id': 15, 'segmentation': [], 'area': 2586.7156, 'bbox': [152.49, 260.74, 26.06, 99.26], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32590, 'image_id': 30717, 'category_id': 15, 'segmentation': [], 'area': 10154.763000000003, 'bbox': [158.78, 137.67, 79.05, 128.46], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32628, 'image_id': 30753, 'category_id': 15, 'segmentation': [], 'area': 4477.6061, 'bbox': [533.38, 44.16, 101.51, 44.11], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32629, 'image_id': 30753, 'category_id': 15, 'segmentation': [], 'area': 7299.384600000001, 'bbox': [368.09, 170.82, 61.98, 117.77], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32630, 'image_id': 30753, 'category_id': 15, 'segmentation': [], 'area': 12181.360099999994, 'bbox': [430.07, 116.92, 104.23, 116.87], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32637, 'image_id': 30759, 'category_id': 15, 'segmentation': [], 'area': 12596.860900000001, 'bbox': [499.15, 23.59, 140.23, 89.83], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32638, 'image_id': 30759, 'category_id': 15, 'segmentation': [], 'area': 8916.353600000004, 'bbox': [443.46, 113.42, 103.39, 86.24], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32639, 'image_id': 30759, 'category_id': 15, 'segmentation': [], 'area': 9908.382500000002, 'bbox': [408.42, 199.66, 75.55, 131.15], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32721, 'image_id': 30837, 'category_id': 15, 'segmentation': [], 'area': 4029.9460000000004, 'bbox': [234.6, 309.55, 79.88, 50.45], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32736, 'image_id': 30851, 'category_id': 15, 'segmentation': [], 'area': 17131.229999999992, 'bbox': [133.44, 225.58, 170.46, 100.5], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32771, 'image_id': 30884, 'category_id': 15, 'segmentation': [], 'area': 22594.99379999999, 'bbox': [373.48, 32.57, 100.61, 224.58], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32772, 'image_id': 30884, 'category_id': 15, 'segmentation': [], 'area': 10664.660000000002, 'bbox': [272.87, 11.91, 100.61, 106], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32862, 'image_id': 30972, 'category_id': 15, 'segmentation': [], 'area': 12618.421200000003, 'bbox': [412.02, 107.13, 111.48, 113.19], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32864, 'image_id': 30972, 'category_id': 15, 'segmentation': [], 'area': 7171.628000000002, 'bbox': [375.19, 220.32, 99.8, 71.86], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32905, 'image_id': 31010, 'category_id': 15, 'segmentation': [], 'area': 17208.234800000002, 'bbox': [90.5, 128.96, 105.32, 163.39], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32966, 'image_id': 31067, 'category_id': 15, 'segmentation': [], 'area': 22640.287200000002, 'bbox': [581.5, 281.6, 154.32, 146.71], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32982, 'image_id': 31081, 'category_id': 15, 'segmentation': [], 'area': 10923.882400000002, 'bbox': [228.14, 0, 138.91, 78.64], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32998, 'image_id': 31096, 'category_id': 15, 'segmentation': [], 'area': 2094.165000000003, 'bbox': [405.2, 190.81, 24.21, 86.5], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 32999, 'image_id': 31096, 'category_id': 15, 'segmentation': [], 'area': 3095.2000000000003, 'bbox': [372.98, 220.5, 36.5, 84.8], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 33000, 'image_id': 31096, 'category_id': 15, 'segmentation': [], 'area': 1853.8127999999992, 'bbox': [425.13, 166.22, 20.82, 89.04], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 33001, 'image_id': 31096, 'category_id': 15, 'segmentation': [], 'area': 2883.7086999999983, 'bbox': [445.48, 151.38, 38.21, 75.47], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 33130, 'image_id': 31221, 'category_id': 15, 'segmentation': [], 'area': 7200.795000000003, 'bbox': [320.81, 190.25, 42.42, 169.75], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 33131, 'image_id': 31221, 'category_id': 15, 'segmentation': [], 'area': 5179.869500000001, 'bbox': [398.17, 114.76, 64.87, 79.85], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 33133, 'image_id': 31221, 'category_id': 15, 'segmentation': [], 'area': 2706.116, 'bbox': [362.61, 157.81, 35.56, 76.1], 'iscrowd': 0, 'attributes': {'occluded': False}}
+skip {'id': 33228, 'image_id': 31305, 'category_id': 15, 'segmentation': [], 'area': 1150.7360000000042, 'bbox': [714.62, 645.41, 21.2, 54.28], 'iscrowd': 0, 'attributes': {'occluded': False}}
+Image info log BK_038783.png(id: 1093)
+Image size info log 1280.00,720.00
+BBOX info log 98.43,164.38,915.71,555.64
+
+Image info log BK_039307.png(id: 576)
+Image size info log 1280.00,720.00
+BBOX info log 38.71,10.93,1241.07,710.68
+
+Image info log BK_028235.png(id: 12094)
+Image size info log 1280.00,720.00
+BBOX info log 74.18,7.61,1196.24,714.09
+
+Image info log BK_034268.png(id: 5711)
+Image size info log 1280.00,720.00
+BBOX info log 122.73,4.31,1059.61,717.34
+
+Image info log BK_039094.png(id: 847)
+Image size info log 1280.00,720.00
+BBOX info log 204.71,5.53,721.10,714.96
+
+Image info log BK_029400.png(id: 10577)
+Image size info log 1280.00,720.00
+BBOX info log 146.11,12.07,1123.14,710.78
+
+Image info log BK_008470.png(id: 31305)
+Image size info log 640.00,360.00
+BBOX info log 445.19,181.90,382.51,475.50
+
+Image info log BK_039945.png(id: 22)
+Image size info log 640.00,360.00
+BBOX info log 0.17,5.60,632.91,356.08
+
+Image info log BK_038764.png(id: 1112)
+Image size info log 1280.00,720.00
+BBOX info log 9.26,53.16,1122.50,667.57
+
+Image info log BK_027979.png(id: 11882)
+Image size info log 1280.00,720.00
+BBOX info log 517.92,6.19,715.31,717.24
+
+Image info log BK_028717.png(id: 11612)
+Image size info log 1280.00,720.00
+BBOX info log 567.07,5.93,712.93,714.68
+
+Image info log BK_008675.png(id: 31067)
+Image size info log 640.00,360.00
+BBOX info log 390.28,99.40,531.62,432.10
+
+Image info log BK_028849.png(id: 10864)
+Image size info log 1280.00,720.00
+BBOX info log 403.06,405.80,429.13,316.76
+
+Image info log BK_029378.png(id: 10599)
+Image size info log 1280.00,720.00
+BBOX info log 6.39,5.01,1229.71,715.66
+
+Image info log BK_039967.png(id: 362)
+Image size info log 1280.00,720.00
+BBOX info log 38.40,0.00,1224.26,724.48
+
+Image info log BK_038943.png(id: 1386)
+Image size info log 1280.00,720.00
+BBOX info log 174.66,34.88,1062.88,687.17
+
+Image info log BK_038746.png(id: 1131)
+Image size info log 1280.00,720.00
+BBOX info log 41.45,44.88,1014.69,679.67
+
+Image info log BK_038146.png(id: 1643)
+Image size info log 1280.00,720.00
+BBOX info log 81.99,2.55,1182.30,721.47
+
+Image info log BK_038411.png(id: 1918)
+Image size info log 1440.00,900.00
+BBOX info log 200.60,60.31,943.64,845.60
+
+Image info log BK_029146.png(id: 11121)
+Image size info log 1280.00,720.00
+BBOX info log 21.21,3.26,1258.79,719.59
+
+Image info log BK_039703.png(id: 626)
+Image size info log 1280.00,720.00
+BBOX info log 89.09,33.01,1147.59,690.77
+
+Image info log BK_027967.png(id: 11894)
+Image size info log 640.00,360.00
+BBOX info log 237.50,0.03,394.58,364.97
+
+Image info log BK_035082.png(id: 5247)
+Image size info log 1280.00,720.00
+BBOX info log 88.38,108.57,1175.32,615.02
+
+Image info log BK_029508.png(id: 10369)
+Image size info log 1280.00,720.00
+BBOX info log 132.33,0.78,1138.52,721.37
+
+Image info log BK_034211.png(id: 6524)
+Image size info log 1280.00,720.00
+BBOX info log 327.64,35.65,849.55,691.93
+
+Image info log BK_037894.png(id: 2435)
+Image size info log 1280.00,720.00
+BBOX info log 211.52,270.33,598.96,452.30
+
+Image info log BK_038394.png(id: 1933)
+Image size info log 640.00,360.00
+BBOX info log 57.37,3.67,380.69,357.17
+
+Image info log BK_028695.png(id: 10892)
+Image size info log 1280.00,720.00
+BBOX info log 486.56,8.09,785.82,712.39
+
+Image info log BK_039288.png(id: 654)
+Image size info log 1280.00,720.00
+BBOX info log 10.79,0.69,986.36,721.79
+
+Image info log BK_038132.png(id: 1657)
+Image size info log 1280.00,720.00
+BBOX info log 48.81,112.02,971.07,609.58
+
+Image info log BK_028173.png(id: 12156)
+Image size info log 1280.00,720.00
+BBOX info log 44.91,12.24,857.18,713.16
+
+Image info log BK_038721.png(id: 1156)
+Image size info log 1280.00,720.00
+BBOX info log 23.16,18.74,1232.53,703.65
+
+Image info log BK_034194.png(id: 6541)
+Image size info log 1280.00,720.00
+BBOX info log 181.92,3.83,910.34,716.20
+
+Image info log BK_038111.png(id: 1678)
+Image size info log 1280.00,720.00
+BBOX info log 149.34,50.01,690.86,670.79
+
+Image info log BK_028155.png(id: 12174)
+Image size info log 1280.00,720.00
+BBOX info log 783.68,28.14,496.32,697.90
+
+Image info log BK_039417.png(id: 912)
+Image size info log 1280.00,720.00
+BBOX info log 7.84,15.27,1156.39,708.93
+
+Image info log BK_038381.png(id: 1946)
+Image size info log 640.00,360.00
+BBOX info log 71.43,11.97,340.62,348.82
+
+Image info log BK_029034.png(id: 10655)
+Image size info log 1280.00,720.00
+BBOX info log 13.90,140.12,1032.21,582.40
+
+Image info log BK_039536.png(id: 406)
+Image size info log 1280.00,720.00
+BBOX info log 0.50,11.89,1279.50,711.09
+
+Image info log BK_028141.png(id: 12188)
+Image size info log 1280.00,720.00
+BBOX info log 796.63,80.63,483.37,646.86
+
+Image info log BK_029027.png(id: 10662)
+Image size info log 1280.00,720.00
+BBOX info log 207.41,1.38,899.56,721.34
+
+Image info log BK_028378.png(id: 11430)
+Image size info log 1280.00,720.00
+BBOX info log 505.53,270.06,722.82,452.26
+
+Image info log BK_039281.png(id: 661)
+Image size info log 1280.00,720.00
+BBOX info log 5.56,10.09,1254.55,711.58
+
+Image info log BK_027933.png(id: 11928)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,14.14,1280.00,706.27
+
+Image info log BK_034174.png(id: 6561)
+Image size info log 1280.00,720.00
+BBOX info log 564.96,0.00,446.04,720.99
+
+Image info log BK_029040.png(id: 10649)
+Image size info log 1280.00,720.00
+BBOX info log 31.54,6.00,1063.77,716.61
+
+Image info log BK_038368.png(id: 1959)
+Image size info log 1280.00,720.00
+BBOX info log 16.95,16.47,935.08,705.55
+
+Image info log BK_039277.png(id: 665)
+Image size info log 1280.00,720.00
+BBOX info log 0.33,4.92,1244.80,718.99
+
+Image info log BK_028687.png(id: 10900)
+Image size info log 1280.00,720.00
+BBOX info log 369.20,5.60,705.71,714.44
+
+Image info log BK_029474.png(id: 10403)
+Image size info log 1280.00,720.00
+BBOX info log 68.40,245.97,981.99,476.44
+
+Image info log BK_027920.png(id: 11941)
+Image size info log 1280.00,720.00
+BBOX info log 176.68,43.15,1063.61,680.58
+
+Image info log BK_039081.png(id: 919)
+Image size info log 1280.00,720.00
+BBOX info log 356.74,16.06,798.85,708.16
+
+Image info log BK_029479.png(id: 10398)
+Image size info log 1280.00,720.00
+BBOX info log 106.28,84.90,955.68,635.50
+
+Image info log BK_039876.png(id: 91)
+Image size info log 1280.00,720.00
+BBOX info log 122.26,58.88,1150.08,662.85
+
+Image info log BK_039276.png(id: 666)
+Image size info log 1280.00,720.00
+BBOX info log 46.99,117.20,989.10,603.20
+
+Image info log BK_034159.png(id: 6576)
+Image size info log 1280.00,720.00
+BBOX info log 503.56,0.00,447.77,722.40
+
+Image info log BK_039895.png(id: 72)
+Image size info log 640.00,360.00
+BBOX info log 172.89,133.16,321.39,227.24
+
+Image info log BK_037844.png(id: 2485)
+Image size info log 1280.00,720.00
+BBOX info log 275.47,3.80,820.62,719.39
+
+Image info log BK_038081.png(id: 1713)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,82.04,1229.96,642.87
+
+Image info log BK_038360.png(id: 1967)
+Image size info log 1440.00,900.00
+BBOX info log 137.32,5.40,1285.94,901.16
+
+Image info log BK_038349.png(id: 1978)
+Image size info log 1280.00,720.00
+BBOX info log 339.62,0.19,795.14,724.60
+
+Image info log BK_039042.png(id: 958)
+Image size info log 1280.00,720.00
+BBOX info log 245.37,37.85,991.81,684.97
+
+Image info log BK_029006.png(id: 10683)
+Image size info log 1280.00,720.00
+BBOX info log 259.71,5.20,606.69,714.95
+
+Image info log BK_027879.png(id: 11970)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,26.63,1269.28,695.02
+
+Image info log BK_028992.png(id: 10697)
+Image size info log 1280.00,720.00
+BBOX info log 164.13,86.15,724.14,637.40
+
+Image info log BK_034755.png(id: 5060)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,0.00,1273.95,725.00
+
+Image info log BK_039038.png(id: 962)
+Image size info log 1280.00,720.00
+BBOX info log 244.81,12.05,824.41,708.52
+
+Image info log BK_029001.png(id: 10688)
+Image size info log 1280.00,720.00
+BBOX info log 127.63,5.25,819.50,719.09
+
+Image info log BK_039022.png(id: 978)
+Image size info log 1280.00,720.00
+BBOX info log 277.53,150.72,986.94,572.08
+
+Image info log BK_038325.png(id: 2002)
+Image size info log 640.00,360.00
+BBOX info log 57.65,0.90,511.82,360.31
+
+Image info log BK_029052.png(id: 11215)
+Image size info log 1280.00,720.00
+BBOX info log 367.37,21.63,733.34,700.98
+
+Image info log BK_035558.png(id: 4296)
+Image size info log 1280.00,720.00
+BBOX info log 95.67,4.83,1020.94,718.29
+
+Image info log BK_028993.png(id: 10696)
+Image size info log 1280.00,720.00
+BBOX info log 338.78,0.00,808.94,720.46
+
+Image info log BK_029054.png(id: 11213)
+Image size info log 1280.00,720.00
+BBOX info log 335.56,1.49,939.16,720.82
+
+Image info log BK_028272.png(id: 11724)
+Image size info log 1280.00,720.00
+BBOX info log 25.83,356.13,877.55,367.05
+
+Image info log BK_027869.png(id: 11980)
+Image size info log 1280.00,720.00
+BBOX info log 237.89,0.00,735.26,722.83
+
+Image info log BK_035547.png(id: 4307)
+Image size info log 1280.00,720.00
+BBOX info log 713.89,3.02,278.85,723.42
+
+Image info log BK_028267.png(id: 11729)
+Image size info log 1280.00,720.00
+BBOX info log 10.73,5.73,1016.33,715.29
+
+Image info log BK_039012.png(id: 988)
+Image size info log 1280.00,720.00
+BBOX info log 158.33,97.14,882.17,623.88
+
+Image info log BK_029046.png(id: 11221)
+Image size info log 1280.00,720.00
+BBOX info log 466.58,81.79,752.57,642.93
+
+Image info log BK_039011.png(id: 989)
+Image size info log 1280.00,720.00
+BBOX info log 117.37,139.74,972.08,582.88
+
+Image info log BK_034677.png(id: 5083)
+Image size info log 1280.00,720.00
+BBOX info log 101.17,3.36,1010.84,720.88
+
+Image info log BK_028617.png(id: 10970)
+Image size info log 1280.00,720.00
+BBOX info log 192.45,185.37,863.02,538.82
+
+Image info log BK_029041.png(id: 11226)
+Image size info log 1280.00,720.00
+BBOX info log 289.26,118.21,714.75,606.76
+
+Image info log BK_039404.png(id: 479)
+Image size info log 1280.00,720.00
+BBOX info log 39.77,138.64,1034.01,582.18
+
+Image info log BK_035392.png(id: 4592)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,89.93,1272.14,630.21
+
+Image info log BK_029044.png(id: 11223)
+Image size info log 1280.00,720.00
+BBOX info log 38.17,6.35,1194.69,715.96
+
+Image info log BK_039006.png(id: 994)
+Image size info log 1280.00,720.00
+BBOX info log 4.39,242.82,1095.29,478.91
+
+Image info log BK_035161.png(id: 4834)
+Image size info log 1280.00,720.00
+BBOX info log 160.38,281.75,461.76,438.57
+
+Image info log BK_039007.png(id: 993)
+Image size info log 1280.00,720.00
+BBOX info log 256.90,41.31,834.72,681.87
+
+Image info log BK_028965.png(id: 10724)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,398.07,1280.00,325.58
+
+Image info log BK_028565.png(id: 11248)
+Image size info log 1280.00,720.00
+BBOX info log 427.60,18.13,819.64,702.72
+
+Image info log BK_039656.png(id: 252)
+Image size info log 1280.00,720.00
+BBOX info log 32.99,52.16,1065.06,668.71
+
+Image info log BK_028960.png(id: 10729)
+Image size info log 1280.00,720.00
+BBOX info log 148.35,83.77,1003.63,636.80
+
+Image info log BK_034652.png(id: 5108)
+Image size info log 1280.00,720.00
+BBOX info log 28.77,85.49,1240.57,636.06
+
+Image info log BK_010356.png(id: 29406)
+Image size info log 640.00,360.00
+BBOX info log 218.90,114.80,638.40,403.80
+
+Image info log BK_039923.png(id: 44)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,43.15,1177.32,677.89
+
+Image info log BK_038605.png(id: 1267)
+Image size info log 1280.00,720.00
+BBOX info log 216.92,16.07,1037.29,707.23
+
+Image info log BK_029322.png(id: 11007)
+Image size info log 1280.00,720.00
+BBOX info log 227.27,0.69,976.49,721.64
+
+Image info log BK_034706.png(id: 5623)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,7.07,1205.92,714.86
+
+Image info log BK_038598.png(id: 1274)
+Image size info log 1280.00,720.00
+BBOX info log 229.12,23.14,910.24,701.57
+
+Image info log BK_029326.png(id: 11003)
+Image size info log 1280.00,720.00
+BBOX info log 51.30,4.50,1060.21,716.34
+
+Image info log BK_034571.png(id: 5375)
+Image size info log 1280.00,720.00
+BBOX info log 267.93,1.56,867.78,720.00
+
+Image info log BK_034089.png(id: 6147)
+Image size info log 720.00,480.00
+BBOX info log 139.04,0.18,280.97,481.07
+
+Image info log BK_038268.png(id: 2059)
+Image size info log 640.00,360.00
+BBOX info log 71.06,16.15,493.53,344.03
+
+Image info log BK_038272.png(id: 2055)
+Image size info log 640.00,360.00
+BBOX info log 140.55,4.76,472.12,358.15
+
+Image info log BK_034562.png(id: 5384)
+Image size info log 1280.00,720.00
+BBOX info log 96.63,336.17,983.39,384.46
+
+Image info log BK_038590.png(id: 1282)
+Image size info log 1280.00,720.00
+BBOX info log 208.34,22.58,824.95,698.40
+
+Image info log BK_039631.png(id: 277)
+Image size info log 1280.00,720.00
+BBOX info log 281.94,0.00,921.94,723.94
+
+Image info log BK_028791.png(id: 11538)
+Image size info log 1280.00,720.00
+BBOX info log 3.37,78.63,1269.69,642.12
+
+Image info log BK_028815.png(id: 11514)
+Image size info log 1280.00,720.00
+BBOX info log 5.91,3.53,895.93,716.78
+
+Image info log BK_028783.png(id: 11546)
+Image size info log 1280.00,720.00
+BBOX info log 0.00,5.10,1234.14,716.32
+
+Image info log BK_038836.png(id: 1040)
+Image size info log 1280.00,720.00
+BBOX info log 321.62,5.94,912.58,718.67
+
+Image info log BK_038438.png(id: 1558)
+Image size info log 640.00,360.00
+BBOX info log 0.00,32.47,173.47,330.35
+
+Image info log BK_028782.png(id: 11547)
+Image size info log 1280.00,720.00
+BBOX info log 21.82,1.17,1253.37,721.81
+
+Image info log BK_038258.png(id: 2069)
+Image size info log 640.00,360.00
+BBOX info log 143.65,41.50,433.45,319.54
+
+Image info log BK_034324.png(id: 5655)
+Image size info log 1280.00,720.00
+BBOX info log 234.03,4.77,957.63,715.27
+
+Image info log BK_034309.png(id: 5670)
+Image size info log 1280.00,720.00
+BBOX info log 227.78,55.47,741.16,664.60
+
+Image info log BK_039139.png(id: 802)
+Image size info log 1280.00,720.00
+BBOX info log 312.34,8.67,545.40,711.35
+
+Image info log BK_029676.png(id: 10016)
+Image size info log 1280.00,720.00
+BBOX info log 197.37,0.00,1033.58,722.62
+
+Image info log BK_037984.png(id: 2345)
+Image size info log 1280.00,720.00
+BBOX info log 27.43,4.60,947.62,716.98
+
+Image info log BK_038821.png(id: 1055)
+Image size info log 1280.00,720.00
+BBOX info log 138.13,12.79,825.76,712.21
+
+Image info log BK_029209.png(id: 11058)
+Image size info log 1280.00,720.00
+BBOX info log 29.81,6.92,849.70,716.31
+
+Image info log BK_008493.png(id: 31282)
+Image size info log 640.00,360.00
+BBOX info log 377.50,212.04,367.70,304.16
+
+Image info log BK_034601.png(id: 5159)
+Image size info log 1280.00,720.00
+BBOX info log 6.14,1.24,973.88,720.62
+
+Image info log BK_034598.png(id: 5162)
+Image size info log 1280.00,720.00
+BBOX info log 431.69,28.85,755.95,693.00
+
+Image info log BK_039607.png(id: 301)
+Image size info log 1280.00,720.00
+BBOX info log 19.13,52.64,1250.93,668.62
+
+Image info log BK_034300.png(id: 5679)
+Image size info log 1280.00,720.00
+BBOX info log 213.04,16.96,995.09,706.20
+
+Image info log BK_029790.png(id: 10539)
+Image size info log 640.00,360.00
+BBOX info log 33.53,0.15,543.85,361.61
+
+Image info log BK_028505.png(id: 11308)
+Image size info log 1280.00,720.00
+BBOX info log 262.57,282.32,800.63,438.83
+
+Image info log BK_034887.png(id: 4922)
+Image size info log 640.00,360.00
+BBOX info log 2.31,0.00,436.39,361.14
+
+Image info log BK_028246.png(id: 12083)
+Image size info log 1280.00,720.00
+BBOX info log 244.93,2.87,1028.34,718.86
+
+Image info log BK_008723.png(id: 31019)
+Image size info log 640.00,360.00
+BBOX info log 240.28,111.10,582.92,526.50
+
+Image info log BK_039120.png(id: 821)
+Image size info log 1280.00,720.00
+BBOX info log 384.52,4.88,512.03,718.85
+
+Image info log BK_039127.png(id: 814)
+Image size info log 1280.00,720.00
+BBOX info log 35.69,162.37,1047.21,558.17
+
+Image info log BK_034290.png(id: 5689)
+Image size info log 1280.00,720.00
+BBOX info log 137.79,0.00,951.51,723.94
+
+Image info log BK_039320.png(id: 563)
+Image size info log 1280.00,720.00
+BBOX info log 123.67,95.29,1022.26,628.18
+
+Image info log BK_038225.png(id: 2102)
+Image size info log 640.00,360.00
+BBOX info log 180.13,104.57,342.22,259.53
+
+Image info log BK_034892.png(id: 4917)
+Image size info log 1280.00,720.00
+BBOX info log 5.33,77.53,1047.78,647.95
+
+Image info log BK_034281.png(id: 5698)
+Image size info log 1280.00,720.00
+BBOX info log 130.53,9.58,1143.68,712.14
+
+Image info log BK_028744.png(id: 11585)
+Image size info log 1280.00,720.00
+BBOX info log 611.25,434.82,349.72,288.70
+
+Image info log BK_029416.png(id: 10561)
+Image size info log 1280.00,720.00
+BBOX info log 167.62,0.92,792.87,723.10
+

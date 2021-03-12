@@ -18,7 +18,7 @@ import re
 from absl import logging
 import numpy as np
 import tensorflow.compat.v1 as tf
-import coco_metric
+import coco_metric_renew as coco_metric
 import efficientdet_arch
 import hparams_config
 import nms_np
@@ -444,6 +444,7 @@ def _model_fn(features, labels, mode, params, model, variable_filter_fn=None):
                   params['num_classes'],
                   nms_configs['max_output_size'],
               ], tf.float32)
+          # print(detections)
           detections_bs.append(detections)
         detections_bs = postprocess.transform_detections(
             tf.stack(detections_bs))
@@ -464,6 +465,8 @@ def _model_fn(features, labels, mode, params, model, variable_filter_fn=None):
             nms_scores,
             nms_classes,
         ]
+        # print('+++++'*100)
+        # print(detections_bs)
         detections_bs = tf.stack(detections_bs, axis=-1, name='detnections')
 
       if params.get('testdev_dir', None):
@@ -504,6 +507,7 @@ def _model_fn(features, labels, mode, params, model, variable_filter_fn=None):
     boxes, scores, classes = postprocess.pre_nms(params, cls_outputs,
                                                  box_outputs)
     metric_fn_inputs = {
+        'filename': labels['filename'],
         'cls_loss_repeat': cls_loss_repeat,
         'box_loss_repeat': box_loss_repeat,
         'image_ids': labels['source_ids'],

@@ -1,0 +1,8 @@
+num_classes: 15
+label_map: {1: CL, 2: CC, 3: SD, 4: BK, 5: LP, 6: JF, 7: JD, 8: DS, 9: ETC, 10: PJ, 11: IN, 12: CAR, 13: INV, 14: HL}
+var_freeze_expr: '(efficientnet-b0/stem/|efficientnet-b0/blocks_0/|efficientnet-b0/blocks_1/)'
+learning_rate: 0.08
+lr_warmup_init: 0.008
+jitter_min: 0.5
+jitter_max: 1.5
+

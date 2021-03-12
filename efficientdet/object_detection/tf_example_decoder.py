@@ -34,6 +34,7 @@ class TfExampleDecoder(object):
     self._include_mask = include_mask
     self._regenerate_source_id = regenerate_source_id
     self._keys_to_features = {
+        'image/filename': tf.FixedLenFeature((), tf.string, ''),
         'image/encoded': tf.FixedLenFeature((), tf.string),
         'image/source_id': tf.FixedLenFeature((), tf.string, ''),
         'image/height': tf.FixedLenFeature((), tf.int64, -1),
@@ -51,6 +52,11 @@ class TfExampleDecoder(object):
           'image/object/mask':
               tf.VarLenFeature(tf.string),
       })
+
+  def _decode_filename(self, parsed_tensors):
+    """Decodes the filename."""
+    filename = parsed_tensors['image/filename']
+    return filename
 
   def _decode_image(self, parsed_tensors):
     """Decodes the image and set its static shape."""
@@ -101,6 +107,7 @@ class TfExampleDecoder(object):
 
     Returns:
       decoded_tensors: a dictionary of tensors with the following fields:
+        - filename: a file name
         - image: a uint8 tensor of shape [None, None, 3].
         - source_id: a string scalar tensor.
         - height: an integer scalar tensor.
@@ -123,7 +130,8 @@ class TfExampleDecoder(object):
         else:
           parsed_tensors[k] = tf.sparse_tensor_to_dense(
               parsed_tensors[k], default_value=0)
-
+              
+    filename = self._decode_filename(parsed_tensors)
     image = self._decode_image(parsed_tensors)
     boxes = self._decode_boxes(parsed_tensors)
     areas = self._decode_areas(parsed_tensors)
@@ -154,6 +162,7 @@ class TfExampleDecoder(object):
       masks = self._decode_masks(parsed_tensors)
 
     decoded_tensors = {
+        'filename': filename,
         'image': image,
         'source_id': source_id,
         'height': parsed_tensors['image/height'],

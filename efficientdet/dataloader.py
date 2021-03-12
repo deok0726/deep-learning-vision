@@ -295,6 +295,7 @@ class InputReader:
     """
     with tf.name_scope('parser'):
       data = example_decoder.decode(value)
+      filename = data['filename']
       source_id = data['source_id']
       image = data['image']
       boxes = data['groundtruth_boxes']
@@ -362,12 +363,12 @@ class InputReader:
         box_targets = tf.nest.map_structure(
             lambda box_target: tf.cast(box_target, dtype=dtype), box_targets)
       return (image, cls_targets, box_targets, num_positives, source_id,
-              image_scale, boxes, is_crowds, areas, classes, image_masks)
+              image_scale, boxes, is_crowds, areas, classes, image_masks, filename)
 
   @tf.autograph.experimental.do_not_convert
   def process_example(self, params, batch_size, images, cls_targets,
                       box_targets, num_positives, source_ids, image_scales,
-                      boxes, is_crowds, areas, classes, image_masks):
+                      boxes, is_crowds, areas, classes, image_masks, filename):
     """Processes one batch of data."""
     labels = {}
     # Count num_positives in a batch.
@@ -390,6 +391,7 @@ class InputReader:
             labels['box_targets_%d' % level], [0, 3, 1, 2])
     # Concatenate groundtruth annotations to a tensor.
     groundtruth_data = tf.concat([boxes, is_crowds, areas, classes], axis=2)
+    labels['filename'] = filename
     labels['source_ids'] = source_ids
     labels['groundtruth_data'] = groundtruth_data
     labels['image_scales'] = image_scales
@@ -417,6 +419,7 @@ class InputReader:
         regenerate_source_id=params['regenerate_source_id']
     )
 
+
     batch_size = batch_size or params['batch_size']
     seed = params['tf_random_seed'] if self._debug else None
     dataset = tf.data.Dataset.list_files(
@@ -435,6 +438,19 @@ class InputReader:
     dataset = dataset.interleave(
         _prefetch_dataset, num_parallel_calls=tf.data.AUTOTUNE)
     dataset = dataset.with_options(self.dataset_options)
+    
+    # print('='*100)
+
+    # # raw_dataset = tf.data.TFRecordDataset(filenames)
+    # for raw_record in dataset:
+    #   num_data += 1
+    #   example = tf.train.Example()
+    #   example.ParseFromString(raw_record.numpy())
+    #   img_filename = example.features.feature['image/filename'].bytes_list.value
+    #   cls_name = example.features.feature['image/object/class/text'].bytes_list.value
+    #   print(img_filename, cls_name)
+    # print('='*100)
+    
     if self._is_training:
       dataset = dataset.shuffle(64, seed=seed)
 
@@ -461,4 +477,13 @@ class InputReader:
       # first batch. This reduces variance in performance and is useful in
       # testing.
       dataset = dataset.take(1).cache().repeat()
+    
+    from pprint import pprint
+
+    print('dataset printing' + '='*90)
+    # iterate = dataset.__iter__()
+    # for i in iterate:
+    #   print(i)
+    pprint(dataset)
+    print()
     return dataset
