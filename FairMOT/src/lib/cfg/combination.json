@@ -1,0 +1,15 @@
+{
+    "root":"/hd/MOT",
+    "train":
+    {
+        "combination":"./data/detrac.train"
+    },
+    "test_emb":
+    {
+        "combination":"./data/detrac.train"
+    },
+    "test":
+    {
+        "combination":"./data/detrac.train"
+    }
+}

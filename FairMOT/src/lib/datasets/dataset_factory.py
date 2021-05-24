@@ -7,6 +7,7 @@ from .dataset.jde import JointDataset
 
 def get_dataset(dataset, task):
   if task == 'mot':
+    print(dataset)
     return JointDataset
   else:
     return None

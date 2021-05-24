@@ -6,6 +6,8 @@ import _init_paths
 
 import logging
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+
 import os.path as osp
 from opts import opts
 from tracking_utils.utils import mkdir_if_missing
@@ -20,7 +22,8 @@ logger.setLevel(logging.INFO)
 def demo(opt):
     result_root = opt.output_root if opt.output_root != '' else '.'
     # use opt argument later
-    opt.input_video = '../videos/NY.mp4'
+    opt.input_video = '../videos/Traffic.mp4'
+    # opt.input_video = '../output.mp4'
     video_route = osp.splitext(osp.abspath(opt.input_video))[0]
     video_name = osp.basename(video_route)
     opt.output_root = '../demos' + '_' + video_name
@@ -28,6 +31,7 @@ def demo(opt):
 
     mkdir_if_missing(result_root)
 
+    print(opt)
     logger.info('Starting tracking...')
     dataloader = datasets.LoadVideo(opt.input_video, opt.img_size)
     result_filename = os.path.join(result_root, 'results.txt')
@@ -48,6 +52,5 @@ def demo(opt):
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '4'
     opt = opts().init()
     demo(opt)

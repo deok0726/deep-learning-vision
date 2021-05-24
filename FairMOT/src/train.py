@@ -5,6 +5,7 @@ from __future__ import print_function
 import _init_paths
 
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '3, 4'
 
 import json
 import torch
@@ -16,7 +17,9 @@ from models.data_parallel import DataParallel
 from logger import Logger
 from datasets.dataset_factory import get_dataset
 from trains.train_factory import train_factory
-
+import sys
+# print(torch.cuda.current_device())
+# print(torch.cuda.device_count())
 
 def main(opt):
     torch.manual_seed(opt.seed)
@@ -36,7 +39,7 @@ def main(opt):
 
     logger = Logger(opt)
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
+    # os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
     opt.device = torch.device('cuda' if opt.gpus[0] >= 0 else 'cpu')
 
     print('Creating model...')
@@ -58,6 +61,7 @@ def main(opt):
     print('Starting training...')
     Trainer = train_factory[opt.task]
     trainer = Trainer(opt, model, optimizer)
+    # print(opt.gpus)
     trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
 
     if opt.load_model != '':
@@ -93,6 +97,6 @@ def main(opt):
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0, 1'
+    # print(sys.path)
     opt = opts().parse()
     main(opt)

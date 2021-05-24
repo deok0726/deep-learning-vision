@@ -1,0 +1,15 @@
+{
+    "root":"/hd/MOT",
+    "train":
+    {
+        "mot16_car":"./data/mot16_car.train"
+    },
+    "test_emb":
+    {
+        "mot16_car":"./data/mot16_car.train"
+    },
+    "test":
+    {
+        "mot16_car":"./data/mot16_car.train"
+    }
+}

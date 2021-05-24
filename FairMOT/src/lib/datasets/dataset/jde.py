@@ -376,27 +376,59 @@ class JointDataset(LoadImagesAndLabels):  # for training
         for ds, path in paths.items():
             with open(path, 'r') as file:
                 self.img_files[ds] = file.readlines()
+                # print(self.img_files[ds])
+                # print()
                 self.img_files[ds] = [osp.join(root, x.strip()) for x in self.img_files[ds]]
+                # print(self.img_files[ds])
+                # print()
                 self.img_files[ds] = list(filter(lambda x: len(x) > 0, self.img_files[ds]))
+                # print(self.img_files[ds])
+                # print()
 
-            self.label_files[ds] = [
+            if ds == 'kitti':
+                self.label_files[ds] = [
+                    x.replace('data_tracking_image_2', 'labels_with_ids').replace('.png', '.txt').replace('.jpg', '.txt')
+                    for x in self.img_files[ds]]
+            elif ds == 'mot16_car':
+                self.label_files[ds] = [
+                    x.replace('train', 'labels_with_ids_car/train').replace('.jpg', '.txt').replace('.jpg', '.txt')
+                    for x in self.img_files[ds]]
+            elif ds == 'detrac':
+                self.label_files[ds] = [
+                    x.replace('traindata', 'labels_with_ids').replace('.jpg', '.txt').replace('.jpg', '.txt')
+                    for x in self.img_files[ds]]
+            else:
+                self.label_files[ds] = [
                 x.replace('images', 'labels_with_ids').replace('.png', '.txt').replace('.jpg', '.txt')
                 for x in self.img_files[ds]]
+
+            # print(self.img_files['mot17'][0])
+            # print(self.label_files['mot17'][0])
+            # print(self.img_files['kitti'][0])
+            # print(self.label_files['detrac'])
+            # sys.exit()
 
         for ds, label_paths in self.label_files.items():
             max_index = -1
             for lp in label_paths:
+                # print(lp)
                 lb = np.loadtxt(lp)
+                # print(lb)
+                # print(lb.shape)
+                # print(len(lb.shape))
                 if len(lb) < 1:
                     continue
                 if len(lb.shape) < 2:
                     img_max = lb[1]
                 else:
-                    img_max = np.max(lb[:, 1])
+                    # print(lb[:,1])
+                    # print(np.max(lb[:, 1]))
+                    img_max = np.max(lb[:, 1]) # the biggest id number in the frame
                 if img_max > max_index:
                     max_index = img_max
             self.tid_num[ds] = max_index + 1
-
+        # print(self.tid_num)
+        # print()
         last_index = 0
         for i, (k, v) in enumerate(self.tid_num.items()):
             self.tid_start_index[k] = last_index
@@ -412,13 +444,13 @@ class JointDataset(LoadImagesAndLabels):  # for training
         self.augment = augment
         self.transforms = transforms
 
-        print('=' * 80)
-        print('dataset summary')
-        print(self.tid_num)
-        print('total # identities:', self.nID)
-        print('start index')
-        print(self.tid_start_index)
-        print('=' * 80)
+        # print('=' * 80)
+        # print('dataset summary')
+        # print(self.tid_num)
+        # print('total # identities:', self.nID)
+        # print('start index')
+        # print(self.tid_start_index)
+        # print('=' * 80)
 
     def __getitem__(self, files_index):
 

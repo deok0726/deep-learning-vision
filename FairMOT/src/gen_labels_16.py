@@ -1,6 +1,7 @@
 import os.path as osp
 import os
 import numpy as np
+import sys
 
 
 def mkdirs(d):
@@ -8,10 +9,13 @@ def mkdirs(d):
         os.makedirs(d)
 
 
-seq_root = '/data/yfzhang/MOT/JDE/MOT16/images/train'
-label_root = '/data/yfzhang/MOT/JDE/MOT16/labels_with_ids/train'
+seq_root = '/hd/MOT/MOT16/train'
+label_root = '/hd/MOT/MOT16/labels_with_ids/train'
+# seq_root = '/hd/MOT/MOT17/train'
+# label_root = '/hd/MOT/MOT17/labels_with_ids/train'
 mkdirs(label_root)
 seqs = [s for s in os.listdir(seq_root)]
+seqs.sort()
 
 tid_curr = 0
 tid_last = -1
@@ -25,9 +29,9 @@ for seq in seqs:
 
     seq_label_root = osp.join(label_root, seq, 'img1')
     mkdirs(seq_label_root)
-
+    # print(seq)
     for fid, tid, x, y, w, h, mark, label, _ in gt:
-        if mark == 0 or not label == 1:
+        if not label == 3 and not label == 5:
             continue
         fid = int(fid)
         tid = int(tid)
@@ -41,3 +45,4 @@ for seq in seqs:
             tid_curr, x / seq_width, y / seq_height, w / seq_width, h / seq_height)
         with open(label_fpath, 'a') as f:
             f.write(label_str)
+    

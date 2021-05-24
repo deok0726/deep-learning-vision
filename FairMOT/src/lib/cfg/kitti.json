@@ -1,0 +1,15 @@
+{
+    "root":"/hd/MOT",
+    "train":
+    {
+        "kitti":"./data/kitti_renew.train"
+    },
+    "test_emb":
+    {
+        "kitti":"./data/kitti_renew.train"
+    },
+    "test":
+    {
+        "kitti":"./data/kitti_renew.train"
+    }
+}
