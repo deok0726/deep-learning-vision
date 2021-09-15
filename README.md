@@ -1,3 +1,3 @@
-# Tmax
+# Deep Learning Vision
 
-This is tmax ai researcher deokhwa_lee's private work code repo
+This is collection of modules that I used for research in deep learning vision
